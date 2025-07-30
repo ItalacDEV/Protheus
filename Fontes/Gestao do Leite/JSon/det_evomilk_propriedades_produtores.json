@@ -1,0 +1,31 @@
+      '{
+        "codigo_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+        "titular_ponto_coleta": true,
+        "inscricao_estadual": "' + Eval({|| EncodeUTF8(AllTrim(_cInscrEst))}) + '",
+        "nome_propriedade_rural": "'+ Eval({|| EncodeUTF8(AllTrim(_cNomeProp))}) + '",
+        "nirf": " ' + Eval({|| EncodeUTF8(AllTrim(_cNIRF))}) + '",
+        "nrp": "",
+        "latitude": "' + Eval({|| EncodeUTF8(AllTrim(_cLatitude))}) + '",
+        "longitude": "' + Eval({|| EncodeUTF8(AllTrim(_cLongitud))}) + '",
+        "codigo_ponto_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+        "data_situacao": "' + Eval({|| EncodeUTF8(AllTrim(_cDataSit))}) + '",
+        "ativo": ' + Eval({|| EncodeUTF8(AllTrim(_cSitProp))}) +',
+        "data_hora": "' + Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) + '",
+        "ponto_coleta": [
+          {
+            "codigo_ponto_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+            "nome": "' + Eval({|| EncodeUTF8(AllTrim(_cRazaoSoc))}) + '",
+            "principal": true,
+            "codigo_rota": "' + Eval({|| EncodeUTF8(AllTrim(_cCodLinha))}) + '",
+            "capacidade": ' + Eval({|| EncodeUTF8(AllTrim(_cCapacTnq))}) + ',
+            "comunitario": false,
+            "data_hora": "' + Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) + '",
+            "rota": {
+              "codigo_rota": "' + Eval({|| EncodeUTF8(AllTrim(_cCodLinha))}) + '",
+              "nome": "' + Eval({|| EncodeUTF8(AllTrim(_cDescLin))}) +'",
+              "ativo": ' + Eval({|| EncodeUTF8(AllTrim(_cSitTnq))}) + ',
+              "data_hora": "' + Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) + '"
+            }
+          }
+        ]
+      }'

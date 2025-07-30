@@ -1,0 +1,24 @@
+'[{
+        "produtor": {            
+            "nome_razao_social": "' + Eval({|| EncodeUTF8(AllTrim(_cRazaoSoc))}) + '",
+            "cpf_cnpj": "' + Eval({|| EncodeUTF8(AllTrim(_cCpf_Cnpj))}) + '",
+            "inscricao_estadual": "' + Eval({|| EncodeUTF8(AllTrim(_cInscrEst))}) + '",
+            "rg_ie": "' + Eval({|| EncodeUTF8(AllTrim(_cRg_IE))}) + '",
+            "data_nascimento_fundacao": "' + Eval({|| EncodeUTF8(AllTrim(_cDtNascF))}) + '",
+            "info_adicional": "' + Eval({|| EncodeUTF8(AllTrim(_cObserv))}) + '",
+			"situacao": "' + Eval({|| EncodeUTF8(AllTrim(_cSituacao))}) + '" ,			
+            "vinculado_ao_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cVincLat))}) + '" ,						
+            "endereco": {
+                "complemento": "' + Eval({|| EncodeUTF8(AllTrim(_cComplem))}) + '",
+                "endereco": "' + Eval({|| EncodeUTF8(AllTrim(_cEndereco))}) + '",
+                "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cNrEnd))}) + '",
+                "bairro": "' + Eval({|| EncodeUTF8(AllTrim(_cBairro))}) + '",
+                "cep": "' + Eval({|| EncodeUTF8(AllTrim(_cCep))}) + '",
+			    "cidade_uf": "' + Eval({|| EncodeUTF8(AllTrim(_cCid_UF))}) + '",			
+				"codigo_ibge_cidade": "' + Eval({|| EncodeUTF8(AllTrim(_cCod_Ibge))}) + '"			
+                },
+            "telefones": [{
+			    "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cTelefon1))}) + '",
+			    "whatsapp": "' + Eval({|| EncodeUTF8(AllTrim(_cWhatsAp1))}) + '"
+			    }],
+			"emails": ['

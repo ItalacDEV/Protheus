@@ -1,0 +1,52 @@
+      '<tem:pedido>
+            <!--Optional:-->
+            <wsit:ASSIST>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_ASSIST)))})+'</wsit:ASSIST>
+            <!--Optional:-->
+            <wsit:BAIENT>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_BAIENT)))})+'</wsit:BAIENT>
+            <!--Optional:-->
+            <wsit:BAIRRO>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_BAIRRO)))})+'</wsit:BAIRRO>
+            <!--Optional:-->
+            <wsit:BAIRTR>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_BAIRTR)))})+'</wsit:BAIRTR>
+            <!--Optional:-->
+            <wsit:CAPROD>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_CAPROD)))})+'</wsit:CAPROD>
+            <!--Optional:-->
+            <wsit:CEPENT>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_CEPENT))})+'</wsit:CEPENT>
+            <!--Optional:-->
+            <wsit:CEPTRA>'+Eval({|| EncodeUTF8( AllTrim(ZFQ->ZFQ_CEPTRA))})+'</wsit:CEPTRA>
+            <!--Optional:-->
+            <wsit:CNPJDE>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_CNPJDE))})+'</wsit:CNPJDE>
+            <!--Optional:-->
+            <wsit:CNPJEM>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_CNPJEM))})+'</wsit:CNPJEM>
+            <!--Optional:-->
+            <wsit:CNPJFA>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_CNPJFA))})+'</wsit:CNPJFA>
+            <!--Optional:-->
+            <wsit:CNPJTR>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_CNPJTR))})+'</wsit:CNPJTR>
+			<!--Optional:-->
+	        <wsit:COCHEP>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_COCHEP)))})+'</wsit:COCHEP>
+            <!--Optional:-->
+            <wsit:COMEND>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_COMEND)))})+'</wsit:COMEND>
+            <!--Optional:-->
+            <wsit:COORDE>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_COORDE)))})+'</wsit:COORDE>
+			<!--Optional:-->
+            <wsit:COREDE>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_COREDE)))})+'</wsit:COREDE>
+            <!--Optional:-->			
+            <wsit:DTAGEN>'+Eval({|| EncodeUTF8(AllTrim(If(Empty(ZFQ->ZFQ_DTAGEN),Strzero(Year(Date()),4)+"-"+Strzero(Month(Date()),2)+"-"+StrZero(Day(Date()),2),Strzero(Year(ZFQ->ZFQ_DTAGEN),4)+"-"+Strzero(Month(ZFQ->ZFQ_DTAGEN),2)+"-"+StrZero(Day(ZFQ->ZFQ_DTAGEN),2))))})+'</wsit:DTAGEN>
+            <!--Optional:-->
+            <wsit:DTEMIS>'+Eval({|| EncodeUTF8(AllTrim(If(Empty(ZFQ->ZFQ_DTEMIS),Strzero(Year(Date()),4)+"-"+Strzero(Month(Date()),2)+"-"+StrZero(Day(Date()),2),Strzero(Year(ZFQ->ZFQ_DTEMIS),4)+"-"+Strzero(Month(ZFQ->ZFQ_DTEMIS),2)+"-"+StrZero(Day(ZFQ->ZFQ_DTEMIS),2))))})+'</wsit:DTEMIS>
+            <!--Optional:-->
+            <wsit:DTPREV>'+Eval({|| EncodeUTF8(AllTrim(If(Empty(ZFQ->ZFQ_DTPREV),Strzero(Year(Date()),4)+"-"+Strzero(Month(Date()),2)+"-"+StrZero(Day(Date()),2),Strzero(Year(ZFQ->ZFQ_DTPREV),4)+"-"+Strzero(Month(ZFQ->ZFQ_DTPREV),2)+"-"+StrZero(Day(ZFQ->ZFQ_DTPREV),2))))})+'</wsit:DTPREV>
+            <!--Optional:-->
+            <wsit:ENDENT>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_ENDENT)))})+'</wsit:ENDENT>
+            <!--Optional:-->
+            <wsit:ENDERE>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_ENDERE)))})+'</wsit:ENDERE>
+            <!--Optional:-->
+            <wsit:ENDTRA>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_ENDTRA)))})+'</wsit:ENDTRA>
+			<!--Optional:-->
+            <wsit:GERENT>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_GERENT)))})+'</wsit:GERENT>
+            <!--Optional:-->
+            <wsit:IBGEENT>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_IBGENT)))})+'</wsit:IBGEENT>
+            <!--Optional:-->
+            <wsit:IBGEFA>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_IBGEFA)))})+'</wsit:IBGEFA>
+            <!--Optional:-->'+If(!Empty(ZFQ->ZFQ_IBGETR),'<wsit:IBGETR>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_IBGETR)))})+'</wsit:IBGETR><!--Optional:-->',"")+'<wsit:ITENSPEDIDO>
+            <!--Zero or more repetitions:-->'
+	    

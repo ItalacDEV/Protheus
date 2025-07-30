@@ -1,0 +1,70 @@
+<html> 
+<head>
+<!--<meta charset="UTF-8">
+<meta name="description" content="Lista Pedido de Compras - LINK"> 
+<meta name="keywords" content="HTML,CSS,XML,JavaScript">
+<meta name="author" content="Darcio Ribeiro Sporl"> -->
+<title>Pedidos de Vendas do Portal</title>
+</head>
+<style type="text/css"><!--
+table.bordasimples { border-collapse: collapse; }
+table.bordasimples tr td { border:1px solid #777777; } 
+td.grupos	{ font-family:VERDANA; font-size:20px; V-align:middle; background-color: #C6E2FF; color:#000080; }
+td.titulos	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #4682B4; }
+td.texto	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; }
+td.itens	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #4682B4; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 25px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #DDD; }
+.but-shadow { box-shadow: 2px 3px 5px #999; }
+.but-rc { border-radius: 4px; }
+--></style>
+
+<body bgcolor="#FFFFFF">
+<center>
+<table width="095%" cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td width="02%"  bgcolor="#4682B4">	
+      <!--<center><img src="http://wfteste.italac.com.br:11201/workflow/htm/logo_novo.png" width='100px' height='030px'></center>-->	
+	  <!--<center><img src="!cLogo!" width='100px' height='030px'></center>-->
+	  <center><img src="!cLogo!" width='100px' height='030px'></center>
+	</td>
+    <td width="98%" bgcolor="#4682B4"><center>WORKFLOW PEDIDO DE VENDAS DO PORTAL</center> </td>	
+  </tr>
+</table>
+<table border="0" width="095%">
+	<tr>
+		<td valign="top" class="texto">
+			<br>Caro(a) Sr(a) !AprNom!,</font>
+			<br><br>Existe(m) Pedido(s) de Venda(s) do Portal pendente(s) para sua avaliação.
+			<br>Para aprovar ou rejeitar o documento, utilize os links abaixo:
+		</td>
+	</tr>
+</table>
+<br>
+<table width="095%" border="0" CellSpacing="2" CellPadding="0">
+	<tr> 
+	    <td align="center" width="5%" height="23" class='totais'>Coordenador:</td>
+		<td align="center" width="15%" height="23" class='totais'>Representante:</td>
+		<td align="center" width="15%" height="23" class='totais'>Razão Social / Fantasia:</td>
+		<td align="center" width="5%" height="23" class='totais'>Numero Pedido:</td>
+		<td align="center" width="5%" height="23" class='totais'>Data / Hora Emissão:</td>
+		<td align="center" width="15%" height="23" class='totais'>Link:</td>	
+	</tr>
+	<tr>
+	    <td valign="top" width="5%" height="23" class="itens">!itens.COORDENA!</td>
+		<td valign="top" width="15%" height="23" class="itens">!itens.VENDEDOR!</td>
+		<td valign="top" width="15%" height="23" class="itens">!itens.CLIENTE!</td>
+		<td valign="top" width="5%" height="23" class="itens">!itens.PEDIDO!</td>
+		<td valign="top" width="5%" height="23" class="itens">!itens.EMISSAO!</td>
+		<!--<td valign="top" width="10%" height="23" class="itens"><a href="!itens.LINK!"><b><center>!itens.cTxtLnk!</center></b></a></td>-->
+		<!--td class="but but-primary but-shadow but-rc"><a href="!itens.LINK!"><b>!itens.cTxtLnk!</b></a>	</td-->	
+		<td align="center" class="itens"><a href="!itens.LINK!"><b>!itens.cTxtLnk!</b></a>	</td>	
+	</tr>
+	<tr>
+		<td colspan="6"><BR><br>PV_LISTA.HTM / MOMS057 / !Ambiente!<br></td>
+	</tr>
+</table>
+</center>
+</body>

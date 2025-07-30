@@ -1,0 +1,8 @@
+'{
+    "numero_identificador": "' + Eval({|| EncodeUTF8(AllTrim(_cNrIdent))}) + '",
+    "matricula_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cNrMatr))}) + '",
+    "volume_litros": ' + Eval({|| EncodeUTF8(AllTrim(_cVolume))}) + ',
+    "data_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cDtColeta))}) + '",
+    "hora_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cHoraCol))}) + '",
+    "observacoes": "' + Eval({|| EncodeUTF8(AllTrim(_cObserv))}) + '"
+}'

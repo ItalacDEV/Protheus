@@ -1,0 +1,235 @@
+/* 
+================================================================================================================================================
+                          ULTIMAS ATUALIZAÇÕES EFETUADAS - CONSULTAR LOG DO VERSIONADOR PARA HISTORICO COMPLETO
+================================================================================================================================================
+    Autor    |   Data   |                                             Motivo                                           
+------------------------------------------------------------------------------------------------------------------------------------------------
+Alex Wallauer| 28/10/22 | Chamado 41707. Corrigir mensagem de "NEGATICO" para "NEGATIVO".
+Alex Wallauer| 11/03/24 | Chamado 46480. Chamada da funcao U_M460Acertos para Acertar os Raterios de campos novos contra valores totais do RDC.
+Lucas Borges | 23/07/25 | Chamado 51340. Ajustar função para validação de ambiente de teste
+================================================================================================================================================
+*/
+
+//====================================================================================================
+// Definicoes de Includes da Rotina.
+//====================================================================================================
+
+/*
+===============================================================================================================================
+Programa--------: M460NOTA
+Autor-----------: Alex Wallauer
+Data da Criacao-: 13/04/2021 
+===============================================================================================================================
+Descrição-------: P.E. no final do faturamento de Cargas e Pedidos - CHAMADO 36078
+===============================================================================================================================
+Parametros------: Nenhum
+===============================================================================================================================
+Retorno---------: Lógico .T.
+===============================================================================================================================
+*/
+USER FUNCTION M460NOTA()
+PRIVATE _aProd:={}
+PRIVATE _aItens:= U_M460Lista()
+PRIVATE _lRet := .T.
+
+FWMSGRUN( ,{|oProc|  U_M460Acertos(.T.) } , "Processando..." , "Acerto de Valores de Pedagios..." )
+
+If LEN(_aItens) > 0 
+   FWMSGRUN( ,{|oProc| _lRet := M460Val(oProc) } , "Processando..." , "Verificando Estoque..." )
+ENDIF
+
+If LEN(_aProd) > 0 .AND. !_lRet
+   _aCab:={'Produto','Descricao','Armazem',"Saldo Disponivel","Observacao"}
+   FWMSGRUN( ,{|oProc| M460Email(_aProd,_aCab,oProc) } , "Processando..." , "Enviando Email..." )
+   U_ITListBox( 'Verificação do estoque dos pedidos da Carga apos faturamento! (M460NOTA)' , _aCab , _aProd , .T. , 1 , 'ESTORNE O FATURAMENTO E VALIDE OS MOVIMENTOS KARDEX, DUVIDAS ENTRE EM CONTATO COM DEPARTAMENTO FISCAL' )
+ENDIF
+
+RETURN .T.
+/*
+===============================================================================================================================
+Programa--------: M460Val()
+Autor-----------: Alex Wallauer
+Data da Criacao-: 26/04/2021 
+===============================================================================================================================
+Descrição-------: Valida se os itens dos pedidos estão com estoque
+===============================================================================================================================
+Parametros------: Nenhum
+===============================================================================================================================
+Retorno---------: Lógico .T.
+===============================================================================================================================
+*/
+STATIC FUNCTION M460Val(oProc)
+LOCAL _lRet  := .T.
+LOCAL _nSaldo:= 0 , I
+PRIVATE _cPictQtde:="@E 999,999,999,999.999"
+
+FOR I := 1 TO LEN(_aItens)
+
+    IF oProc <> NIL
+       oProc:cCaption := ("Vendo Estoque: "+_aItens[I,1] +"-"+ _aItens[I,2] )
+       ProcessMessages()
+    ENDIF  
+
+    _aSaldo:= CalcEst( _aItens[I,1] , _aItens[I,2] , dDataBase+1 ) 
+    _nSaldo:= _aSaldo[1]
+    _lErro :=(_nSaldo < 0)// SALDO NEGATIVO
+    If _lErro
+       AADD( _aProd , { _aItens[I,1] ,ALLTRIM(POSICIONE("SB1",1,xfilial("SB1")+ALLTRIM(_aItens[I,1] ),"B1_DESC")), _aItens[I,2] , TRANS(_nSaldo,_cPictQtde) ,;
+            'ESTORNE O FATURAMENTO E VALIDE OS MOVIMENTOS NO KARDEX, DUVIDAS ENTRE EM CONTATO COM DEPARTAMENTO FISCAL'} )
+       _lRet :=.F.
+    ELSE
+      // AADD( _aProd , { _aItens[I,1] ,ALLTRIM(POSICIONE("SB1",1,xfilial("SB1")+ALLTRIM(_aItens[I,1] ),"B1_DESC")), _aItens[I,2] , TRANS(_nSaldo,_cPictQtde) ,"Saldo Positivo" } )
+    EndIf
+NEXT
+
+RETURN _lRet
+
+/*
+===============================================================================================================================
+Programa----------: M460Email()
+Autor-------------: Alex Wallauer
+Data da Criacao---: 05/11/2019
+===============================================================================================================================
+Descrição---------: Monta e envia email 
+===============================================================================================================================
+Parametros--------: _aTLinhas,_aCab,oProc
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================
+*/
+Static Function M460Email(_aTLinhas,_aCab,oProc)
+Local _aConfig	:= U_ITCFGEML('')
+Local _cEmlLog	:= ""
+Local _cMsgEml	:= ""
+Local _nI , _aSizeOK:={}
+Local cGetCc	:= ""
+Local cGetPara	:= ALLTRIM(U_ITGetMV( "IT_MESTNEG" , "sistema@italac.com.br" ))
+Local _cTot     := ALLTRIM(STR(LEN(_aTLinhas)))
+Local _nTam     := LEN(_cTot)
+Local _cNomeFil := cFilant+" - "+AllTrim( Posicione('SM0',1,"01"+cFilant,'M0_FILIAL') )
+Local cGetAssun := "Resultado do estoque apos Faturamento da(s) Carga(s): "+_aItens[1,3] 
+Local cTit      := "Resultado do estoque apos Faturamento"
+Local cErMens	:= "ESTORNE O FATURAMENTO E VALIDE OS MOVIMENTOS NO KARDEX, DUVIDAS ENTRE EM CONTATO COM DEPARTAMENTO FISCAL"
+
+If IsInCallStack('MATA460A') //Faturamento por pedido
+   cGetAssun := "Resultado do estoque apos Faturamento do(s) Pedido(s): "+_aItens[1,3] 
+ENDIF
+
+If (LEN(PSWRET()) # 0) // Quando nao for rotina automatica do configurador
+   PswOrder(1)
+   PswSeek(__cUserID,.T.)
+   aUsuario:= PswRet()
+   cGetCc  := LOWER(Alltrim(aUsuario[1,14]))+SPACE(150)// Pega e-mail do usuario
+Endif
+
+IF EMPTY(cGetPara)
+   cGetPara:=cGetCc
+ENDIF   
+_cMsgEml := '<html>'
+_cMsgEml += '<head><title>'+cTit+'</title></head>'
+_cMsgEml += '<body>'
+_cMsgEml += '<style type="text/css"><!--'
+_cMsgEml += 'table.bordasimples { border-collapse: collapse; }'
+_cMsgEml += 'table.bordasimples tr td { border:1px solid #777777; }'
+_cMsgEml += 'td.titulos	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #C6E2FF; }'
+_cMsgEml += 'td.grupos	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #E5E5E5; }'
+_cMsgEml += 'td.itens	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #FFFFFF; }'
+_cMsgEml += 'td.itensV	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #FFFFFF;  color:#FF0000;}'//#FF0000
+_cMsgEml += '--></style>'
+_cMsgEml += '<center>'
+_cMsgEml += '<img src="http://www.italac.com.br/wf/italac-wf.jpg" width="600" height="50"><br>'
+_cMsgEml += '<table class="bordasimples" width="600">'
+_cMsgEml += '    <tr>'
+_cMsgEml += '	     <td class="titulos"><center>'+cTit+'</center></td>'
+_cMsgEml += '	 </tr>'
+_cMsgEml += '</table>'
+_cMsgEml += '<br>'
+_cMsgEml += '<table class="bordasimples" width="600">'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td align="center" colspan="2" class="grupos">Dados da alteração</b></td>'
+_cMsgEml += '    </tr>'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td class="itens" align="left" width="30%"><b>Faturado por: </b></td>'
+_cMsgEml += '      <td class="itens" >'+ UsrFullName(__cUserID) +'</td>' 
+_cMsgEml += '    </tr>'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td class="itens" align="left" width="30%"><b>Filial:</b></td>'
+_cMsgEml += '      <td class="itens" >'+ _cNomeFil +'</td>'
+_cMsgEml += '    </tr>'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td class="itens" align="left" width="30%"><b>Observações:</b></td>'
+_cMsgEml += '      <td class="itensV" ><b>'+cErMens+'</b></td>'
+_cMsgEml += '    </tr>'
+_cMsgEml += '</table>'
+
+//          01   02   03   04   05 
+_aSizeOK:={"10","50","05","15","25"}//{'Produto','Descricao','Armazem',"Saldo Estoque","Problema"}
+
+_cMsgEml += '<br>'
+_cMsgEml += '<table class="bordasimples" width="1300">'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td align="center" colspan="'+ALLTRIM(STR(LEN(_aSizeOK)))+'" class="grupos"><b>Estoque negativo de Produtos / Armazens</b></td>'
+_cMsgEml += '    </tr>'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td class="itens" align="center" width="'+_aSizeOK[01]+'%"><b>'+_aCab[01]+'</b></td>'
+_cMsgEml += '      <td class="itens" align="left"   width="'+_aSizeOK[02]+'%"><b>'+_aCab[02]+'</b></td>'
+_cMsgEml += '      <td class="itens" align="center" width="'+_aSizeOK[03]+'%"><b>'+_aCab[03]+'</b></td>'
+_cMsgEml += '      <td class="itens" align="right"  width="'+_aSizeOK[04]+'%"><b>'+_aCab[04]+'</b></td>'
+_cMsgEml += '      <td class="itens" align="left"   width="'+_aSizeOK[05]+'%"><b>'+_aCab[05]+'</b></td>'
+_cMsgEml += '    </tr>'
+_cMsgEml += '    #LISTAOK#'
+_cMsgEml += '</table>'
+_cMsgEml += '<br>'
+
+_cMsgEml += '</center>'
+_cMsgEml += '<br>'
+_cMsgEml += '<br>'
+_cMsgEml += '    <tr>'
+_cMsgEml += '      <td class="itens" align="center" ><b>Ambiente:</b></td>'
+_cMsgEml += '      <td class="itens" align="left" > ['+ GETENVSERVER() +'] / <b>Fonte:</b> [M460NOTA]</td>'
+_cMsgEml += '    </tr>'
+_cMsgEml += '</body>'
+_cMsgEml += '</html>'
+
+_cOKLista:=""
+_cGetLista:=""
+_lEnvia:=.F.
+For _nI := 1 To LEN(_aTLinhas)
+	
+    IF oProc <> NIL
+	   oProc:cCaption := ("Enviando Log: "+ALLTRIM(STRZERO(_nI,_nTam))+" de "+ _cTot)
+	   ProcessMessages()
+	ENDIF   
+	
+	_cOKLista += '    <tr>'
+	_cOKLista += '      <td class="itens" align="left"   width="'+_aSizeOK[01]+'%">'+ _aTLinhas[_nI][01]+'</td>'
+	_cOKLista += '      <td class="itens" align="left"   width="'+_aSizeOK[02]+'%">'+ _aTLinhas[_nI][02]+'</td>'
+	_cOKLista += '      <td class="itens" align="center" width="'+_aSizeOK[03]+'%">'+ _aTLinhas[_nI][03]+'</td>'
+	_cOKLista += '      <td class="itens" align="right"  width="'+_aSizeOK[04]+'%">'+ _aTLinhas[_nI][04]+'</td>'
+	_cOKLista += '      <td class="itens" align="left"   width="'+_aSizeOK[05]+'%">SALDO NEGATIVO</td>'
+	_cOKLista += '    </tr>'
+	_lEnvia:=.T.
+
+Next
+
+IF _lEnvia
+
+   _cMsgEml:=STRTRAN(_cMsgEml,"#LISTAOK#",_cOKLista)  
+
+   // Chama a função para envio do e-mail
+   U_ITENVMAIL( "", cGetPara, cGetCc, "", cGetAssun, _cMsgEml, "", _aConfig[01], _aConfig[02], _aConfig[03], _aConfig[04], _aConfig[05], _aConfig[06], _aConfig[07], @_cEmlLog )
+		
+   If SuperGetMV("IT_AMBTEST",.F.,.T.)
+      U_ITMSG(UPPER(_cEmlLog)+CHR(13)+CHR(10)+;
+		           "E-mail para: "+cGetPara+;
+		           " Com Copia: "+cGetCc+CHR(13)+CHR(10),"Envio do E-MAIL",,3)
+   ENDIF
+ELSE   
+   If SuperGetMV("IT_AMBTEST",.F.,.T.)
+      U_ITMSG("Não tem registros para enviar","Envio do E-MAIL",,1)
+   ENDIF   
+ENDIF
+
+Return .T.
+
+

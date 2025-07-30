@@ -1,0 +1,203 @@
+ <html>
+<head>
+<title>TP_APROVADOR.HTM</title>
+</head>
+<script type="text/javascript">
+<!--
+	function avisar(aviso){
+	var ctemp = ""
+		if(aviso == 'Aprovado'){
+			if(document.getElementById("BtnAprovar").value == 'Aprovar (Aguarde…)')
+			{
+				document.getElementById("BtnAprovar").disabled=true;
+			}
+			else{
+				document.getElementById("BtnAprovar").value='Aprovar (Aguarde…)';
+				
+				document.getElementById("BtnRejeitar").disabled=true;
+				document.getElementById("BtnQuestionar").disabled=true;
+
+			}  
+			
+			if(document.frm_aprovador.tx_obs.value == '')
+			{
+				document.frm_aprovador.tx_obs.value = aviso
+				return true;
+			}
+			else
+			{
+				return true ;	  
+			}
+		}
+
+		if(aviso == 'Rejeitado')
+		{
+			if(document.getElementById("BtnRejeitar").value == 'Rejeitar (Aguarde…)')
+	        {
+	        	document.getElementById("BtnRejeitar").disabled=true;
+	        }
+	        else
+	        {
+	        	document.getElementById("BtnRejeitar").value='Rejeitar (Aguarde…)';
+	        	
+	        	document.getElementById("BtnAprovar").disabled=true;
+	        	document.getElementById("BtnQuestionar").disabled=true;
+	        }
+	        
+            if(document.frm_aprovador.tx_obs.value == '')
+	        {
+	        	document.frm_aprovador.tx_obs.value = 'Rejeitado';
+	        	return true;
+            }
+            else
+			{
+	        	return true;
+            }
+		
+		}		
+	}  
+	function Questionar(){
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+      window.alert('Para questionamento por favor preencher o campo Observação');
+	  return false;
+    }
+    else{
+		if(document.getElementById("BtnQuestionar").value == 'Questionar (Aguarde…)')
+		{
+			document.getElementById("BtnQuestionar").disabled=true;
+		}
+		else{
+			document.getElementById("BtnQuestionar").value='Questionar (Aguarde…)';
+			
+			document.getElementById("BtnAprovar").disabled=true;
+			document.getElementById("BtnRejeitar").disabled=true;
+			return true ;
+		}	
+    }
+  }  
+
+//-->
+</script>
+<style type="text/css"><!--
+table.bordasimples { border-collapse: collapse; }
+table.bordasimples tr td { border:1px solid #777777; }  
+td.grupos	{ font-family:VERDANA; font-size:20px; text-align:middle; background-color: #e30613; color:#ffffff; }
+td.titulos	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.itens	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.itenspc	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(212, 22, 22, 0)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #36F; }
+.but-success { color: #fff; background-color: #009835;}
+.but-quest {color: #FFF;background-color: #0066FF;}
+.but-error {color: #fff;background-color: #CC0000;}
+.but-warning {color: #fff;background-color: #00baf2;}
+.but-shadow { box-shadow: 1px 1px 1px #999; }
+.but-rc { border-radius: 4px; }
+--></style>
+<body>
+<center>
+<form action=mailto:%WFMailTo% method="POST" name="frm_aprovador">
+	<input type="hidden" name="T1" value="%cChaveTAP%">
+	<input type="hidden" name="T1" value="%cIDUserSol%">
+	<input type="hidden" name="T1" value="%cIDUserApr%">	
+	<input type="hidden" name="T1" value="%cPergPai%">	
+
+<table width="100%" cellspacing="0" cellpadding="2">
+	<tr>
+    <td width="01%" class="grupos">
+      <!--<center><img src="http://wfteste.italac.com.br:4034/sc/logo_novo.png" width='100px' height='030px'></center>-->
+	  <center><img src="http://wf.italac.com.br:1026/workflow/htm/logo_novo.jpg" width='100px' height='030px'></center>
+	</td>
+    <td width="99%" class="grupos"><center><span style="color: #ffffff; background-color: #e30613; font-size: 20px; font-weight: bold;">Compras - Aprovação de Tabela de Preços de Fornecedores</span></center></td>
+	</tr>
+</table>
+
+<br>
+<table border="0" width="100%" bordercolor="#FFFFFF" bordercolordark="#DFEFFF" bordercolorlight="#DFEFFF" bgcolor="#FFFFFF">
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Fornecedor: </b>%Fornecedor%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Filial: </b>%Filial%</font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Tabela de Preços: </b>%NumTP%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Vigencia: </b>%Vigencia%</font></td>
+	</tr>
+	<tr> 
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Solicitante: </b>%Solicitante%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Dt. Solicitacao: </b>%DtEmissao%</font></td>
+	</tr>
+	<tr> 
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Tipo de Frete: </b>%TipoFrete%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Condicao de Pagamento: </b>%CondPagto%</font></td>
+	</tr>
+	<tr >
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Aprovador: </b> %Aprovador% </font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Moeda: </b>%DescMoeda%</font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" colspan='2' class="itens"><b>Observação: </b> %AIA_cObs% </font></td>
+	</tr>
+
+	</table>
+<br><br>
+<table border="0" width="100%">
+	<tr> 
+		<td align="center" width="05%" height="23" class='totais'>Item</td>
+		<td align="center" width="20%" height="23" class='totais'>Produto</td>
+		<td align="center" width="10%" height="23" class='totais'>Valor Unitario</td>
+		<td align="center" width="10%" height="23" class='totais'>% ICMS</td>
+		<td align="center" width="10%" height="23" class='totais'>Valor ICMS</td>
+	</tr>
+	<tr>
+		<td align="center" width="05%" height="21" class='itens'>!Itens.Item!</td>
+		<td align="left"   width="25%" height="21" class='itens'>!Itens.Produto!</td>
+		<td align="right"  width="05%" height="21" class='itens'>!Itens.Valor!</td>
+		<td align="right"  width="05%" height="21" class='itens'>!Itens.PICMS!</td>
+		<td align="right"  width="05%" height="21" class='itens'>!Itens.VICMS!</td>
+		<tr valign="top">
+		</tr>
+	</tr>
+</table>
+<br>
+<br>
+!cQuest!
+<br>
+<br>
+<table bgcolor="#f2f4f7" border="0" width="100%">
+	<tr>
+	   <table cellpadding='0' cellspacing='0'  align="center">
+			<tr>
+				<td width="100" height="0" align="center">
+					<font color="#333366" face="Verdana" size="4" >Questionamento ou Observação</font> 
+				</td>
+			</tr>
+			<tr>
+			   <td width="100" height="100"  align="center">
+					<p> <font face="Verdana" >
+						<textarea name="%TP_OBS%" id="tx_obs" TEMPLATE_name="S1" rows="4" cols="96" align="center"></textarea></font>
+					</p>
+			  </td>
+			</tr>
+			<tr> 
+				<td align="center" width="73%" height="27" >
+					<p>
+						<font face="Verdana">
+							<input class="but but-success but-shadow but-rc" type="submit" id="BtnAprovar"    name="%APROVACAO%" value="Aprovar"    onClick="return avisar('Aprovado')"> 
+							<input class="but but-quest but-shadow but-rc"   type="submit" id="BtnQuestionar" name="%APROVACAO%" value="Questionar" onClick="return Questionar()"> 
+							<input class="but but-error but-shadow but-rc"   type="submit" id="BtnRejeitar"   name="%APROVACAO%" value="Rejeitar"   onClick="return avisar('Rejeitado')"> 
+						</font>
+					</p>
+				</td>
+			</tr>
+        </table>
+	</tr>
+</table>
+</form>
+</center>
+</body>
+</html>
+
+<br>TP_APROVADOR.HTM / MCOM026 / !A_RODAP!<br>

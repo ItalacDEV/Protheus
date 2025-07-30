@@ -1,0 +1,21 @@
+'   ],
+            "dados_bancarios": [
+                {
+				    "nome_banco": "' + Eval({|| EncodeUTF8(AllTrim(_cNomBanco))}) + '",
+                    "banco": "' + Eval({|| EncodeUTF8(AllTrim(_cCodBanco))}) + '",
+                    "agencia": "' + Eval({|| EncodeUTF8(AllTrim(_cCodAgenc))}) + '",
+                    "conta": "' + Eval({|| EncodeUTF8(AllTrim(_cNumConta))}) + '",
+                    "tipo": "CORRENTE",
+					"nome_titular_conta": "' + Eval({|| EncodeUTF8(AllTrim(_cTitConta))}) + '",
+					"informacao_adicional": "' + Eval({|| EncodeUTF8(AllTrim(_cInfoAdic))}) + '",
+					"conta_principal": "1"
+                }
+            ],
+			"produtor_parceiro_de": [
+                {
+				    "cpf_cnpj": "' + Eval({|| EncodeUTF8(AllTrim(_cCPFCnpjP))}) + '",
+                    "matricula_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cMatParce))}) + '"             
+                }
+            ]
+		},
+        "propriedades": ['

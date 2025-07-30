@@ -1,0 +1,4 @@
+         </tem:nfe>
+      </tem:VinculaNfePedido>
+   </soapenv:Body>
+</soapenv:Envelope>

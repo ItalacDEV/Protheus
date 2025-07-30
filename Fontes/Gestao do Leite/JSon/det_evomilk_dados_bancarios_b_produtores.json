@@ -1,0 +1,14 @@
+'{
+        "nome_banco": "' + Eval({|| EncodeUTF8(AllTrim(_cNomBanco))}) + '",
+        "codigo_banco": "'+ Eval({|| EncodeUTF8(AllTrim(_cCodBanco))}) +'",
+        "agencia": "' + Eval({|| EncodeUTF8(AllTrim(_cCodAgenc))}) + '",
+        "conta": "' + Eval({|| EncodeUTF8(AllTrim(_cNumConta))}) +'",
+        "tipo": 1,
+        "nome_titular_conta": "' + Eval({|| EncodeUTF8(AllTrim(_cTitConta))}) + '",
+        "codigo_produtor": " ' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+        "codigo_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cCodPropL))}) +'",
+        "produtor_titular": ' + Eval({|| EncodeUTF8(AllTrim(_cProduTit))}) + ',
+        "conta_principal": ' + Eval({|| EncodeUTF8(AllTrim(_cContaPri))}) + ',
+        "data_hora": "' + Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) + '"
+      } '
+	

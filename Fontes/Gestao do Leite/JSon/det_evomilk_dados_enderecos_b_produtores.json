@@ -1,0 +1,13 @@
+'    {
+      "endereco": "' + Eval({|| EncodeUTF8(AllTrim(_cEndereco))}) + '",
+      "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cNrEnd))}) +'",
+      "bairro": "' + Eval({|| EncodeUTF8(AllTrim(_cBairro))}) +'",
+      "cep": "'    + Eval({|| EncodeUTF8(AllTrim(_cCep))}) +'",
+      "cidade": "' + Eval({|| EncodeUTF8(AllTrim(_cCidade))}) +'",
+      "codigo_ibge_cidade": "' + Eval({|| EncodeUTF8(AllTrim(_cCod_Ibge))}) + '",
+      "codigo_produtor": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+      "codigo_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+      "codigo_usuario": "' + Eval({|| EncodeUTF8(AllTrim(_cCodPropL))}) + '",
+      "uf": "'+ Eval({|| EncodeUTF8(AllTrim(_cUF))}) + '",
+      "data_hora": "'+ Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) +'"
+    }'

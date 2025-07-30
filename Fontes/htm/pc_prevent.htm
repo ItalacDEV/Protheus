@@ -1,0 +1,99 @@
+ <html>  
+<head>
+<title>Pedido de Compra</title>
+<script type="text/javascript">
+<!--
+
+//-->
+</script>
+</head>
+<!--  SEMPRE SALVAR ESTE ARQUIVO SALVAR EM ISO ANSI -->
+<style type="text/css">
+table.bordasimples { border-collapse: collapse }
+table.bordasimples tr td { border:1px solid #777777 } 
+td.grupos	{ font-family:VERDANA; font-size:20px; text-align:middle; background-color: #FFFFFF; color:#000080; }
+td.titulos	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.'itens'	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.itenspc	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #36F; }
+.but-success { color: #fff; background-color: #009835;}
+.but-error {color: #fff;background-color: #CC0000;}
+.but-warning {color: #fff;background-color: #F28E00;}
+.but-quest {color: #FFF;background-color: #0066FF;}
+.but-shadow { box-shadow: 1px 1px 1px #999; }
+.but-rc { border-radius: 4px; }
+.CellWithComment{position:relative;}
+.CellComment{display:none; position:absolute; z-index:100; border:1px; background-color:rgb(122, 118, 118);  border-style:solid; border-width:1px; border-color:rgb(179, 177, 177); padding:3px; color:rgb(255, 255, 255); top:20px; left:20px;} 
+.CellWithComment:hover span.CellComment{ display:block;} 
+-->
+</style>
+<body>
+<left>
+<form action=mailto:%WFMailTo% method="POST" name="frm_aprovador" >
+	<input type="hidden" name="T1" value="%cNivelAP%">
+	<input type="hidden" name="T1" value="%cUser%">
+<br>
+<table id="tabCrud" width="100%"  border="0" cellpadding='0' cellspacing='0'>
+	<td valign="top" class="itens">
+		<br>Caro(a) Sr(a) !A_SOLIC!,</font>
+		<br><br>Este Pedido de Compras foi !Modelo! e há divergência com a solicitação de compra.
+		<br>Abaixo segue em detalhes:
+		<br>
+	</td>
+	<tr>
+		<td width="100%" class="grupos">
+			<font style="font-size: 14px;"><b></b></font><br>
+			<font style="font-size: 14px;"><b>Número SC: </b>!cnumSC!</font><br>			
+			<font style="font-size: 14px;"><b>Data inclusão SC: </b>!cdtinc!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">Número Pedido: %NumPC%<br></font><br>	
+		</td>
+	</tr>
+	<tr>
+		<td width="70%" class="grupos" colspan='3' valign='left' height="040px >
+			<left> 
+			<font style="font-size: 14px; font-weight: bold;"> </font><br>
+			<font style="font-size: 14px; font-weight: bold;">!cNomFor!</font><br>
+			<font style="font-size: 12px;">CNPJ/CPF:!cCGCFor! </font><br>
+			<font style="font-size: 14px; font-weight: bold;">Contato: !cContatFor!</font>
+			<font style="font-size: 14px; font-weight: bold;"> </font><br>
+			<br></left>
+		</td>
+	</tr>
+	<tr>
+		<td colspan='4'>
+			<table width="50%" border="0" cellpadding='0' cellspacing='0'> 
+				<tr> 
+					<br>
+				</tr>
+				<tr HEIGHT=30 >
+					<td width='100%' Style="font-family:VERDANA; font-size:12px; " align="left">Item: !Itens.Item!
+						<br>Produto: !Itens.Prodpc!
+						<br>Descrição: !Itens.DesProd!
+						<br>UM: !Itens.UM!
+						<br>data necessidade solicit.: !Itens.DtSol!
+						<br>quantidade solicitada: !Itens.QtdeSol!
+						<br>quantidade pedido: !Itens.Qtde!
+						<br>data entrega pedido: !Itens.DtEmis!
+						<br>
+					</td>
+					<tr> 
+						<br>
+					</tr>
+				</tr>
+			</table>	
+		</td>
+	</tr>
+</table>
+
+<br>
+<br>
+<br>
+</form>
+</center>
+</body>
+</html>
+
+<br>PC_PREVENT.HTM / MCOM004<br>

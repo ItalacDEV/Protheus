@@ -1,0 +1,13 @@
+'{
+    "nota_fiscal": [
+       {
+                "vinculado_ao_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_CNPJLV))}) + '",
+                "matricula_laticinio":  "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_CODPRO)+'-'+AllTrim(ZBM->ZBM_LOJPRO))}) + '",
+                "cpf_cnpj_produtor": "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_CNPJPR))}) + '",
+                "data_emissao": "' + Eval({|| EncodeUTF8(StrZero(Year(ZBM->ZBM_DTEMIS),4)+'-'+StrZero(Month(ZBM->ZBM_DTEMIS),2)+'-'+StrZero(Day(ZBM->ZBM_DTEMIS),2))}) + '",
+                "mes_ano_referencia": "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_AMREFE))}) + '",
+                "nf_numero": "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_NRNFE)+'-'+AllTrim(ZBM->ZBM_SERNFE))}) + '",
+                "valor_total_liquido": ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBM->ZBM_VALNFE,16,2)))}) + ',
+                "litros_total": ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBM->ZBM_QTDLIT,16,2)))}) + ',
+                "preco_litro_unitario": ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBM->ZBM_VALLIT,16,2)))}) + ',
+				 "itens": ['

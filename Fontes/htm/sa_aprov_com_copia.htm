@@ -1,0 +1,151 @@
+ <html>
+<head>
+<title>Solicitação ao Armazém</title>
+</head>
+<script type="text/javascript">
+<!--
+	function avisar(aviso){
+	var ctemp = ""
+		if(aviso == 'Aprovado'){
+			if(document.getElementById("BtnAprovar").value == 'Aprovar (Aguarde…)')
+			{
+				document.getElementById("BtnAprovar").disabled=true;
+			}
+			else{
+				document.getElementById("BtnAprovar").value='Aprovar (Aguarde…)';
+				
+				document.getElementById("BtnRejeitar").disabled=true;
+			}  
+			
+			if(document.frm_aprovador.tx_obs.value == '')
+			{
+				document.frm_aprovador.tx_obs.value = aviso
+				return true;
+			}
+			else
+			{
+				return true ;	  
+			}
+		}
+
+		if(aviso == 'Rejeitado'){
+			if(document.frm_aprovador.tx_obs.value == '')
+			{
+				window.alert('Para rejeitar preencha o campo Observação');
+				return false;
+			}
+			else
+			{
+				ctemp = document.frm_aprovador.tx_obs.value
+				if(ctemp.length < 11)
+				{
+					window.alert('Tamanho do campo observação da Rejeição inválido.');
+					return false;
+				}
+				else
+				{
+					if(document.getElementById("BtnRejeitar").value == 'Rejeitar (Aguarde…)')
+					{
+						document.getElementById("BtnRejeitar").disabled=true;
+					}
+					else{
+						document.getElementById("BtnRejeitar").value='Rejeitar (Aguarde…)';
+						
+						document.getElementById("BtnAprovar").disabled=true;
+						return true;
+					}
+				}
+			}			
+		}		
+	}  
+
+//-->
+</script>
+<style type="text/css"><!--
+table.bordasimples { border-collapse: collapse; }
+table.bordasimples tr td { border:1px solid #777777; }  
+td.grupos	{ font-family:VERDANA; font-size:20px; text-align:middle; background-color: #f68b33; color:#000000; }
+td.titulos	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.itens	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.itenspc	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #36F; }
+.but-success { color: #fff; background-color: #009835;}
+.but-error {color: #fff;background-color: #CC0000;}
+.but-warning {color: #fff;background-color: #F28E00;}
+.but-shadow { box-shadow: 1px 1px 1px #999; }
+.but-rc { border-radius: 4px; }
+--></style>
+<body>
+<form action=mailto:%WFMailTo% method="POST" name="frm_aprovador">
+
+<table width="100%" cellspacing="0" cellpadding="2">
+	<tr>
+    <td width="02%" class="grupos">
+      <!--<center><img src="http://wfteste.italac.com.br:4034/sc/logo_novo.png" width='100px' height='030px'></center>-->
+	  <center><img src="http://wf.italac.com.br:1026/workflow/htm/logo_novo.jpg" width='100px' height='030px'></center>
+	</td>
+    <td width="98%" class="grupos"><center>Solicitação ao Armazém - Validação</center></td>
+	</tr>
+</table>
+
+<br>
+<table border="0" width="100%" bordercolor="#FFFFFF" bordercolordark="#DFEFFF" bordercolorlight="#DFEFFF" bgcolor="#FFFFFF">
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Solicitação: </b>%NumSA%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Filial: </b>%Filial%</font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Solicitante: </b>%Solicitante%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Emissão: </b>%DtEmissao%</font></td>
+	</tr>
+	<tr> 
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Local Investimento: </b>%LocInvest%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Desc. Investimento: </b>%DescInvest%</font></td> 
+	</tr>
+	<tr> 
+		<td bgcolor="#f2f4f7" colspan="2" height="21" class="itens"><font size="2" face="Verdana"><b>Centro de Custo: </b>%CentroCusto%</font></td>
+	</tr>	
+	<tr >
+		<td bgcolor="#f2f4f7" colspan="2" height="21" class="itens"><b><font size="2" face="Verdana"> Observação:</b> %Obs% </font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" colspan="2" height="21" class="itens"><b><font size="2" face="Verdana"> Valor Total SA:</b> %VlrTot% </font></td>
+	</tr>
+</table>
+<br><br>
+<table border="0" width="100%">
+	<tr> 
+		<td align="center" width="05%" height="23" class='totais'>Item</td>
+		<td align="center" width="25%" height="23" class='totais'>Produto</td>
+		<td align="center" width="04%" height="23" class='totais'>UM</td>
+		<td align="center" width="05%" height="23" class='totais'>Qtde</td>
+		<td align="center" width="05%" height="23" class='totais'>Valor Total</td>
+		<td align="center" width="07%" height="23" class='totais'>Estoque Mínimo</td>
+		<td align="center" width="07%" height="23" class='totais'>Estoque Máximo</td>
+		<td align="center" width="06%" height="23" class='totais'>Saldo Atual Filial</td>
+		<td align="center" width="06%" height="23" class='totais'>Media 3 meses</td>
+	</tr>
+	<tr>
+		<td align="center" width="05%" height="21" class='itens'>!Itens.Item!</td>
+		<td align="left"   width="25%" height="21" class='itens'>!Itens.Produto!</td>
+		<td align="center" width="04%" height="21" class='itens'>!Itens.UM!</td>
+		<td align="right"  width="05%" height="21" class='itens'>!Itens.Qtde!</td>
+		<td align="right"  width="05%" height="21" class='itens'>!Itens.Valor!</td>
+		<td align="right"  width="07%" height="21" class='itens'>!Itens.EstMin!</td>
+		<td align="center" width="07%" height="21" class='itens'>!Itens.EstMax!</td>
+		<td align="right"  width="06%" height="21" class='itens'>!Itens.SldAtFil!</td>
+		<td align="right"  width="06%" height="21" class='itens'>!Itens.SldAtEmp!</td>	  
+		<tr valign="top">
+		</tr>
+	</tr>
+</table>
+<br>
+ &nbsp;
+ <BR><br>SA_APROV_COM_COPIA.HTM / MEST019 / !A_RODAP!<br>
+</form>
+</body>
+
+</html>

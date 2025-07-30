@@ -1,0 +1,4 @@
+         </tem:pedido>
+      </tem:CancelaPedido>
+   </soapenv:Body>
+</soapenv:Envelope>

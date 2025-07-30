@@ -1,0 +1,19 @@
+'                  {
+                        "codigo_do_produto": "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_CODPRD))}) + '",
+                        "descricao_do_produto": "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_DESPRD))}) + '",
+                        "ncm" : "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_NCM))}) + '",
+                        "cst" : "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_CST))}) + '",
+                        "csosn" : "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_CSOSN))}) + '",
+                        "cfop" : "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_CF))}) + '",
+                        "unidade" : "' + Eval({|| EncodeUTF8(AllTrim(ZBN->ZBN_UNID))}) + '",
+                        "quantidade" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_QTDE,16,2)))}) + ',
+                        "valor_unitario" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_VALUNI,16,2)))}) + ',
+                        "valor_total" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_VALTOT,16,2)))}) + ',
+                        "icms_bc" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_BASICM,16,2)))}) + ',
+                        "icms_aliquota" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_PERICM,16,2)))}) + ',
+                        "icms_valor" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_VALICM,16,2)))}) + ',
+                        "ipi_bc" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_BASIPI,16,2)))}) + ',
+                        "ipi_aliquota" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_PERIPI,16,2)))}) + ',
+                        "ipi_valor" : ' + Eval({|| EncodeUTF8(AllTrim(Str(ZBN->ZBN_VALIPI,16,2)))}) + '
+                    }
+'

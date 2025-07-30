@@ -1,0 +1,297 @@
+ <html> 
+<head>
+<!--<meta charset="UTF-8">
+<meta name="description" content="Pedido de Compras - LINK">
+<meta name="keywords" content="HTML,CSS,XML,JavaScript">
+<meta name="author" content="Darcio Ribeiro Sporl"> -->
+<title>PEDIDO DE COMPRAS</title>
+</head>
+<style type="text/css"><!--
+table.bordasimples { border-collapse: collapse; }
+table.bordasimples tr td { border:1px solid #777777; }
+td.grupos	{ font-family:VERDANA; font-size:20px; V-align:middle; background-color: #C6E2FF; color:#000080; }
+td.titulos	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.itens	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; }
+td.totais	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.grupos1	{ font-family:VERDANA; font-size:20px; V-align:middle; background-color: #FFFFFF; color:#000080; }
+td.titulos1	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.itens1	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.itenspc1	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais1	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #36F; }
+.but-shadow { box-shadow: 1px 1px 1px #999; }
+.but-rc { border-radius: 4px; }
+.CellWithComment{position:relative;}
+.CellComment{display:none; position:absolute; z-index:100; border:1px; background-color:rgb(122, 118, 118);  border-style:solid; border-width:1px; border-color:rgb(179, 177, 177); padding:3px; color:rgb(255, 255, 255); top:20px; left:20px;} 
+.CellWithComment:hover span.CellComment{ display:block;} 
+-->
+</style>
+
+<body bgcolor="#FFFFFF">
+<center>
+<table width="070%" cellspacing="0" cellpadding="2" border="0">
+  <tr>
+    <td width="02%"  bgcolor="#4169E1">
+      <!--<center><img src="http://wfteste.italac.com.br:4034/sc/logo_novo.png" width='100px' height='030px'></center>-->
+	  <center><img src="!cLogo!"></center>
+	</td>
+    <td width="98%" bgcolor="#4169E1"><center>WORKFLOW PEDIDO DE COMPRAS QUESTIONAMENTO</center> </td>
+  </tr>
+</table>
+<table border="0" width="070%">
+	<tr>
+		<td valign="top" class="itens">
+			<br>Caro(a) Sr(a) !A_NOMAPR!,</font>
+			<br><br>Existe um questionamento pendente para sua avaliação.
+			<br>Para visualizar e responder o questionamento, utilize o link abaixo:
+			<br><br><a class="but but-primary but-shadow but-rc" href="!A_LINK!"><b>Clique Aqui para Responder o Questionamento</b></a>
+		</td>
+	</tr>
+</table>
+<br>
+<table width="070%" border="0" CellSpacing="2" CellPadding="0">
+	<tr>
+		<td valign="top" class="totais" width="0120px">Solicitante:</td>
+		<td valign="top" class="totais">!A_NOMSOL!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">C.Custo:</td>
+		<td valign="top" class="totais">!A_CUSTO!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Urgente:</td>
+		<td valign="top" class="totais">!A_URGEN!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Compra Direta:</td>
+		<td valign="top" class="totais">!A_CMPDI!</td>
+	</tr>	
+	<tr>
+		<td valign="top" class="totais" width="0120px">Aplicação:</td>
+		<td valign="top" class="totais">!A_INVES!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Fornecedor:</td>
+		<td valign="top" class="totais">!A_FORNEC!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Data Entrega:</td>
+		<td valign="top" class="totais">!A_DTENTR!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Valor Total:</td>
+		<td valign="top" class="totais">!A_VLTOTAL!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Observação:</td>
+		<td valign="top" class="totais">!A_OBSPC!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Obs. Aprov. SC:</td>
+		<td valign="top" class="totais">!A_OBSSC!</td>
+	</tr>
+	<tr>
+		<td valign="top" class="totais" width="0120px">Obs. Generica SC:</td>
+		<td valign="top" class="totais">!A_OBSSCGEN!</td>
+	</tr>
+</table>
+<br>
+<br>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr height="040px">
+		<td width="035%" class="grupos1" rowspan='3'>
+			<center>
+			<img src="!cLogo!"><br>
+			<font style="font-size: 16px; font-weight: bold;">%cNomFil%</font><br>
+			<font style="font-size: 14px;">!cEndFil!</font><br>
+			<font style="font-size: 12px;">CEP:!cCepFil! - !cCidFil!-!cEstFil!</font><br>
+			<font style="font-size: 12px;">TEL:!cTelFil! - FAX:!cFaxFil!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">CNPJ/CPF:!cCGCFil!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">I.E:!cIEFil!</font>
+			</Center>
+		</td>
+		<td width="040%"  BGCOLOR=#4169E1 colspan='3' valign='center' >
+			<center>
+			<font color= #F2FBEF style="font-size: 16px; font-weight: bold;">PEDIDO DE COMPRAS !cTitulo!</font>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<font color= #FFFF00  style="font-size: 30px;font-weight: bold;"<B>!cReavaliar!<B></font>			
+			</center>
+		</td>
+	</tr>
+	<tr>
+		<td width="035%" class="grupos">
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Solicitante: </b>!cNomSol!</font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Aprovador da SC: </b>!cNomApr!</font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Gestor de Compras: </b> !cNomGes! </font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Aplicação:</b>!cAplic!</font><br>	
+			<font !cCorUrgen! style="font-size: 14px;">&nbsp;&nbsp;<b>Urgente:</b> !cUrgen!</font>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Compra Direta:</b> !cCompDir!</font><br>						
+		</td>
+
+		<td width="025%" class="grupos">
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Número SC: </b>!cnumSC!</font><br>			
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Data inclusão SC: </b>!cdtinc!</font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Data aprovação SC: </b> !cdtapr! </font><br>			
+		</td>
+
+		<td width="7%" class="grupos">
+			<center>
+			<font style="font-size: 14px; font-weight: bold;">Nº<br>%NumPC%<br></font><br>
+			</center>
+		</td>
+		</tr>
+	<tr>
+		<td width="055%" class="grupos1" colspan='3' valign='center'>
+			<center>
+			<font style="font-size: 14px; font-weight: bold;">!cNomFor!</font><br>
+			<font style="font-size: 12px;">!cEndFor!</font><br>
+			<font style="font-size: 12px;">CEP:!cCEPFor!- !cCidFor!-!cEstFor!</font><br>
+			<font style="font-size: 12px;">TEL:!cTelFor! FAX:!cFaxFor!</font><br>
+			<font style="font-size: 12px;">CNPJ/CPF:!cCGCFor! I.E.:!cIEFor!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">CONTATO: !cContatFor!</font>
+			<br></center>
+		</td>
+	</tr>
+	<tr>
+		<td colspan='4'>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'> 
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center"> 
+					<td width='01%'><font color="#F2FBEF" </font> Item </td>
+					<td width='07%'><font color="#F2FBEF" </font> Produto</td>
+					<td width='30%'><font color="#F2FBEF" </font> Descrição</td>
+					<td width='01%'><font color="#F2FBEF" </font> UM</td>
+					<td width='07%'><font color="#F2FBEF" </font> Quantidade</td>
+					<td width='10%'><font color="#F2FBEF" </font> Vlr.Unit.</td>
+					<td width='07%'><font color="#F2FBEF" </font> Vlr.Desc.</td>
+					<td width='10%'><font color="#F2FBEF" </font> Vlr.Total</td>
+					<td width='07%'><font color="#F2FBEF" </font> ICMS</td>
+<!--					<td width='05%'><font color="#F2FBEF" </font> ICMS ST</td> -->
+					<td width='05%'><font color="#F2FBEF" </font> Dt.Entrega</td>
+					<td width='07%'><font color="#F2FBEF" </font> Ul.Prc.Compra</td>
+					<td width='05%'><font color="#F2FBEF" </font> Saldo Filial</td>
+					<td width='05%'><font color="#F2FBEF" </font> Saldo Geral</td>
+				</tr>					
+				<tr HEIGHT=30 >
+					<td width='01%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.Item!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.Prodpc!</td>
+					<td width='30%' Style="font-family:VERDANA; font-size:12px; " align="left"  > !Itens.DesProd!</td>
+					<td width='01%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.UM!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.Qtde!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrUni!</td>
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrDes!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrTot!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="center" > !Itens.ICMS!</td>
+<!--					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrST!</td> -->
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.DtEmis!</td>
+<!--           <td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" class="CellWithComment"> !Itens.VlrUc!<span class="CellComment"> !Itens.DtUc!</span> </td> -->
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrUc!</td>
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.SldAtFil!</td>
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.SldAtEmp!</td>					
+				</tr>
+			</table>	
+		</td>
+	</tr>
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0';>
+	<tr>
+		<td rowspan='3' width='20%' align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;">Condição de Pagamento:</font><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!cCondPG!</font>
+		</td>
+		 <td rowspan='3' width='20%' align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;">Comprador:</font><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!cDigiFor!</font>
+		</td> 
+		 <td rowspan='3' width='10%' align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;">Data de Emissão:</font><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!dDtEmiss!</font>
+		</td> 
+		<td width='25%'><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Total das Mercadorias:</font></td>
+		<td width='25%' align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotMer%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<tr>
+		<td><font Style="border-style: none; font-family:VERDANA; font-size:12px;">IPI:</font></td>
+		<td align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nIPI%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>	
+	<tr>
+		<td><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Total das Mercadorias + IPI:</font></td>
+		<td align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotImp%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+		<!--</tr>-->
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr>
+		<td BGCOLOR=#4169E1 width="50%" rowspan='5' style="vertical-align: top;">
+			<font color= #F2FBEF Style="border-style: none; font-family:VERDANA; font-size:12px;">OBSERVAÇÕES:</font>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;			
+			<font color= #FFFF00  style="font-size: 16px;"><B>!cReavaliar!</B></font><br>
+			<font color= #F2FBEF Style="border-style: none; font-family:VERDANA; font-size:12px;">%cObs%</font>
+		</td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">ICMS (incluso):</font></td>
+		<td width="16%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nICMS%&nbsp;&nbsp;&nbsp;</font></td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Outros Imp.:</font></td>
+		<td width="17%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nOutImp%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<tr>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Frete: <b>!cFrete!</b> </font></td>
+		<td width="16%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nVlFrete!&nbsp;&nbsp;&nbsp;</font></td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Descontos:</font></td>
+		<td width="17%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nTotDesc!&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<tr>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">!cGord!</font></td>
+		<td width="16%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nSeguro!&nbsp;&nbsp;&nbsp;</font></td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Despesas:</font></td>
+		<td width="17%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nDesp!&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<!--<tr>
+		<td width="25%" align="right" colspan='2'><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold">Total Geral:</font></td>
+		<td width="25%" colspan='2' align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotGer%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>-->
+	<tr>
+		<td HEIGHT=30 width="25%" align="LEFT" colspan='2'><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold">T O T A L&nbsp;&nbsp;&nbsp;&nbsp;G E R A L:</font></td>
+		<td HEIGHT=30 BGCOLOR=#4169E1 width="25%" colspan='2' align="right"><font color= #F2FBEF  Style="border-style: none; font-family:VERDANA; font-size:13px; font-weight: bold;">%nTotGer%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>	
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr>
+		<td style="vertical-align: top;" rowspan="!nLinhas!">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Transportadora:</font>
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px;">!cTransp!</font><br>
+		</td>
+	</tr>
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr height="80px">
+		<td width='16.2%' style="vertical-align: top" align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Nome Aprovador</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold;">!Apr.Aprovador!</font>
+		</td>
+		<td width='17%' style="vertical-align: top"align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Data Aprovação</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold">!Apr.DtAprov!&nbsp;&nbsp;!Apr.HrAprov!</font>
+		</td>
+		<td width='17%' style="vertical-align: top"align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Obs Aprovação</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold">!Apr.ObsAprov!</font>
+		</td>
+		<td width='17%' style="vertical-align: top"align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Situação</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold">!Apr.NivelAprov!</font><br>
+		</td>
+	</tr>
+	
+</table>
+<br>
+<br>
+!cQuest!
+<br>
+<br>
+<a class="but but-primary but-shadow but-rc" href="!A_LINK!"><b>Clique Aqui para Responder o Questionamento</b></a>
+</center>
+</body>
+
+
+<br>PC_LINK_Q.HTM / MCOM004<br>

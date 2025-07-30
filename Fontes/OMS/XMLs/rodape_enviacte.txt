@@ -1,0 +1,4 @@
+         </tem:xmlCte>
+      </tem:EnviaCte>
+   </soapenv:Body>
+</soapenv:Envelope>

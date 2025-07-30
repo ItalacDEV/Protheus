@@ -1,0 +1,9 @@
+'{
+        "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cTelefon1))}) +'",
+        "telefone_principal": true,
+        "whatsapp": true,
+        "codigo_produtor": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) +'",
+        "codigo_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+        "codigo_usuario": "' + Eval({|| EncodeUTF8(AllTrim(_cCodPropL))}) +'",
+        "data_hora": "' + Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) + '"
+      }'

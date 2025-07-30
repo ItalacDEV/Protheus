@@ -1,0 +1,8 @@
+'{
+        "email": "' + Eval({|| EncodeUTF8(AllTrim(_cEMail))}) + '",
+        "email_principal": true,
+        "codigo_produtor": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+        "codigo_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+        "codigo_usuario": "' + Eval({|| EncodeUTF8(AllTrim(_cCodPropL))}) + '",
+        "data_hora": "'+ Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) + '"
+      }'

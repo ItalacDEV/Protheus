@@ -1,0 +1,3 @@
+' <wsit:CNPJEM>'+Eval({|| EncodeUTF8(AllTrim(ZZM->ZZM_CGC))})+'</wsit:CNPJEM>
+  <!--Optional:-->
+  <wsit:PEDIDO>'+Eval({|| EncodeUTF8(AllTrim(SC5->C5_NUM))})+'</wsit:PEDIDO>'

@@ -1,0 +1,6 @@
+            '<wsit:CNPJEM>'+Eval({|| EncodeUTF8(ZFK->ZFK_CGC)})+'</wsit:CNPJEM>
+            <!--Optional:-->
+            <wsit:NOTA>'+Eval({|| EncodeUTF8(ZFK->ZFK_CHVNFE)})+'</wsit:NOTA>
+            <!--Optional:-->
+            <wsit:PEDIDO>'+Eval({|| EncodeUTF8(ZFK->ZFK_PEDIDO)})+'</wsit:PEDIDO>'
+			

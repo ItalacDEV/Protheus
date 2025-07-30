@@ -1,0 +1,31 @@
+				'<tem:produto>
+					<wsit:APLICA>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_APLICA))})+'</wsit:APLICA>
+					<wsit:CNPJEM>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_CGC))})+'</wsit:CNPJEM>
+					<wsit:CODIGO>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_COD))})+'</wsit:CODIGO>					
+					<wsit:CODIGODN>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_CODIDN))})+'</wsit:CODIGODN>
+					<wsit:CSTCON>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_CSTCON))})+'</wsit:CSTCON>
+                                        <wsit:CSTIPI>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_CSTPIS))})+'</wsit:CSTIPI>
+					<wsit:CTSICM>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_CTSICM))})+'</wsit:CTSICM>
+					<wsit:CTSIPI>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_CTSIPI))})+'</wsit:CTSIPI>
+					<wsit:DESCOD>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_DESCPR))})+'</wsit:DESCOD>
+					<wsit:DESIGNA>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_DESC))})+'</wsit:DESIGNA>
+                    <wsit:EMBA>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_EMB))})+'</wsit:EMBA>
+					<wsit:GRUPO>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_GRUPO))})+'</wsit:GRUPO>
+					<wsit:NCM>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_POSIPI))})+'</wsit:NCM>
+					<wsit:PESO>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFI->ZFI_PESO,5,2)))})+'</wsit:PESO>
+					<wsit:PESOMAX>'+Eval({|| EncodeUTF8(AllTrim(STR(ZFI->ZFI_PESMAX,9,4)))})+'</wsit:PESOMAX>					
+                    <wsit:PESOMIN>'+Eval({|| EncodeUTF8(AllTrim(STR(ZFI->ZFI_PESMIN,9,4)))})+'</wsit:PESOMIN>	
+                    <wsit:PESOVAR>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_PESVAR))})+'</wsit:PESOVAR>					
+					<wsit:QTDEE>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFI->ZFI_EMPMAX,2)))})+'</wsit:QTDEE>
+					<wsit:QTDEL>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFI->ZFI_QTDEL,2)))})+'</wsit:QTDEL>
+					<wsit:SUBAPLI>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_SUBAPL))})+'</wsit:SUBAPLI>
+					<wsit:SUBEMBA>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_SUBEMB))})+'</wsit:SUBEMBA>
+					<wsit:SUBGRUPO>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_SUBGRU))})+'</wsit:SUBGRUPO>
+					<wsit:TPPROD>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_TPPROD))})+'</wsit:TPPROD>					
+					<wsit:UNMED>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_UM))})+'</wsit:UNMED>
+					<wsit:UNVED>'+Eval({|| EncodeUTF8(AllTrim(ZFI->ZFI_SEGUM))})+'</wsit:UNVED>	
+	
+
+               	
+				</tem:produto>'
+

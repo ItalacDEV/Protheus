@@ -1,0 +1,38 @@
+        '</wsit:ITENSPEDIDO>
+            <!--Optional:-->
+            <wsit:NRTRAN>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_NRTRAN))})+'</wsit:NRTRAN>
+            <!--Optional:-->
+            <wsit:NUMENT>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_NUMENT))})+'</wsit:NUMENT>
+            <!--Optional:-->
+            <wsit:NUMERO>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_NUMERO))})+'</wsit:NUMERO>
+			<!--Optional:-->
+            <wsit:OBSCPA>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_OBSCPA	))})+'</wsit:OBSCPA>
+            <!--Optional:-->
+            <wsit:OBSNFE>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_OBSNFE))})+'</wsit:OBSNFE>
+            <!--Optional:-->
+            <wsit:OBSPVE>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_OBSPVE))})+'</wsit:OBSPVE>			
+            <!--Optional:-->'+If(!Empty(ZFQ->ZFQ_PEDID2),'<wsit:PEDID2>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_PEDID2))})+'</wsit:PEDID2><!--Optional:-->', "")+'
+            <wsit:PEDIDO>'+Eval({|| EncodeUTF8(AllTrim(ZFQ->ZFQ_PEDIDO))})+'</wsit:PEDIDO>
+            <!--Optional:-->
+            <wsit:PESOPE>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFQ->ZFQ_PESOPE,14,4)))})+'</wsit:PESOPE>
+            <!--Optional:-->
+            <wsit:QTDEPA>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFQ->ZFQ_QTDEPA,2)))})+'</wsit:QTDEPA>
+            <!--Optional:-->
+            <wsit:REPRES>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_REPRES)))})+'</wsit:REPRES>
+			<!--Optional:-->
+            <wsit:SITUAC>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_SITPED)))})+'</wsit:SITUAC>
+            <!--Optional:-->
+            <wsit:STATUS>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_STATUS)))})+'</wsit:STATUS>
+            <!--Optional:-->
+            <wsit:TIPEDI>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_TIPEDI)))})+'</wsit:TIPEDI>
+			<!--Optional:-->
+            <wsit:TIPOPA>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_TIPOPA)))})+'</wsit:TIPOPA>
+			<!--Optional:-->
+            <wsit:TPAGEN>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_TPAGEN)))})+'</wsit:TPAGEN>
+	        <!--Optional:-->
+            <wsit:USUALT>'+Eval({|| EncodeUTF8(Upper(AllTrim(ZFQ->ZFQ_USUALT )))})+'</wsit:USUALT>            
+            <!--Optional:-->
+            <wsit:VLRPED>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFQ->ZFQ_VLRPED,18,4)))})+'</wsit:VLRPED>
+            <!--Optional:-->
+            <wsit:VOLUME>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFQ->ZFQ_VOLUME,10,4)))})+'</wsit:VOLUME>
+         </tem:pedido>'

@@ -1,0 +1,22 @@
+'[{
+        "laticinio": {            
+            "nome_razao_social": "' + Eval({|| EncodeUTF8(AllTrim(_cRazaoSoc))}) + '",
+            "cpf_cnpj": "' + Eval({|| EncodeUTF8(AllTrim(_cCpf_Cnpj))}) + '",
+			"situacao": "' + Eval({|| EncodeUTF8(AllTrim(_cSituacao))}) + '" ,			
+            "vinculado_ao_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cVincLat))}) + '" ,	
+            "tipo_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cTipoLat))}) + '" ,				
+            "endereco": {
+                "complemento": "' + Eval({|| EncodeUTF8(AllTrim(_cComplem))}) + '",
+                "endereco": "' + Eval({|| EncodeUTF8(AllTrim(_cEndereco))}) + '",
+                "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cNrEnd))}) + '",
+                "bairro": "' + Eval({|| EncodeUTF8(AllTrim(_cBairro))}) + '",
+                "cep": "' + Eval({|| EncodeUTF8(AllTrim(_cCep))}) + '",
+			    "cidade_uf": "' + Eval({|| EncodeUTF8(AllTrim(_cCid_UF))}) + '",			
+				"codigo_ibge_cidade": "' + Eval({|| EncodeUTF8(AllTrim(_cCod_Ibge))}) + '"			
+                },
+            "telefones": [{
+			    "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cTelefon1))}) + '",
+				"telefone_principal": "' + Eval({|| EncodeUTF8(AllTrim(_cTelPrinc))}) + '",
+			    "whatsapp": "' + Eval({|| EncodeUTF8(AllTrim(_cWhatsAp1))}) + '"
+			    }],
+			"emails": ['

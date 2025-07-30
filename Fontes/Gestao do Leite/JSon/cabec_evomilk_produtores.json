@@ -1,0 +1,11 @@
+'[
+  {
+    "codigo_produtor": "'+ Eval({|| EncodeUTF8(AllTrim(_cIdProdut))}) + '",
+    "nome_razao_social": "'+ Eval({|| EncodeUTF8(AllTrim(_cRazaoSoc))}) + '",
+    "cpf_cnpj": "'+Eval({|| EncodeUTF8(AllTrim(_cCpf_Cnpj))})+'",
+    "rg": "'+ Eval({|| EncodeUTF8(AllTrim(_cRg_IE))}) +'",
+    "orgao_emissor": "",
+    "data_nascimento_fundacao": "'+ Eval({|| EncodeUTF8(AllTrim(_cDtNascF))}) +'",
+    "data_hora": "'+ Eval({|| EncodeUTF8(AllTrim(_cDtHrEnv))}) +'",
+    "codigo_usuario": "'+ Eval({|| EncodeUTF8(AllTrim(_cIdProdut))}) + '",
+    "propriedades": ['

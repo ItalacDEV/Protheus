@@ -1,0 +1,45 @@
+'{
+        "produtor": {            
+            "nome_razao_social": "' + Eval({|| EncodeUTF8(AllTrim(_cRazaoSoc))}) + '",
+            "cpf_cnpj": "' + Eval({|| EncodeUTF8(AllTrim(_cCpf_Cnpj))}) + '",
+            "inscricao_estadual": "' + Eval({|| EncodeUTF8(AllTrim(_cInscrEst))}) + '",
+            "rg_ie": "' + Eval({|| EncodeUTF8(AllTrim(_cRg_IE))}) + '",
+            "data_nascimento_fundacao": "' + Eval({|| EncodeUTF8(AllTrim(_cDtNascF))}) + '",
+            "info_adicional": "' + Eval({|| EncodeUTF8(AllTrim(_cObserv))}) + '",
+			"situacao": "' + Eval({|| EncodeUTF8(AllTrim(_cSituacao))}) + '" ,			
+            "endereco": {
+                "complemento": "' + Eval({|| EncodeUTF8(AllTrim(_cComplem))}) + '",
+                "endereco": "' + Eval({|| EncodeUTF8(AllTrim(_cEndereco))}) + '",
+                "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cNrEnd))}) + '",
+                "bairro": "' + Eval({|| EncodeUTF8(AllTrim(_cBairro))}) + '",
+                "cep": "' + Eval({|| EncodeUTF8(AllTrim(_cCep))}) + '",
+			    "cidade_uf": "' + Eval({|| EncodeUTF8(AllTrim(_cCid_UF))}) + '",			
+				"codigo_ibge_cidade": "' + Eval({|| EncodeUTF8(AllTrim(_cCod_Ibge))}) + '"			
+                },
+            "telefones": [{
+			    "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cTelefon1))}) + '",
+			    "whatsapp": "' + Eval({|| EncodeUTF8(AllTrim(_cWhatsAp1))}) + '"
+			    }],
+			"emails": [{
+				"email": "' + Eval({|| EncodeUTF8(AllTrim(_cEMail))}) + '"
+			    }],
+            "dados_bancarios": [
+                {
+				    "nome_banco": "' + Eval({|| EncodeUTF8(AllTrim(_cNomBanco))}) + '",
+                    "banco": "' + Eval({|| EncodeUTF8(AllTrim(_cCodBanco))}) + '",
+                    "agencia": "' + Eval({|| EncodeUTF8(AllTrim(_cCodAgenc))}) + '",
+                    "conta": "' + Eval({|| EncodeUTF8(AllTrim(_cNumConta))}) + '",
+                    "tipo": "CORRENTE",
+					"nome_titular_conta": "' + Eval({|| EncodeUTF8(AllTrim(_cTitConta))}) + '",
+					"informacao_adicional": "' + Eval({|| EncodeUTF8(AllTrim(_cInfoAdic))}) + '",
+					"conta_principal": "1"
+                }
+            ],
+			"produtor_parceiro_de": [
+                {
+				    "cpf_cnpj": "' + Eval({|| EncodeUTF8(AllTrim(_cCPFCnpjP))}) + '",
+                    "matricula_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cMatParce))}) + '"             
+                }
+            ]
+		},
+        "propriedades": ['

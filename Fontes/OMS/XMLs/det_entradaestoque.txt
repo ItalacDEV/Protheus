@@ -1,0 +1,12 @@
+         '<tem:estoque>
+            <!--Optional:-->
+            <wsit:CNPJEM>'+Eval({|| EncodeUTF8(AllTrim(ZFJ->ZFJ_CGC))})+'</wsit:CNPJEM>
+            <!--Optional:-->
+            <wsit:CODIGO>'+Eval({|| EncodeUTF8(AllTrim(ZFJ->ZFJ_COD))})+'</wsit:CODIGO>
+            <!--Optional:-->
+            <wsit:DATESTO>'+Eval({|| EncodeUTF8(Strzero(Year(ZFJ->ZFJ_DATEST),4)+"-"+Strzero(Month(ZFJ->ZFJ_DATEST),2)+"-"+StrZero(Day(ZFJ->ZFJ_DATEST),2))})+'</wsit:DATESTO>
+			<!--Optional:-->
+            <wsit:QTDESTO>'+Eval({|| EncodeUTF8(Alltrim(Str(ZFJ->ZFJ_QATU,13)))})+'</wsit:QTDESTO>
+			<!--Optional:-->
+			<wsit:CODARM>'+Eval({|| EncodeUTF8(Alltrim(ZFJ->ZFJ_CODARM))})+'</wsit:CODARM>
+         </tem:estoque>'

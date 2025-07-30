@@ -1,0 +1,159 @@
+/*
+===============================================================================================================================
+               ULTIMAS ATUALIZAÇÕES EFETUADAS - CONSULTAR LOG DO VERSIONADOR PARA HISTORICO COMPLETO
+===============================================================================================================================
+   Autor      |   Data   |                              Motivo                                                          
+-------------------------------------------------------------------------------------------------------------------------------
+Lucas Borges  |09/10/2024| Chamado 48465. Retirada manipulação do SX1
+===============================================================================================================================
+*/
+
+#include "report.ch"
+
+/*
+===============================================================================================================================
+Programa--------: ROMS008
+Autor-----------: Jeovane
+Data da Criacao-: 11/02/2009
+Descrição-------: Relatorio de Titulos Cancelados. 
+Parametros------: Nenhum
+Retorno---------: Nenhum
+===============================================================================================================================
+*/
+User function ROMS008()
+private oReport
+Private oZAI
+Private cPerg := "ROMS008"
+Private QRY1
+Private aOrd := {"Dt. Emissao","Dt. Vencimento","Dt. Cancelamento","Cliente","Numero"}
+private cCliente := " "
+
+pergunte(cPerg,.F.)
+
+DEFINE REPORT oReport NAME "ROMS008" TITLE "Relação de Títulos Cancelados" PARAMETER cPerg ACTION {|oReport| PrintReport(oReport)}
+
+//Seta Padrao de impressao Paisagem.
+//oReport:SetLandscape()
+oReport:SetTotalInLine(.F.)
+
+//Define secao
+
+DEFINE SECTION oZAI OF oReport TITLE "Dados" TABLES "ZAI"  ORDERS aOrd
+DEFINE CELL NAME "A1_NOME"  	OF oZAI ALIAS "SA1"
+DEFINE CELL NAME "A1_LOJA"  	OF oZAI ALIAS "SA1"
+
+DEFINE SECTION oZAIDet OF oZAI TITLE "Dados" TABLES "ZAI"  ORDERS aOrd
+DEFINE CELL NAME "ZAI_FILIAL"	OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_PREFIX"	OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_NUM"	    OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_PARCEL"	OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_TIPO"	    OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_EMISSA"   OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_VENCTO"   OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_VENCRE"   OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_VALOR"    OF oZAIDet ALIAS "ZAI"
+DEFINE CELL NAME "ZAI_CDUSU"    OF oZAIDet ALIAS "ZAI" //BLOCK {||  }
+DEFINE CELL NAME "ZAI_DTCANC"   OF oZAIDet ALIAS "ZAI"    
+
+
+DEFINE FUNCTION FROM oZAIDet:Cell("ZAI_VALOR") FUNCTION SUM  
+oZAIDet:OnPrintLine({|| cCliente := QRY1->A1_NOME    })
+oZAIDet:SetTotalText({|| "SUBTOTAL CLIENTE: " + cCliente})                                                        
+oZAIDet:SetTotalInLine(.F.)
+
+oReport:PrintDialog()
+Return
+
+Static Function PrintReport(oReport)
+Local cFiltro := "%"
+local cOrdem := "%"
+Private nOrdem := oZAI:GetOrder() //Busca ordem selecionada pelo usuario
+
+//Define o filtro de acordo com os parametros digitados
+//Filtra Filial da ZAI
+if !empty(alltrim(mv_par01))	
+	if !empty(xFilial("ZAI"))
+		cFiltro += " AND ZAI.ZAI_FILIAL IN " + FormatIn(mv_par01,";")
+	endif	                         
+endif
+//Filtra Prefixo
+if !empty(mv_par02) .and. !empty(mv_par03)
+	cFiltro += " AND ZAI.ZAI_PREFIX BETWEEN '" + mv_par02 + "' AND '" + mv_par03 + "'"
+endif
+//Filtra Numero
+if !empty(mv_par04) .and. !empty(mv_par05)
+	cFiltro += " AND ZAI.ZAI_NUM BETWEEN '" + mv_par04 + "' AND '" + mv_par05 + "'"
+endif
+//Filtra Emissao da ZAI
+if !empty(mv_par06) .and. !empty(mv_par07)
+	cFiltro += " AND ZAI.ZAI_EMISSA BETWEEN '" + dtos(mv_par06) + "' AND '" + dtos(mv_par07) + "'"
+endif
+
+//Filtra Vencimento Real
+if !empty(mv_par08) .and. !empty(mv_par09)
+	cFiltro += " AND ZAI.ZAI_VENCRE BETWEEN '" + dtos(mv_par08) + "' AND '" + dtos(mv_par09) + "'"
+endif
+
+//Filtra Cliente
+if !empty(mv_par10) .and. !empty(mv_par12)
+	cFiltro += " AND ZAI.ZAI_CLIENT BETWEEN '" + mv_par10 + "' AND '" + mv_par12 + "'"
+endif
+
+//Filtra Loja Cliente
+if !empty(mv_par11) .and. !empty(mv_par13)
+	cFiltro += " AND ZAI.ZAI_LOJA BETWEEN '" + mv_par11 + "' AND '" + mv_par13 + "'"
+endif
+
+//Filtra Rede Cliente
+if !empty(mv_par14)
+	cFiltro += " AND SA1.A1_GRPVEN IN " + FormatIn(mv_par14,";")
+endif
+
+//Filtra usuario que exclui
+if !empty(mv_par15)
+	cFiltro += " AND ZAI.ZAI_CDUSU = '" + mv_par15 + "' "
+endif
+cFiltro += "%"                                           
+
+//Verifica qual ordem usuario definiu
+do case
+	case nOrdem == 1 //Dt. Emissao
+		cOrdem += " ZAI.ZAI_EMISSA,ZAI_PREFIX,ZAI_NUM,ZAI_PARCEL "
+	case nOrdem == 2 //Dt. Vencimento
+		cOrdem += " ZAI.ZAI_VENCTO,ZAI_PREFIX,ZAI_NUM,ZAI_PARCEL "
+	case nOrdem == 3 //Dt. Cancelamento
+		cOrdem += " ZAI.ZAI_DTCANC,ZAI_PREFIX,ZAI_NUM,ZAI_PARCEL "
+	case nOrdem == 4 //Cliente
+		cOrdem += " ZAI.ZAI_CLIENT,ZAI.ZAI_LOJA,ZAI_PREFIX,ZAI_NUM,ZAI_PARCEL "		
+	case nOrdem == 5 //Prefixo+Numero
+		cOrdem += " ZAI_PREFIX,ZAI_NUM,ZAI_PARCEL "			
+endcase
+cOrdem += "%"
+
+
+//Define query para ordem Supervisor
+//BEGIN REPORT QUERY oSC5_1
+BEGIN REPORT QUERY oZAI
+	BeginSql alias "QRY1"   	   	
+	   	SELECT 
+			ZAI_FILIAL,ZAI_PREFIX,ZAI_NUM,ZAI_PARCEL,ZAI_TIPO,ZAI_CLIENT,ZAI_LOJA,SA1.A1_NOME,
+			ZAI_VENCTO,ZAI_EMISSA,ZAI_CDUSU,ZAI_DTCANC,ZAI.ZAI_VENCRE
+		FROM 
+			%table:ZAI% ZAI
+			JOIN %table:SA1% SA1 ON ZAI_CLIENT = SA1.A1_COD AND ZAI_LOJA = SA1.A1_LOJA
+		WHERE 
+			ZAI.%notDel%  
+			AND SA1.%notDel%
+		    %exp:cFiltro%
+		ORDER BY 
+			%exp:cOrdem%
+	EndSql
+END REPORT QUERY oZAI
+
+//Secao Supervisor/Vendedor
+oZAIDet:SetParentQuery()
+oZAIDet:SetParentFilter({|cParam| QRY1->ZAI_CLIENT+QRY1->ZAI_LOJA == cParam },{|| QRY1->ZAI_CLIENT+QRY1->ZAI_LOJA })
+
+
+oReport:Section(1):Print(.T.)
+return

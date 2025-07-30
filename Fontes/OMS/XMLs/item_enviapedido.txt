@@ -1,0 +1,30 @@
+               '<wsit:PedidoItem>
+			      <!--Optional:-->
+                  <wsit:CODARM>'+Eval({|| EncodeUTF8(AllTrim(ZFR->ZFR_CODARM))})+'</wsit:CODARM>
+                  <!--Optional:-->
+                  <wsit:CODIGO>'+Eval({|| EncodeUTF8(AllTrim(ZFR->ZFR_CODIGO))})+'</wsit:CODIGO>
+                  <!--Optional:-->
+                  <wsit:CUBADO>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_CUBADO,10,4)))})+'</wsit:CUBADO>
+				  <!--Optional:-->
+                  <wsit:FATOPA>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_FATOPA,18,6)))})+'</wsit:FATOPA>
+                  <!--Optional:-->
+                  <wsit:ITEM>'+Eval({|| EncodeUTF8(AllTrim(ZFR->ZFR_ITEM))})+'</wsit:ITEM>
+                  <!--Optional:-->
+                  <wsit:NATOPE>'+Eval({|| EncodeUTF8(AllTrim(ZFR->ZFR_NATOPE))})+'</wsit:NATOPE>
+                  <!--Optional:-->
+                  <wsit:PESOBR>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_PESOBR,18,4)))})+'</wsit:PESOBR>
+                  <!--Optional:-->
+                  <wsit:PESOUN>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_PESOUN,18,4)))})+'</wsit:PESOUN>
+                  <!--Optional:-->
+                  <wsit:QTDEPA>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_QTDEPA,2)))})+'</wsit:QTDEPA>
+                  <!--Optional:-->
+                  <wsit:QTDEPR>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_QTDEPR,12,4)))})+'</wsit:QTDEPR>
+                  <!--Optional:-->
+                  <wsit:QTDPEC>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_QTDPEC,14,5)))})+'</wsit:QTDPEC>
+                  <!--Optional:-->
+                  <wsit:UNMED>'+Eval({|| EncodeUTF8(AllTrim(ZFR->ZFR_UNMED))})+'</wsit:UNMED>
+                  <!--Optional:-->
+                  <wsit:VLRPRO>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_VLRPRO,12,4)))})+'</wsit:VLRPRO>
+                  <!--Optional:-->
+                  <wsit:VOLUME>'+Eval({|| EncodeUTF8(AllTrim(Str(ZFR->ZFR_VOLUME,10,4)))})+'</wsit:VOLUME>				  
+               </wsit:PedidoItem>' 

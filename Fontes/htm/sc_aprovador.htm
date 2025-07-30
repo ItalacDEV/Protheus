@@ -1,0 +1,242 @@
+<html>
+<head>
+<title>Solicitação de Compras</title>
+<script type="text/javascript">
+<!--
+  function avisar(aviso){
+	if(document.getElementById("BtnAprovar").value == 'Aprovar (Aguarde…)')
+	{
+		document.getElementById("BtnAprovar").disabled=true;
+	}
+	else{
+		document.getElementById("BtnAprovar").value='Aprovar (Aguarde…)';
+		
+		document.getElementById("BtnRejeitar").disabled=true;
+		document.getElementById("BtnQuestionar").disabled=true;
+	}  
+  
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+ 	  document.frm_aprovador.tx_obs.value = aviso
+	  return true;
+    }
+	else
+	{
+	  return true ;	  
+    }
+  }
+  
+  function ObrigarInformar(){
+  var cTemp = ""
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+      window.alert('SC Rejeitada, por favor preencher o campo Observação');
+	  return false;
+    }
+    else{
+		cTemp = document.frm_aprovador.tx_obs.value
+		if(cTemp.length < 11)
+		{
+			window.alert('Tamanho do campo observação da Rejeição inválido.');
+			return false;
+		}
+		else
+		{
+			if(document.getElementById("BtnRejeitar").value == 'Rejeitar (Aguarde…)')
+			{
+				document.getElementById("BtnRejeitar").disabled=true;
+			}
+			else{
+				document.getElementById("BtnRejeitar").value='Rejeitar (Aguarde…)';
+				
+				document.getElementById("BtnAprovar").disabled=true;
+				document.getElementById("BtnQuestionar").disabled=true;
+				return true ;
+			}
+		}
+    }
+  }  
+  function Questionar(){
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+      window.alert('Para questionamento por favor preencher o campo Observação');
+	  return false;
+    }
+    else{
+		if(document.getElementById("BtnQuestionar").value == 'Questionar (Aguarde…)')
+		{
+			document.getElementById("BtnQuestionar").disabled=true;
+		}
+		else{
+			document.getElementById("BtnQuestionar").value='Questionar (Aguarde…)';
+			
+			document.getElementById("BtnAprovar").disabled=true;
+			document.getElementById("BtnRejeitar").disabled=true;
+			return true ;
+		}	
+    }
+  }  
+
+//-->
+</script>
+</head>
+
+<style type="text/css"><!--
+table.bordasimples { border-collapse: collapse; }
+table.bordasimples tr td { border:1px solid #777777; }  
+td.grupos	{ font-family:VERDANA; font-size:20px; V-align:middle; background-color: #C6E2FF; color:#000080; }
+td.titulos	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.itens	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.itenspc	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #36F; }
+.but-success { color: #fff; background-color: #009835;}
+.but-quest {color: #FFF;background-color: #0066FF;}
+.but-error {color: #fff;background-color: #CC0000;}
+.but-shadow { box-shadow: 1px 1px 1px #999; }
+.but-rc { border-radius: 4px; }
+--></style>
+<body>
+<center>
+<form action=mailto:%WFMailTo% method="POST" name="frm_aprovador">
+
+<table width="100%" cellspacing="0" cellpadding="2">
+	<tr>
+		<td width="30%" class="grupos">
+			<img src="!cLogo!"><br>
+		</td>
+		<td width="70%" class="grupos" align="left">
+			Solicitação de Compras - Avaliação <B>%cCLAIM%<B>
+		</td>
+	</tr>
+</table>
+
+<br>
+<table border="0" width="100%" bordercolor="#FFFFFF" bordercolordark="#DFEFFF" bordercolorlight="#DFEFFF" bgcolor="#FFFFFF">
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Solicitação: </b>%NumSC%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Filial: </b>%Filial%</font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Solicitante: </b>%Solicitante%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Emissão: </b>%DtEmissao%</font></td>
+	</tr>
+	<tr> 
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Aprovador: </b>%Aprovador%</font></td>
+		<!--<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Aprovador: </b>%APRNOM%</font></td>-->
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Urgente: </b>!Urgente!</font></td>
+	</tr>	
+	<tr> 
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Aplicação: </b>%Aplicacao%</font></td>
+		<td bgcolor="#f2f4f7" valign="middle" width="50%" height="24" class="itens"><b>Centro de Custo: </b>%CentroCusto%</font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" colspan="2" height="21" class="itens"><b><font size="2" face="Verdana"> Observação Genérica:</b> %ObsGen% </font></td>
+	</tr>
+	<tr>
+		<td bgcolor="#f2f4f7" colspan="2" height="21" class="itens"><b><font size="2" face="Verdana"> Valor Total Orçado :</b> %VlrTotOrc% </font></td>
+	</tr>
+</table>
+<br><br>
+<table border="0" width="100%">
+	<tr> 
+		<td align="center" width="05%" height="23" class='totais'>Item</td>
+		<td align="center" width="28%" height="23" class='totais'>Produto</td>
+		<td align="center" width="04%" height="23" class='totais'>UM</td>
+		<td align="center" width="04%" height="23" class='totais'>Local</td>
+		<td align="center" width="05%" height="23" class='totais'>Qtde</td>
+		<td align="center" width="08%" height="23" class='totais'>Último Preço</td>
+		<td align="center" width="08%" height="23" class='totais'>Data Necessidade</td>
+		<td align="center" width="06%" height="23" class='totais'>Saldo Atual Filial</td>
+		<td align="center" width="06%" height="23" class='totais'>Media 3 meses</td>
+	</tr>
+	<tr>
+		<td align="center" width="05%" height="21" class='itens'>!Itens.Item!</td>
+		<td align="left"   width="28%" height="21" class='itens'>!Itens.Produto!</td>
+		<td align="center" width="04%" height="21" class='itens'>!Itens.UM!</td>
+		<td align="center" width="04%" height="21" class='itens'>!Itens.Almox!</td>
+		<td align="right"  width="05%" height="21" class='itens'>!Itens.Qtde!</td>
+		<td align="right"  width="08%" height="21" class='itens'>!Itens.VlrUc!</td>
+		<td align="center" width="08%" height="21" class='itens'>!Itens.DtNeces!</td>
+		<td align="right"  width="06%" height="21" class='itens'>!Itens.SldAtFil!</td>
+		<td align="right"  width="06%" height="21" class='itens'>!Itens.SldAtEmp!</td>	  
+		<tr valign="top">
+			<td colspan="10" height="21" font face="Verdana" size="1" ></font></b><font size="2" face="Verdana"> !Itens.Obs! </font></td>
+		</tr>
+	</tr>
+</table>
+<br>
+<table border='0' cellpadding='0' cellspacing='1' width='100%'>
+	<tr>
+		<td class='grupos'><center>Último Pedido de Compra de cada item:</center></td>
+	</tr>
+</table>
+<table border="0" width="100%">
+	<tr> 
+		<td align="center" width="05%" height="23" class='totais'>Número</td>
+		<td align="center" width="05%" height="23" class='totais'>Item</td>
+		<td align="center" width="40%" height="23" class='totais'>Fornecedor</td>
+		<td align="center" width="08%" height="23" class='totais'>Quant.</td>
+		<td align="center" width="08%" height="23" class='totais'>U.M.</td>
+		<td align="center" width="08%" height="23" class='totais'>Qtd. Emb.</td>
+		<td align="center" width="08%" height="23" class='totais'>Valor</td>
+		<td align="center" width="10%" height="23" class='totais'>Total</td>
+		<td align="center" width="08%" height="23" class='totais'>Emissão</td>
+	</tr>
+	<tr>
+		<td align="left"  width="100%" height="21" colspan="9" class='itens'><b>%ItensPC1.Prodpc%</b></td>	
+		<tr>
+			<td align="center" width="05%" height="21" class='itens'>!ItensPC1.Numpc!</td>
+			<td align="center" width="05%" height="21" class='itens'>!ItensPC1.Itempc!</td>
+			<td align="left"   width="40%" height="21" class='itens'>!ItensPC1.Fornecpc!</td>
+			<td align="right"  width="08%" height="21" class='itens'>!ItensPC1.Quantpc!</td>
+			<td align="center" width="08%" height="21" class='itens'>!ItensPC1.UMpc!</td>
+			<td align="right"  width="08%" height="21" class='itens'>!ItensPC1.Qtdepc!</td>
+			<td align="right"  width="08%" height="21" class='itens'>!ItensPC1.Valorpc!</td>
+			<td align="right"  width="10%" height="21" class='itens'>!ItensPC1.Totalpc!</td>
+			<td align="center" width="08%" height="21" class='itens'>!ItensPC1.Emissaopc!</td>
+		</tr>
+	</tr>
+	
+	<tr><td width='100%' colspan='9'>&nbsp;</td></tr>
+</table>
+<br>
+<br>
+!cQuest!
+<br>
+<br>
+<table bgcolor="#f2f4f7" border="0" width="100%">
+	<tr>
+		<td width="100%">
+			<table border="0" width="100%"  align="center" >
+				<tr>
+				  <center>
+			       <font color="#333366" face="Verdana" size="4" align="center" >Questionamento ou Observação</font> 
+				  </center>
+		        </tr>
+
+				<tr>
+					<td width="100%" height="100"><p align="center"> <font face="Verdana" size="2">
+						<textarea name="%CR_OBS%" id="tx_obs" TEMPLATE_name="S1" rows="5" cols="96"></textarea></font></p></td>
+				</tr>
+				<tr> 
+					<td width="100%" height="27"><p align="center"><font face="Verdana">
+					
+					<input class="but but-success but-shadow but-rc" id="BtnAprovar"    type="submit" name="%opcao%" value="Aprovar"    onClick="return avisar('Aprovado')"> 
+					<input class="but but-quest but-shadow but-rc"   id="BtnQuestionar" type="submit" name="%opcao%" value="Questionar" onClick="return Questionar()"> 
+					<input class="but but-error but-shadow but-rc"   id="BtnRejeitar"   type="submit" name="%opcao%" value="Rejeitar"   onClick="return ObrigarInformar()"> 
+			
+			    </tr>
+
+			</table>
+		</td>
+	</tr>
+</table>
+ &nbsp;
+</form>
+</center>
+</body>
+</html>
+<br>SC_APROVADOR.HTM / MCOM003<br>

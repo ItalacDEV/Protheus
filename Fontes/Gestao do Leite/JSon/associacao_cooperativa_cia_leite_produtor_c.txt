@@ -1,0 +1,16 @@
+'],
+            "responsavel_laticinio": 
+                {
+				    "nome": "' + Eval({|| EncodeUTF8(AllTrim(_cNomRespL))}) + '",
+                    "telefone": "' + Eval({|| EncodeUTF8(AllTrim(_cTelRespL))}) + '",
+                    "email": "' + Eval({|| EncodeUTF8(AllTrim(_cEmaRespL))}) + '"                    
+                }
+            ,
+			"responsavel_politica_leiteira": 
+                {
+				    "nome": "' + Eval({|| EncodeUTF8(AllTrim(_cNomRespP))}) + '",
+                    "telefone": "' + Eval({|| EncodeUTF8(AllTrim(_cTelRespP))}) + '",
+                    "email": "' + Eval({|| EncodeUTF8(AllTrim(_cEmaRespP))}) + '"          
+                }
+            }
+		  }]'  

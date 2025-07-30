@@ -1,0 +1,19 @@
+            '<wsit:CDMUDE>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CDMUDE))})+'</wsit:CDMUDE>
+            <!--Optional:-->
+            <wsit:CDMUOR>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CDMUOR))})+'</wsit:CDMUOR>
+            <!--Optional:-->
+            <wsit:CNPJFA>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CNPJFA))})+'</wsit:CNPJFA>
+            <!--Optional:-->
+            <wsit:CODCAR>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CODCAR))})+'</wsit:CODCAR>
+            <!--Optional:-->
+            <wsit:CODCAV>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CODCAV))})+'</wsit:CODCAV>
+            <!--Optional:-->
+            <wsit:CODFRO>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CODFRT))})+'</wsit:CODFRO>
+            <!--Optional:-->
+            <wsit:CODMOT>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_CODMOT))})+'</wsit:CODMOT>
+            <!--Optional:-->
+            <wsit:NRSOLI>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_NRORDE))})+'</wsit:NRSOLI>
+            <!--Optional:-->
+            <wsit:SITUAC>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_SITOPE))})+'</wsit:SITUAC>
+            <!--Optional:-->
+            <wsit:TPOPER>'+Eval({|| EncodeUTF8(AllTrim(ZG4->ZG4_TPOPER))})+'</wsit:TPOPER>'

@@ -1,0 +1,931 @@
+/*
+===============================================================================================================================
+               ULTIMAS ATUALIZAÇÕES EFETUADAS - CONSULTAR LOG DO VERSIONADOR PARA HISTORICO COMPLETO
+===============================================================================================================================
+ Autor        |    Data    |                              Motivo                      										 
+-------------------------------------------------------------------------------------------------------------------------------
+Julio Paz     | 02/05/2017 | Chamado 19813. Inclusão da função de Log ITLOGACS().
+-------------------------------------------------------------------------------------------------------------------------------
+Alex Walaluer | 19/12/2018 | Chamado 27370. Quando mv_par01 = 1, p/ o consumo standard, na SG1 a revisão deve ser = a OP-SC2.
+-------------------------------------------------------------------------------------------------------------------------------
+Lucas Borges  | 11/09/2024 | Chamado 48465. Removendo warning de compilação.
+===============================================================================================================================
+*/
+
+//====================================================================================================
+// Definicoes de Includes da Rotina.
+//====================================================================================================
+#INCLUDE "MATR450.CH"
+#INCLUDE "PROTHEUS.CH"
+
+/*
+===============================================================================================================================
+Programa----------: REST006
+Autor-------------: André Lisboa
+Data da Criacao---: 30/03/2016
+===============================================================================================================================
+Descrição---------: Relatório criado com base no padrão MATR450 - Consumo real x standard
+===============================================================================================================================
+Parametros--------: Nenhum
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================
+*/
+User Function REST006()
+
+Local oReport
+
+oReport:= ReportDef()
+oReport:PrintDialog()
+
+//========================================================================
+// Grava log de Relatório de Consumo real x standard
+//======================================================================== 
+U_ITLOGACS('REST006')
+
+Return Nil
+
+/*
+===============================================================================================================================
+Programa----------: ReportDef
+Autor-------------: Flavio Luiz Vicco 
+Data da Criacao---: 03/07/2006
+===============================================================================================================================
+Descrição---------: Relacao Consumo Real x Standard.  
+===============================================================================================================================
+Parametros--------: Nenhum
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================*/
+Static Function ReportDef()
+
+Local oReport 
+Local oSection1 
+Local oSection2
+Local oSection3
+Local oSection4
+Local cTitle    := OemToAnsi(STR0001) //"Consumo Real x Standard"
+
+Private cPicD3C114 := PesqPict("SD3","D3_CUSTO1",14)
+Private cPicD3C116 := PesqPict("SD3","D3_CUSTO1",16)
+Private cPicD3C118 := PesqPict("SD3","D3_CUSTO1",18)
+Private cPicD3Qtde := PesqPict("SD3","D3_QUANT" ,15)
+Private cPicC2Qtde := PesqPict("SC2","C2_QUANT",15)
+Private cTamCod    := TamSX3("D3_COD")[1]
+Private cNumOP	   := PesqPict("SD3","D3_OP",6)	
+
+//³Criacao do componente de impressao                                      ³
+//³                                                                        ³
+//³TReport():New                                                           ³
+//³ExpC1 : Nome do relatorio                                               ³
+//³ExpC2 : Titulo                                                          ³
+//³ExpC3 : Pergunte                                                        ³
+//³ExpB4 : Bloco de codigo que sera executado na confirmacao da impressao  ³
+//³ExpC5 : Descricao                                                       ³
+oReport := TReport():New("REST006",cTitle,"MTR451",{|oReport| ReportPrint(oReport,'SD3')},STR0001) //"Consumo Real x Standard"
+oReport:SetLandscape()
+
+
+//³ Variaveis utilizadas para parametros                         ³
+//³ mv_par01    // Listagem por Ordem de Producao ou Produto.    ³
+//³ mv_par02    // Listagem Sintetica ou Analitica.              ³
+//³ mv_par03    // De                                            ³
+//³ mv_par04    // Ate                                           ³
+//³ mv_par05    // Custo do Consumo Real 1...6 ( Moeda )         ³
+//³ mv_par06    // Custo do Consumo Std  1...6                   ³
+//³ mv_par07    // Movimentacao De                               ³
+//³ mv_par08    // Movimentacao Ate                              ³
+//³ mv_par09    // Calcular Pela Estrutura / Empenho             ³
+//³ mv_par10    // Aglutina por Produto.                         ³
+Pergunte(oReport:uParam,.F.)
+
+//³Criacao da secao utilizada pelo relatorio                               ³
+//³TRSection():New                                                         ³
+//³ExpO1 : Objeto TReport que a secao pertence                             ³
+//³ExpC2 : Descricao da secao                                              ³
+//³ExpA3 : Array com as tabelas utilizadas pela secao. A primeira tabela   ³
+//³        sera considerada como principal para a secao.                   ³
+//³ExpA4 : Array com as Ordens do relatorio                                ³
+//³ExpL5 : Carrega campos do SX3 como celulas                              ³
+//³        Default : False                                                 ³
+//³ExpL6 : Carrega ordens do Sindex                                        ³
+//³        Default : False                                                 ³
+//³Criacao das celulas da secao do relatorio                               ³
+//³TRCell():New                                                            ³
+//³ExpO1 : Objeto TSection que a secao pertence                            ³
+//³ExpC2 : Nome da celula do relatorio. O SX3 sera consultado              ³
+//³ExpC3 : Nome da tabela de referencia da celula                          ³
+//³ExpC4 : Titulo da celula                                                ³
+//³        Default : X3Titulo()                                            ³
+//³ExpC5 : Picture                                                         ³
+//³        Default : X3_PICTURE                                            ³
+//³ExpC6 : Tamanho                                                         ³
+//³        Default : X3_TAMANHO                                            ³
+//³ExpL7 : Informe se o tamanho esta em pixel                              ³
+//³        Default : False                                                 ³
+//³ExpB8 : Bloco de codigo para impressao.                                 ³
+//³        Default : ExpC2                                                 ³
+
+//³ Section 1 - Total em Quantidade da OP / Produto              ³
+oSection1:= TRSection():New(oReport,STR0045,{"SD3"},/*aOrdem*/) //"Saldo Inicial OP / Produto"
+oSection1:SetHeaderSection(.F.) // Inibe Header
+
+TRCell():New(oSection1,"CPROD",		"",STR0037	        ,/*Picture*/,17,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,"CDESC",		"",STR0038	        ,/*Picture*/,If(cTamCod>15, 37, 25),/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,"CCESC",		"","Centro de Custo",/*Picture*/,17,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,"REVIS",		"","Revisao"	    ,/*Picture*/,17,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,"CUMED",		"",STR0039	        ,/*Picture*/, 2,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection1,"NQTDE",		"",STR0022	        ,cPicC2Qtde	,15,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")
+
+//³ Section 2 - Linha de Detalhe                                 ³
+oSection2:= TRSection():New(oSection1,STR0044,{"SD3"},/*aOrdem*/) //"Itens de Movimentação Interna"
+oSection2:SetHeaderPage(.T.)
+oSection2:SetHeaderSection(.T.)  
+
+TRCell():New(oSection2,"CPROD"		,"",STR0020	+CRLF+STR0037,/*Picture*/	,cTamCod+2	   				,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection2,"CDESC"		,"",""		+CRLF+STR0038,/*Picture*/	,If(cTamCod>15, 22, 25)		,/*lPixel*/,/*{|| code-block de impressao }*/) //"M a t e r i a l"
+TRCell():New(oSection2,"CUMED"		,"",""		+CRLF+STR0039,/*Picture*/	, 2							,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection2,"NQTDE"		,"",STR0021	+CRLF+STR0022,cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Consumo"###"Quantidade"
+TRCell():New(oSection2,"NCUSUNIT"	,"",STR0023	+CRLF+STR0024,cPicD3C114	,14							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Real"###"Custo Un."
+TRCell():New(oSection2,"NVLTOT"		,"","" 		+CRLF+STR0025,cPicD3C116	,16							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Valor total"
+TRCell():New(oSection2,"NQTDE2"		,"",STR0021	+CRLF+STR0022,cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Consumo"###"Quantidade"
+TRCell():New(oSection2,"NCUSUSTD"	,"",STR0026	+CRLF+STR0024,cPicD3C114	,14							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Standard"###"Custo Un."
+
+TRCell():New(oSection2,"NQUANT"		,"",       	+CRLF+"QUANT",cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Consumo"###"Quantidade"
+TRCell():New(oSection2,"NPERD"		,"",       	+CRLF+"PERD" ,"@!"			,20							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"CENTER") //"Consumo"###"Quantidade"
+
+TRCell():New(oSection2,"NVLTOT2"	,"",""   	+CRLF+STR0025,cPicD3C116	,16							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Valor Total"
+TRCell():New(oSection2,"NQTDE3"		,"",STR0027	+CRLF+STR0040,cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Variacao"###"Quantidade"
+TRCell():New(oSection2,"NTOTALVAR"	,"",""    	+CRLF+STR0025,cPicD3C114	,14							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Valor Total"
+TRCell():New(oSection2,"NSVALOR"	,"",""      +CRLF+STR0028,cPicD3C114	,14							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"$Qdt."
+TRCell():New(oSection2,"NSQUANT"	,"",""      +CRLF+STR0029,cPicD3Qtde	,13							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"$Valor"
+TRCell():New(oSection2,"NPERC"		,"",""      +CRLF+"    %","9999.99"		, 7 						,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")
+TRCell():New(oSection2,"COP"		,"",""      +CRLF+" OP",cNumOP		, 6 						,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //Numero da OP
+
+//³ Section 3 - Linha de Totais                                  ³
+oSection3:= TRSection():New(oSection2,STR0046,{"SD3"},/*aOrdem*/) //"Totais por OP / Produto"
+oSection3:SetHeaderSection(.F.)
+oSection3:SetNoFilter("SD3")
+
+TRCell():New(oSection3,"CTOTAL"		,""	,STR0020+CRLF+STR0037	,/*Picture*/,cTamCod+2					,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection3,"CDESC"		,""	,""		+CRLF+STR0038	,/*Picture*/,If(cTamCod>15, 22, 25) 	,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection3,"CUMED"		,""	,""	  	+CRLF+STR0039	,/*Picture*/, 2							,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection3,"NQTDE"		,""	,STR0021+CRLF+STR0022	,cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Quantidade"
+TRCell():New(oSection3,"NTOTREALOPU",""	,STR0023+CRLF+STR0024	,cPicD3C114	,14							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Custo un."
+TRCell():New(oSection3,"NTOTREALOP"	,""	,"" 	+CRLF+STR0025	,cPicD3C116	,16							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Valor total"
+TRCell():New(oSection3,"NQTDE2"		,""	,STR0021+CRLF+STR0022	,cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Quantidade"
+TRCell():New(oSection3,"NTOTSTDOPU",""	,STR0026+CRLF+STR0024	,cPicD3C114	,14							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Custo Un."
+TRCell():New(oSection3,"NTOTSTDOP"	,""	,STR0025				,cPicD3C116	,16							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Valor Total"
+TRCell():New(oSection3,"NQTDE3"		,""	,STR0022				,cPicD3Qtde	,15							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Quantidade"
+TRCell():New(oSection3,"NTOTVAROP"	,""	,STR0025				,cPicD3C116	,16							,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")//"Valor Total"
+
+//³ Section 4 - Resumo Geral                                     ³
+oSection4:= TRSection():New(oReport,STR0047,{"SD3"},/*aOrdem*/) //"Resumo Aglutinado por Produto"
+oSection4:SetHeaderPage(.T.)
+oSection4:SetHeaderSection(.F.)
+oSection4:SetNoFilter("SD3")
+
+TRCell():New(oSection4,"CPROD"		,"",""     +CRLF+STR0037	,/*Picture*/,cTamCod+2 	,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection4,"CDESC"		,"",""     +CRLF+STR0038	,/*Picture*/,25 		,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection4,"CUMED"		,"",""						,/*Picture*/, 2			,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection4,"NQTDE"		,"",STR0030+CRLF+STR0041	,cPicD3Qtde	,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Consumo Real"###"Quantidade"
+TRCell():New(oSection4,"NVLTOT"		,"",""     +CRLF+STR0031	,cPicD3C118	,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Valor"
+TRCell():New(oSection4,"NQTDE2"		,"",STR0032+CRLF+STR0042	,cPicD3Qtde	,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Consumo Std."###"Quantidade"
+TRCell():New(oSection4,"NVLTOT2"	,"",""     +CRLF+STR0031	,cPicD3C118	,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Valor"
+TRCell():New(oSection4,"NQTDE3"		,"",STR0027+CRLF+STR0043	,cPicD3Qtde	,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Variacao"###"Quantidade"
+TRCell():New(oSection4,"NVLTOT3"	,"",""     +CRLF+STR0031	,cPicD3C118	,/*Tamanho*/,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") //"Valor"
+TRCell():New(oSection4,"NPERCTOT"	,"",""     +CRLF+"    %"	,"9999.99"	,7			,/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT") // Percentual( % )
+
+Return(oReport)
+/*
+===============================================================================================================================
+Programa----------: ReportPrin
+Autor-------------: Flavio Luiz Vicco 
+Data da Criacao---: 03/07/2006
+===============================================================================================================================
+Descrição---------: Relacao Consumo Real x Standard.  
+===============================================================================================================================
+Parametros--------: oReport,cAliasSB1
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================*/
+Static Function ReportPrint(oReport,cAliasSB1)
+
+Local oSection1  := oReport:Section(1)
+Local oSection2  := oReport:Section(1):Section(1)
+Local oSection3  := oReport:Section(1):Section(1):Section(1)
+Local oSection4  := oReport:Section(2)
+Local aTam       := TamSX3("D3_CUSTO1")
+Local cAnt       := ""
+Local cOpAnt     := ""
+Local nQuantG1   := 0
+Local lOpConf    := .T.
+Local aRecnoD4   := {}
+Local nTotalVar  := 0
+Local nQtdVar    := 0
+Local nPercent   := 0
+Local nCusStdOP  := nTotStdOP := nCusRealOP := nTotRealOP := nTotVarOP := 0
+Local nCusUnit   := nCusUnitR := nCusUnitS  := nCusUStd   := 0
+Local nSValor    := 0
+Local nSQuant    := 0
+Local nPosTrb1   := nPosTrb2  := nPosTrb3   := 0
+Local nI		 := 0
+Local cFilSB1    := xFilial("SB1")
+Local cFilSC2    := xFilial("SC2")
+Local cFilSG1    := xFilial("SG1")
+Local cFiltraDEATE:= "% D3_ESTORNO <> 'S'  %"
+Local cCampoFiltro:= " D3_OP "
+
+
+Private cAliasNew  := "SD3"
+Private nTamDecQtd := TamSX3("D3_QUANT")[2]
+Private nTamDecCus := aTam[2]
+Private aLstTrb1   := {}
+Private aLstTrb2   := {}
+Private aLstTrb3   := {}
+Private lQuery     := .F.
+
+MV_PAR07:=MV_PAR07
+MV_PAR08:=MV_PAR08
+
+dbSelectArea(cAliasNew)
+dbSetOrder(6)
+//³Filtragem do relatorio                                                  ³
+
+	lQuery    := .T.
+	cAliasNew := GetNextAlias()
+	//³Transforma parametros Range em expressao SQL                        ³
+	MakeSqlExpr(oReport:uParam)
+	//³Query do relatorio da secao 1                                       ³
+	oReport:Section(1):BeginQuery()	
+
+    IF MV_PAR01 == 1//Ordem de Producao 
+       cCampoFiltro:= " D3_OP "
+    ELSE  // Produto
+       cCampoFiltro:= " D3_COD "
+    ENDIF
+    
+    IF !EMPTY(MV_PAR04)
+	   cFiltraDEATE:= "% D3_ESTORNO <> 'S' AND "+cCampoFiltro+" BETWEEN '"+MV_PAR03+"' AND '"+MV_PAR04+"'  %"
+	ELSEIF !EMPTY(MV_PAR03) 
+	   cFiltraDEATE:= "% D3_ESTORNO <> 'S' AND "+cCampoFiltro+" >= '"+MV_PAR03+"' %"
+	ELSE   
+       cFiltraDEATE:= "% D3_ESTORNO <> 'S'  %"
+	ENDIF   
+
+	BeginSql Alias cAliasNew
+
+		SELECT SD3.* ,SD3.R_E_C_N_O_ D3REC
+
+		FROM %table:SD3% SD3
+
+		WHERE SD3.D3_FILIAL = %xFilial:SD3%
+				AND SD3.D3_OP <> ' ' //%Exp:cVazio1%
+				AND SD3.D3_CF <> 'ER0' AND SD3.D3_CF <> 'ER1'
+				AND SD3.D3_EMISSAO >= %Exp:DTOS(MV_PAR07)%
+				AND SD3.D3_EMISSAO <= %Exp:DTOS(MV_PAR08)%
+				AND	%Exp:cFiltraDEATE%
+				AND SD3.%NotDel%
+//				AND SD3.D3_ESTORNO <> 'S'
+		
+	    ORDER BY %Order:SD3%
+		
+	EndSql
+	oReport:Section(1):EndQuery(/*Array com os parametros do tipo Range*/)
+
+dbSelectArea(cAliasNew)
+COUNT TO _nTotal
+DBGOTOP()
+oReport:SetMeter(_nTotal)
+
+While !oReport:Cancel() .And. (cAliasNew)->(!Eof())
+
+	oReport:IncMeter()
+
+	If oReport:Cancel()
+		Exit
+	EndIf
+
+	If !lQuery .And. SB1->B1_FILIAL+SB1->B1_COD # (cFilSB1+(cAliasNew)->D3_COD)
+		SB1->(MsSeek(cFilSB1+(cAliasNew)->D3_COD))
+	EndIf
+
+	If SC2->C2_FILIAL+SC2->C2_NUM+SC2->C2_ITEM+SC2->C2_SEQUEN+SC2->C2_ITEMGRD # (cFilSC2+(cAliasNew)->D3_OP)
+		SC2->(MsSeek(cFilSC2+(cAliasNew)->D3_OP))
+	EndIf
+
+	//³ Le requisicoes e devolucoes SD3 e grava no aLstTrb1 para gravacao do REAL ³
+	If SubStr((cAliasNew)->D3_CF,2,1)$"E" .And. ( lQuery .Or. ( (cAliasNew)->(!Empty(D3_OP) ) ) )
+
+		//Ordem de Producao / Produto                                  ³
+		If MV_PAR01 == 1
+			nPosTrb1 := aScan(aLstTrb1,{|x| x[2]+x[1]==(cAliasNew)->D3_OP+(cAliasNew)->D3_COD})
+		Else  
+			If mv_par10 == 1
+				nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]==SC2->C2_PRODUTO+(cAliasNew)->D3_COD})
+			Else
+				nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]+x[2]==SC2->C2_PRODUTO+(cAliasNew)->D3_COD+SC2->(C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)})
+			EndIf
+		EndIf
+
+		If Empty(nPosTrb1)
+			aAdd(aLstTrb1,{	(cAliasNew)->D3_COD,		;	  		//01 - PRODUTO
+							(cAliasNew)->D3_OP,			; 			//02 - OP
+							(cAliasNew)->D3_NUMSEQ,		; 			//03 - NUMSEQ
+							R450TRT("RE"),				; 			//04 - TRT
+							(cAliasNew)->D3_CHAVE,		; 			//05 - CHAVE
+							(cAliasNew)->D3_EMISSAO,	; 			//06 - EMISSAO
+							SC2->C2_PRODUTO,			; 			//07 - PAI
+							"",							;	 		//08 - FIXVAR
+							R450Qtd("R",0,cAliasNew),	; 			//09 - QTDREAL
+							0,							; 			//10 - QTDSTD
+							0,							; 			//11 - QTDVAR
+							0,							; 			//12 - CUSTOSTD
+							R450Cus('R', mv_par05,,cAliasNew),;	//13 - CUSTOREAL
+							0	})						  			//14 - CUSTOVAR
+		Else
+			aLstTrb1[nPosTrb1,03] := (cAliasNew)->D3_NUMSEQ			//03 - NUMSEQ
+			aLstTrb1[nPosTrb1,04] := R450TRT("RE")						//04 - TRT
+			aLstTrb1[nPosTrb1,05] := (cAliasNew)->D3_CHAVE				//05 - CHAVE
+			aLstTrb1[nPosTrb1,06] := (cAliasNew)->D3_EMISSAO			//06 - EMISSAO
+			aLstTrb1[nPosTrb1,09] += R450Qtd("R",0,cAliasNew)		 	//09 - QTDREAL
+			aLstTrb1[nPosTrb1,13] += R450Cus('R', mv_par05,,cAliasNew)	//13 - CUSTOREAL
+		EndIf
+
+	EndIf
+
+	//³ Le producoes e gravar TRB. para gravacao do STANDARD         ³
+	If (cAliasNew)->D3_ESTORNO != "S" .And. SubStr((cAliasNew)->D3_CF,1,2)$"PR"
+
+		//³ Considera filtro de Usuario                                  ³
+		If !(SB1->(MsSeek(cFilSB1+(cAliasNew)->D3_COD)))
+			(cAliasNew)->(DbSkip())
+			Loop
+		EndIf
+
+		//³ Lista por Ordem de Producao / Produto                        ³
+		If MV_PAR01 == 1
+			nPosTrb2 := aScan(aLstTrb2,{|x|x[2]==(cAliasNew)->D3_OP})
+		Else
+			nPosTrb2 := aScan(aLstTrb2,{|x|x[1]==(cAliasNew)->D3_COD})
+		EndIf
+
+		If Empty(nPosTrb2)
+			aAdd(aLstTrb2,Array(10))
+			nPosTrb2 := Len(aLstTrb2)
+			aLstTrb2[nPosTrb2,4] := 0
+		EndIf
+		aLstTrb2[nPosTrb2,1] := (cAliasNew)->D3_COD
+		aLstTrb2[nPosTrb2,2] := (cAliasNew)->D3_OP
+		aLstTrb2[nPosTrb2,3] := (cAliasNew)->D3_UM
+		aLstTrb2[nPosTrb2,4] += (cAliasNew)->D3_QUANT
+		aLstTrb2[nPosTrb2,5] := NgSeek('SI3',(cAliasNew)->D3_CC,1,'SI3->I3_DESC')
+		aLstTrb2[nPosTrb2,6] := SC2->C2_REVISAO
+
+		cProduto := (cAliasNew)->D3_COD
+
+		//³ Calcular pela Estrutura                                      ³
+		If mv_par09 == 1
+			dbSelectArea("SG1")
+			dbSetOrder(1)
+			dbSeek(cFilSG1+cProduto)
+			While !Eof() .And. cFilSG1+cProduto == G1_FILIAL + G1_COD
+				If G1_INI > dDataBase .Or. G1_FIM < dDataBase
+					dbSelectArea("SG1")
+					dbSkip()
+					Loop
+				EndIf
+				If !Empty(SG1->G1_REVINI) .Or. SG1->G1_REVFIM <> "ZZZ"
+					If SC2->C2_REVISAO < SG1->G1_REVINI .Or. SC2->C2_REVISAO > SG1->G1_REVFIM
+						dbSelectArea("SG1")
+						dbSkip()
+						Loop
+					EndIf
+				EndIf
+				dbSelectArea("SB1")
+				MsSeek(cFilSB1+(cAliasNew)->D3_COD)
+				If SG1->G1_FIXVAR == "F"
+					nQuantG1 := SG1->G1_QUANT
+					If (cAliasNew)->D3_PARCTOT == 'P'
+						nQuantG1 := Round(nQuantG1*IIf(SC2->(C2_QUJE==C2_QUANT),1,SC2->(C2_QUJE/C2_QUANT)),nTamDecQtd)
+					EndIf
+				Else
+					nQuantG1 := ExplEstr((cAliasNew)->D3_QUANT,,SC2->C2_OPC,SC2->C2_REVISAO)
+				EndIf
+
+				//³ Se Produto for FANTASMA gravar so os componentes.            ³
+				If RetFldProd(SB1->B1_COD,"B1_FANTASM") == "S" // Projeto Implementacao de campos MRP e FANTASM no SBZ
+					R450Fant(nQuantG1 )
+				Else
+					//³ Gravar Valores da Producao no array aLstTrb1                 ³
+					dbSelectArea("SB1")
+					If MsSeek(cFilSB1+SG1->G1_COMP)
+						If MV_PAR01 == 1
+							nPosTrb1 := aScan(aLstTrb1,{|x| x[2]+x[1]==(cAliasNew)->D3_OP+SG1->G1_COMP})
+						Else
+							If mv_par10 == 1
+								nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]==SC2->C2_PRODUTO+SG1->G1_COMP})
+							Else
+								nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]+x[2]==SC2->C2_PRODUTO+SG1->G1_COMP+SC2->(C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)})
+							EndIf
+						EndIf
+						//³ Valida Requesicoes de mesmo componente para a mesma estrutura ³
+						If !Empty(nPosTrb1) .And. !Empty(aLstTrb1[nPosTrb1,4])
+							aRetSD3 := R450TRT("PR",nPosTrb1)
+						Else
+							aRetSD3 := {"",0,.F.}
+						EndIf
+						If Empty(nPosTrb1)
+							aAdd(aLstTrb1,Array(14))
+							nPosTrb1 := Len(aLstTrb1)
+							aLstTrb1[nPosTrb1,01] := SG1->G1_COMP
+							aLstTrb1[nPosTrb1,02] := (cAliasNew)->D3_OP
+							aLstTrb1[nPosTrb1,09] := 0
+							aLstTrb1[nPosTrb1,10] := 0
+							aLstTrb1[nPosTrb1,11] := 0
+							aLstTrb1[nPosTrb1,12] := 0
+							aLstTrb1[nPosTrb1,13] := 0
+							aLstTrb1[nPosTrb1,14] := 0
+						EndIf
+						aLstTrb1[nPosTrb1,04] := aRetSD3[1]
+						aLstTrb1[nPosTrb1,07] := cProduto
+						aLstTrb1[nPosTrb1,08] := SG1->G1_FIXVAR
+						aLstTrb1[nPosTrb1,10] += Round(nQuantG1,nTamDecQtd)
+						aLstTrb1[nPosTrb1,12] += R450Cus("S",mv_par06,Round(nQuantG1,nTamDecCus))
+
+						If aRetSD3[3] .And. ! lQuery
+							(cAliasNew)->( MsGoTo(aRetSD3[2]) )
+						EndIf
+
+					EndIf
+
+				EndIf
+				dbSelectArea("SG1")
+				dbSkip()
+			EndDo
+
+		//³ Calcular pelo Empenho                                        ³
+		Else
+		
+			dbSelectArea("SD4")
+			dbSetOrder(2)
+			dbSeek(xFilial("SD4")+(cAliasNew)->D3_OP)
+			If (cAliasNew)->D3_OP # cOpAnt
+				lOpConf:=.T.
+			Else
+				lOpConf:=.F.
+			EndIf
+
+			While SD4->(!Eof() .And. SD4->D4_FILIAL + SD4->D4_OP == xFilial("SD4")+(cAliasNew)->D3_OP ) .And. cOpAnt # (cAliasNew)->D3_OP .And. lOpConf
+
+				If aScan(aRecnoD4, SD4->(RecNo())) > 0
+					dbSkip()
+					Loop
+				EndIf
+
+				aAdd(aRecnoD4, SD4->(RecNo()))
+
+				//³ Gravar Valores da Producao no array aLstTrb1                 ³
+				dbSelectArea("SB1")
+				MsSeek(cFilSB1+SD4->D4_COD)
+				If MV_PAR01 == 1
+					nPosTrb1 := aScan(aLstTrb1,{|x|x[2]+x[1]==(cAliasNew)->D3_OP+SD4->D4_COD})
+				Else
+					If mv_par10 == 1
+						nPosTrb1 := aScan(aLstTrb1,{|x|x[7]+x[1]==SC2->C2_PRODUTO+SD4->D4_COD}) 
+					Else
+						nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]+x[2]==SC2->C2_PRODUTO+SD4->D4_COD+SC2->(C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)})
+					EndIf
+				EndIf
+
+				If Empty(nPosTrb1)
+					aAdd(aLstTrb1,Array(14))
+					nPosTrb1 := Len(aLstTrb1)
+					aLstTrb1[nPosTrb1,01] := SD4->D4_COD
+					aLstTrb1[nPosTrb1,02] := (cAliasNew)->D3_OP
+					aLstTrb1[nPosTrb1,09] := 0
+					aLstTrb1[nPosTrb1,10] := 0
+					aLstTrb1[nPosTrb1,11] := 0
+					aLstTrb1[nPosTrb1,12] := 0
+					aLstTrb1[nPosTrb1,13] := 0
+					aLstTrb1[nPosTrb1,14] := 0
+				EndIf
+				aLstTrb1[nPosTrb1,07] := cProduto
+				aLstTrb1[nPosTrb1,08] := ""
+				If Empty(SD4->D4_QUANT)
+					aLstTrb1[nPosTrb1,10] += Round(SD4->D4_QTDEORI*IIf(SC2->(C2_QUJE==C2_QUANT),1,SC2->(C2_QUJE/C2_QUANT)),nTamDecQtd)
+				Else
+					aLstTrb1[nPosTrb1,10] += Round((SD4->D4_QTDEORI-SD4->D4_QUANT),nTamDecQtd)
+				EndIf
+				aLstTrb1[nPosTrb1,12] +=  R450Cus("S",mv_par06,Round((SD4->D4_QTDEORI-SD4->D4_QUANT),nTamDecQtd))
+
+				dbSelectArea("SD4")
+				dbSkip()
+			EndDo
+			
+			cOpAnt := (cAliasNew)->D3_OP
+		EndIf
+		dbSelectArea(cAliasNew)
+	EndIf
+	(cAliasNew)->(dbSkip())
+EndDo
+
+//³ Ordena por Ordem de Producao / Produto                       ³
+If MV_PAR01 == 1
+	aLstTrb1 := ASort(aLstTrb1,,, { | x,y | x[7]+x[2]+x[1] < y[7]+y[2]+y[1] })  //alterada a ordem de impressão
+Else
+	aLstTrb1 := ASort(aLstTrb1,,, { | x,y | x[7]+x[1]+x[2] < y[7]+y[1]+y[2] })
+EndIf
+
+//³ Inicio da Impressao do array.                                ³
+oReport:SetTitle(oReport:Title()+IIF(MV_PAR01 == 1, STR0009,STR0010)) //" ( Por Ordem de Producao )"###" ( Por Produto )"
+//oReport:SetMeter(RecCount())
+oReport:SetMeter(Len(aLstTrb1))
+
+oSection1:Init()
+oSection2:Init()
+oSection3:Init()
+nQuantOp := 0.00
+
+For nI:=1 To Len(aLstTrb1)
+
+	oReport:IncMeter()
+
+	If oReport:Cancel()
+		Exit
+	EndIf
+
+	//³ Filtro por OP / Produto                                      ³
+	If MV_PAR01 == 1
+		// Filtrar por OP
+		If AllTrim(aLstTrb1[nI,2]) < AllTrim(mv_par03) .Or. AllTrim(aLstTrb1[nI,2]) > AllTrim(mv_par04)
+           Loop
+		EndIf
+	Else
+		// Filtrar por Produto Pai
+		If aLstTrb1[nI,7] < mv_par03 .Or. aLstTrb1[nI,7] > mv_par04
+			Loop	
+		EndIf
+	EndIf
+
+	//³ Impressao por OP e PRODUTO                               ³
+	If MV_PAR01 = 1
+		nPosTrb2 := aScan(aLstTrb2,{|x| x[2]==aLstTrb1[nI,2]})
+	Else
+		nPosTrb2 := aScan(aLstTrb2,{|x| x[1]==aLstTrb1[nI,7]})	
+	EndIf
+	If Empty(nPosTrb2)
+		Loop
+	EndIf
+	If mv_par02 == 1
+		oSection1:Cell("CPROD"):SetValue(If(MV_PAR01=1,STR0036+aLstTrb2[nPosTrb2,2],STR0035)) //"OP: "###"PRODUTO:"
+		oSection1:Cell("CDESC"):SetValue(aLstTrb2[nPosTrb2,1])
+		oSection1:Cell("CUMED"):SetValue(aLstTrb2[nPosTrb2,3])
+		oSection1:Cell("NQTDE"):SetValue(aLstTrb2[nPosTrb2,4])
+		oSection1:Cell("CCESC"):SetValue(aLstTrb2[nPosTrb2,5])
+		oSection1:Cell("REVIS"):SetValue(aLstTrb2[nPosTrb2,6])
+
+		oSection1:PrintLine()
+		oReport:SkipLine() //-- Salta linha
+		nQuantOp := aLstTrb2[nPosTrb2,4]
+	EndIf
+	nCusStdOP := nTotStdOP := nCusRealOP := nTotRealOP := nTotVarOP := 0
+	nCusUnitR := nCusUnitS := 0
+
+	cAnt 	  := IIf( mv_par01 == 1,aLstTrb1[nI,02],aLstTrb1[nI,07])
+
+	While nI <= Len(aLstTrb1) .And. IIF( mv_par01 == 1,aLstTrb1[nI,2],aLstTrb1[nI,7]) == cAnt
+		nTotalVar  := aLstTrb1[nI,13]-aLstTrb1[nI,12]  //	CUSTOREAL-CUSTOSTD
+		nQtdVar    := aLstTrb1[nI,09]-aLstTrb1[nI,10]	//	QTDREAL-QTDSTD
+		nPercent   := (nQtdVar/aLstTrb1[nI,10])*100	//	((QTDREAL-QTDSTD)/QTDSTD)*100
+		nCusUnit   := IIf(Empty(aLstTrb1[nI,09]),aLstTrb1[nI,13],Round(aLstTrb1[nI,13]/aLstTrb1[nI,09],nTamDecCus))	//Round(CUSTOREAL/IIF(QTDREAL=0,1,QTDREAL),nTamDecCus)
+		nCusUStd   := IIf(Empty(aLstTrb1[nI,10]),aLstTrb1[nI,12],Round(aLstTrb1[nI,12]/aLstTrb1[nI,10],nTamDecCus))	//Round(CUSTOSTD/IIF(QTDSTD=0,1,QTDSTD),nTamDecCus)
+		nSValor    := Round(nCusUnit*nQtdVar,nTamDecCus)
+		nSQuant    := Round(nTotalVar-nSValor,nTamDecCus)
+		//³ Posiciona na tabela de PRODUTOS                          ³
+		SB1->(DbSetOrder(1))
+		SB1->(dbSeek(xFilial("SB1")+aLstTrb1[nI,01]))	
+		If mv_par02 == 1 .And. (mv_par09 == 1 .Or. (QtdComp(aLstTrb1[nI,09],.T.) # QtdComp(0,.T.)))
+			oSection2:Cell("CPROD"	):SetValue(aLstTrb1[nI,01])
+			oSection2:Cell("CDESC"	):SetValue(SB1->B1_DESC)
+			oSection2:Cell("CUMED"	):SetValue(SB1->B1_UM)
+
+			oSection2:Cell("NQTDE"		):SetValue(aLstTrb1[nI,09])
+			oSection2:Cell("NCUSUNIT"	):SetValue(nCusUnit)
+			oSection2:Cell("NVLTOT"		):SetValue(aLstTrb1[nI,13])
+
+			oSection2:Cell("NQTDE2"		):SetValue(aLstTrb1[nI,10])
+			oSection2:Cell("NCUSUSTD"	):SetValue(nCusUStd)
+			oSection2:Cell("NVLTOT2"	):SetValue(aLstTrb1[nI,12])
+
+			dbSelectArea("SG1")
+			dbSetOrder(2)
+			dbSeek(cFilSG1+aLstTrb1[nI,01])
+			oSection2:Cell("NQUANT"		):SetValue(aLstTrb1[nI,10]-(aLstTrb1[nI,10]*(SG1->G1_PERDA/100)))
+			oSection2:Cell("NPERD"		):SetValue(AllTrim(Transform(SG1->G1_PERDA,PesqPict("SG1","G1_PERDA"))) + " %")
+			oSection2:Cell("NPERD"		):SetAlign("RIGHT")
+
+			oSection2:Cell("NQTDE3"		):SetValue(nQtdVar)
+			oSection2:Cell("NTOTALVAR"	):SetValue(nTotalVar)
+			oSection2:Cell("NSVALOR"	):SetValue(nSValor)
+			oSection2:Cell("NSQUANT"	):SetValue(nSQuant)
+			oSection2:Cell("NPERC"		):SetValue(nPercent)
+			oSection2:Cell("COP"		):SetValue(aLstTrb1[nI,02])
+			oSection2:PrintLine()
+		EndIf
+		//³ Aglutinar Produto para Posterior Resumo.                 ³
+		nPosTrb3 := aScan(aLstTrb3,{|x|x[1]==aLstTrb1[nI,1]})
+		If Empty(nPosTrb3)
+			aAdd(aLstTrb3,{	aLstTrb1[nI,01],; //PRODUTO
+							aLstTrb1[nI,09],; //QTDREAL
+							aLstTrb1[nI,10],; //QTDSTD
+							aLstTrb1[nI,13],; //CUSTOREAL
+							aLstTrb1[nI,12],; //CUSTOSTD
+							SB1->B1_DESC})    //DESCRICAO
+		Else
+			aLstTrb3[nPosTrb3,02] += aLstTrb1[nI,09] //QTDREAL
+			aLstTrb3[nPosTrb3,03] += aLstTrb1[nI,10] //QTDSTD
+			aLstTrb3[nPosTrb3,04] += aLstTrb1[nI,13] //CUSTOREAL
+			aLstTrb3[nPosTrb3,05] += aLstTrb1[nI,12] //CUSTOSTD
+		EndIf
+		nCusUnitR  += nCusUnit
+		nCusUnitS  += nCusUStd
+		nTotRealOP += aLstTrb1[nI,13]
+		nTotStdOP  += aLstTrb1[nI,12]
+		nTotVarOP  += nTotalVar
+		nI++
+		If nI > Len(aLstTrb1) .Or. IIf( mv_par01 == 1,aLstTrb1[nI,2],aLstTrb1[nI,7]) # cAnt
+			nI--
+			Exit
+		EndIf
+	EndDo
+	//³ Impressao dos Totais por OP/Produto.                     ³
+	If mv_par02 == 1
+		oReport:ThinLine() //-- Impressao de Linha Simples
+		oSection3:Cell("CTOTAL"			):SetValue(STR0012+IIf(mv_par01==1,STR0013,STR0014)) //"Total "###"da OP:"###"do Produto:"
+		oSection3:Cell("NTOTREALOPU"	):SetValue((nTotRealOP/nQuantOp))
+		oSection3:Cell("NTOTREALOP"		):SetValue(nTotRealOP)
+		oSection3:Cell("NTOTSTDOPU"		):SetValue((nTotStdOP/nQuantOp))
+		oSection3:Cell("NTOTSTDOP"		):SetValue(nTotStdOP)
+		oSection3:Cell("NTOTVAROP"		):SetValue(nTotVarOP)
+		oSection3:PrintLine()
+		oReport:ThinLine() //-- Impressao de Linha Simples
+		oReport:SkipLine() //-- Salta linha
+	EndIf
+Next
+oSection2:SetHeaderSection(.F.)
+oSection4:SetHeaderSection(.T.)
+oSection1:Finish()
+oSection2:Finish()
+oSection3:Finish()
+//³ Impressao do Resumo Aglutinado por Produto.              ³
+oReport:SetTitle(STR0015) //"V A R I A C A O   DE   U S O   E   C O N S U M O"
+oReport:SetMeter(Len(aLstTrb1))
+oReport:EndPage()
+oSection4:Init()
+aLstTrb3 := aSort(aLstTrb3,,, { | x,y | x[1] < y[1] })
+For nI:=1 To Len(aLstTrb3)
+	oReport:IncMeter()
+	If oReport:Cancel()
+		Exit
+	EndIf
+	oSection4:Cell("CPROD" 		):SetValue(aLstTrb3[nI,01])
+	oSection4:Cell("CDESC" 		):SetValue(aLstTrb3[nI,06])
+	oSection4:Cell("NQTDE" 		):SetValue(aLstTrb3[nI,02])
+	oSection4:Cell("NVLTOT"		):SetValue(aLstTrb3[nI,04])
+	oSection4:Cell("NQTDE2"		):SetValue(aLstTrb3[nI,03])
+	oSection4:Cell("NVLTOT2"	):SetValue(aLstTrb3[nI,05])
+	oSection4:Cell("NQTDE3"		):SetValue(Round(aLstTrb3[nI,02]-aLstTrb3[nI,03],nTamDecCus))
+	oSection4:Cell("NVLTOT3"	):SetValue(Round(aLstTrb3[nI,04]-aLstTrb3[nI,05],nTamDecCus))
+	oSection4:Cell("NPERCTOT"	):SetValue( (oSection4:Cell("NQTDE3"):GetValue() / aLstTrb3[nI,03]) * 100  )	
+	oSection4:PrintLine()
+	oReport:ThinLine() //-- Impressao de Linha Simples
+Next
+oSection4:Finish()
+Return NIL
+
+/*
+===============================================================================================================================
+Programa----------: R450Cus
+Autor-------------: Erike Yuri da Silva 
+Data da Criacao---: 14/03/2006
+===============================================================================================================================
+Descrição---------: Relacao Consumo Real x Standard.  
+===============================================================================================================================
+Parametros: ExpC1 := Tipo "S" para Standard e "R" para Real     
+            ExpN2 := Indica a Moeda para obtencao do Custo      
+            ExpN3 := Quantidade utilizada.                      
+            ExpN4 := Alias do SD3
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================*/
+Static Function R450Cus(cTipo,nMoeda,nQtd,cAliasSD3)
+Local aAreaAnt  := GetArea()
+Local nRet      := 0
+
+Default cAliasSD3 := "SD3"
+Default nQtd      := 0
+
+If cTipo = "R" 	// Custo Real
+	nRet := (cAliasSD3)->( &("D3_CUSTO"+ Str(nMoeda,1)) ) * IIf(SubStr((cAliasSD3)->D3_CF, 1, 1) == 'R', 1, -1)
+Else  // Custo Standard
+	dbSelectArea("SB1")
+	nRet := (nQtd*xMoeda(RetFldProd(SB1->B1_COD,"B1_CUSTD"),Val(RetFldProd(SB1->B1_COD,"B1_MCUSTD")), nMoeda, RetFldProd(SB1->B1_COD,"B1_DATREF") ))
+EndIf
+
+RestArea(aAreaAnt)
+Return (nRet)
+/*
+===============================================================================================================================
+Programa----------: R450Fant
+Autor-------------: Cesar Eduardo Valadao
+Data da Criacao---: 01.06.99
+===============================================================================================================================
+Descrição---------: Retorna a Estrutura de Produto Fantasma  
+===============================================================================================================================
+Parametros--------: ExpC1 := Quantidade do Pai
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================*/
+Static Function R450Fant(nQuantPai)
+Local aAreaAnt  := GetArea()
+Local aAreaSB1  := SB1->(GetArea())
+Local aAreaSG1  := SG1->(GetArea())
+Local cComponen := SG1->G1_COMP
+Local nPosTrb1  := 0
+
+dbSelectArea("SG1")
+If dbSeek(xFilial("SG1")+cComponen, .F.)
+	While !Eof() .And. G1_FILIAL+G1_COD == xFilial("SG1")+cComponen
+		If G1_INI > dDataBase .Or. G1_FIM < dDataBase
+			dbSkip()
+			Loop
+		EndIf
+		//³ Gravar Valores da Producao em TRB do componente.             ³
+		dbSelectArea("SB1")
+		If MsSeek(xFilial("SB1")+SG1->G1_COMP)
+			If SG1->G1_FIXVAR == "F"
+				nQuantG1 := SG1->G1_QUANT
+			Else
+				nQuantG1 := ExplEstr(nQuantPai,,SC2->C2_OPC,SC2->C2_REVISAO)
+			EndIf
+			If mv_par01 == 1
+				nPosTrb1 := aScan(aLstTrb1,{|x| x[2]+x[1]==(cAliasNew)->D3_OP+SG1->G1_COMP})
+			Else
+				If mv_par10 == 1
+					nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]==SC2->C2_PRODUTO+SG1->G1_COMP})
+				Else
+					nPosTrb1 := aScan(aLstTrb1,{|x| x[7]+x[1]+x[2]==SC2->C2_PRODUTO+SG1->G1_COMP+SC2->(C2_NUM+C2_ITEM+C2_SEQUEN+C2_ITEMGRD)})
+				EndIf				
+			EndIf
+
+			If RetFldProd(SB1->B1_COD,"B1_FANTASM") == "S" // Projeto Implementeacao de campos MRP e FANTASM no SBZ
+				//³ Se Produto for FANTASMA gravar so os componentes.            ³
+				R450Fant(nQuantG1 )
+			Else
+				If !Empty(nPosTrb1) .And. !Empty(aLstTrb1[nPosTrb1,04])
+					aRetSD3 := R450TRT("PR",nPosTrb1)
+				Else
+					aRetSD3 := {"",0,.F.}
+				EndIF
+
+				If Empty(nPosTrb1)
+					aAdd(aLstTrb1,Array(14))
+					nPosTrb1 := Len(aLstTrb1)
+					aLstTrb1[nPosTrb1,01] := SG1->G1_COMP
+					aLstTrb1[nPosTrb1,02] := (cAliasNew)->D3_OP
+					aLstTrb1[nPosTrb1,09] := 0
+					aLstTrb1[nPosTrb1,10] := 0
+					aLstTrb1[nPosTrb1,12] := 0
+					aLstTrb1[nPosTrb1,13] := 0
+					aLstTrb1[nPosTrb1,14] := 0
+				EndIf
+				aLstTrb1[nPosTrb1,04] := aRetSD3[1]
+				aLstTrb1[nPosTrb1,07] := cProduto
+				aLstTrb1[nPosTrb1,08] := SG1->G1_FIXVAR
+				aLstTrb1[nPosTrb1,10] += Round(nQuantG1,nTamDecQtd)
+				aLstTrb1[nPosTrb1,12] += R450Cus("S",mv_par06,Round(nQuantG1,nTamDecCus))
+
+				// Volta ao Registro Original do SD3
+				If aRetSD3[3] .And. ! lQuery
+					(cAliasNew)->( dbGoTo(aRetSD3[2]) )
+				EndIf
+
+			EndIf
+		EndIf
+		dbSelectArea("SG1")
+		dbSkip()
+	End
+EndIf
+RestArea(aAreaSB1)
+RestArea(aAreaSG1)
+RestArea(aAreaAnt)
+Return(Nil)
+
+/*
+===============================================================================================================================
+Programa----------: R450TRT
+Autor-------------: Marcelo Iuspa 
+Data da Criacao---: 24.11.03
+===============================================================================================================================
+Descrição---------: Funcao para tratar duas ou mais requisicoes de um mesmo componente utilizados dentro da mesma estrutura
+===============================================================================================================================
+Parametros--------: ExpC1 := Tipo de Movimento 'RE' ou 'PR' / ExpN1 := Numero da Linha  
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================
+*/
+Static Function R450TRT(cTipoMov,nLin)
+Local cConteudo := If(Empty(nLin),"",RTrim(aLstTrb1[nLin,4]))
+Local aAreaAnt  := GetArea()
+Local cQuery    := ""
+Local cAliasSD3 := ""
+Local nRegSD3   := 0
+Local nPosCorte := 0
+Local lReposSD3 := .F.
+Local xRetorno
+
+If cTipoMov == "RE"
+	// Chamado a partir da leitura das REQUISICOES para compor o REAL
+	If !Empty((cAliasNew)->D3_TRT)
+		If Empty(cConteudo)
+			xRetorno := "   /" + (cAliasNew)->D3_TRT
+		Else
+			xRetorno := cConteudo+"/" + (cAliasNew)->D3_TRT
+		EndIf
+	EndIf
+Else
+	// Chamado a partir da leitura das PRODUCOES para compor o STANDARD
+	lReposSD3	:= .F.
+	nPosCorte	:= At("/",cConteudo)
+	If nPosCorte <> 0
+		cTRTCorte	:= SubStr(cConteudo,1,nPosCorte-1)
+		cConteudo	:= Substr(cConteudo,nPosCorte+1,Len(cConteudo))
+	Else
+		cTRTCorte	:= AllTrim(cConteudo)
+		cConteudo	:= ""
+	EndIf
+	nRegSD3	:= SD3->( Recno() )
+	#IFDEF TOP
+		cAliasSD3 := GetNextAlias()
+		cQuery    := "SELECT SD3.R_E_C_N_O_ SD3RECNO "
+		cQuery    +=   "FROM " + RetSqlName("SD3") + " SD3 "
+		cQuery    +=  "WHERE SD3.D3_FILIAL  = '"  + xFilial('SD3') 			+ "' "
+		cQuery    +=    "AND SD3.D3_EMISSAO = '"  + DTOS(aLstTrb1[nLin,06])+ "' "
+		cQuery    +=    "AND SD3.D3_NUMSEQ  = '"  + aLstTrb1[nLin,03] 		+ "' "
+		cQuery    +=    "AND SD3.D3_CHAVE   = '"  + aLstTrb1[nLin,05] 		+ "' "
+		cQuery    +=    "AND SD3.D3_COD     = '"  + aLstTrb1[nLin,01] 		+ "' "
+		cQuery    +=    "AND SD3.D_E_L_E_T_ = ' ' "
+		dbUseArea(.T.,"TOPCONN",TCGenQry(,,cQuery),cAliasSD3,.F.,.T.)
+		Do While !Eof()
+			xRetorno := {cConteudo,(cAliasSD3)->SD3RECNO,.T.}
+			Exit
+			dbSkip()
+		EndDo
+		(cAliasSD3)->(dbCloseArea())
+		RestArea(aAreaAnt)
+	#ELSE
+		If SD3->( MsSeek(xFilial("SD3")+DTOS(aLstTrb1[nLin,06])+aLstTrb1[nLin,03]+aLstTrb1[nLin,05]+aLstTrb1[nLin,01]) )
+			Do While !SD3->(Eof())
+				If SD3->D3_TRT == cTRTCorte
+					lReposSD3 := .T.
+					Exit
+				EndIf
+				SD3->( dbSkip() )
+			EndDo
+			xRetorno := {cConteudo,nRegSD3,lReposSD3}
+		EndIf
+	#ENDIF
+EndIf
+Return (xRetorno)
+
+/*
+===============================================================================================================================
+Programa----------: R450Qtd
+Autor-------------: Fernando Joly Siquini
+Data da Criacao---: 03/05/2006
+===============================================================================================================================
+Descrição---------: Retorna a Quantidade
+===============================================================================================================================
+Parametros--------: ExpC1 := Tipo "R" Qtde Real, "S" Qtde Standard
+					ExpN2 := Quantidade Standard
+					ExpC3 := Alias da tabela SD3
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================
+*/
+Static Function R450Qtd(cTipo,nQuant,cAliasSD3)
+
+Local aAreaAnt   := GetArea()
+Local nRet       := 0
+
+Default cAliasSD3:= "SD3"
+
+If cTipo = "R" // Quantidade Real
+	nRet := (cAliasSD3)->D3_QUANT*IIf(SubStr((cAliasSD3)->D3_CF, 1, 1)=='R', 1, -1)
+Else // Quantidade Standard
+	nRet := nQuant
+EndIf
+
+RestArea(aAreaAnt)
+Return (nRet)

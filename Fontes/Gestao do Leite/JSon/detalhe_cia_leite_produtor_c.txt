@@ -1,0 +1,20 @@
+'               ],
+				"linhas": [{
+                    "codigo_linha_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cCodLinha))}) + '",
+                    "nome_linha": "' + Eval({|| EncodeUTF8(AllTrim(_cDescLin))}) + '"
+                }],
+				"horario_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cHoraCole))}) + '",
+				"tanques": [ 
+				      {   
+					    "tipo_tanque": "' + Eval({|| EncodeUTF8(AllTrim(_cTipoTanq))}) + '",
+				        "capacidade_tanque": "' + Eval({|| EncodeUTF8(AllTrim(_cCapacTnq))}) + '",
+						"nome_tanque": "' + Eval({|| EncodeUTF8(AllTrim(_cNomeTnq))}) + '",
+				        "codigo_tanque": "' + Eval({|| EncodeUTF8(AllTrim(_cCodigotq))}) + '",
+						"tanque_tipo_resfriamento": "' + Eval({|| EncodeUTF8(AllTrim(_cTipoResf))}) + '",
+						"marca": "' + Eval({|| EncodeUTF8(AllTrim(_cMarcaTanq))}) + '",
+						"capacidade_resfriamento": "' + Eval({|| EncodeUTF8(AllTrim(_cCapacRef))}) + '",
+						"situacao":  "' + Eval({|| EncodeUTF8(AllTrim(_cSitTnq))}) + '" ,
+                        "dt_fabricacao": null
+                       }
+                 ]
+            }'

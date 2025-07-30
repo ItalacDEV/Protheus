@@ -1,0 +1,11 @@
+'     			],
+                "xml_nf" : "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_XMLNFE))}) + '",
+ 	            "demonstrativo_binary_file": null,
+                "demonstrativo_base64_file": "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_PDFEXT))}) + '",
+                "demonstrativo_url_file": null,
+                "nota_fiscal_binary_file": null,
+                "nota_fiscal_base64_file": "' + Eval({|| EncodeUTF8(AllTrim(ZBM->ZBM_PDFNFE))}) + '",
+                "nota_fiscal_url_file": null
+       }
+   ]
+}'

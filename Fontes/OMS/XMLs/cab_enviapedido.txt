@@ -1,0 +1,5 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/" xmlns:wsit="http://schemas.datacontract.org/2004/07/WSITF18.Contracts">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <tem:EnviaPedido>
+         <!--Optional:-->

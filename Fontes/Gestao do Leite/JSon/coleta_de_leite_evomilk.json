@@ -1,0 +1,9 @@
+'{
+    "codigo_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cNrIdent))}) + '",
+    "codigo_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cNrMatr))}) + '",
+    "volume_coletado": ' + Eval({|| EncodeUTF8(AllTrim(_cVolume))}) + ',
+	"volume_informado": ' + Eval({|| EncodeUTF8(AllTrim(_cVolume))}) + ',
+	"observacoes": "' + Eval({|| EncodeUTF8(AllTrim(_cObserv))}) + '",
+    "data_hora": "' + Eval({|| EncodeUTF8(AllTrim(_cDtColeta))}) + '",
+    "codigo_usuario": "' + Eval({|| EncodeUTF8(AllTrim(_cNrMatr))}) + '"
+}'

@@ -1,0 +1,398 @@
+ <html>  
+<head>
+<title>Pedido de Compra</title>
+<script type="text/javascript">
+<!--
+  function avisar(aviso){
+  	if(aviso == 'Aprovado'){
+		if(document.getElementById("BtnAprovar").value == 'Aprovar (Aguarde…)')
+		{
+			document.getElementById("BtnAprovar").disabled=true;
+		}
+		else
+		{
+			document.getElementById("BtnAprovar").value='Aprovar (Aguarde…)';
+
+			document.getElementById("BtnRejeitar").disabled=true;
+			document.getElementById("BtnQuestionar").disabled=true;
+			document.getElementById("BtnAguardar5d").disabled=true;
+			document.getElementById("BtnAguardar10d").disabled=true;
+			document.getElementById("BtnAguardar20d").disabled=true;
+		}
+	}
+	if(aviso == 'Aguardar 5 Dias'){
+		if(document.getElementById("BtnAguardar5d").value == 'Aguardar 5 Dias (Aguarde…)')
+		{
+			document.getElementById("BtnAguardar5d").disabled=true;
+		}
+		else
+		{
+			document.getElementById("BtnAguardar5d").value='Aguardar 5 Dias (Aguarde…)';
+			
+			document.getElementById("BtnAprovar").disabled=true;
+			document.getElementById("BtnRejeitar").disabled=true;
+			document.getElementById("BtnQuestionar").disabled=true;
+			document.getElementById("BtnAguardar10d").disabled=true;
+			document.getElementById("BtnAguardar20d").disabled=true;
+		}
+	}
+	if(aviso == 'Aguardar 10 Dias'){
+		if(document.getElementById("BtnAguardar10d").value == 'Aguardar 10 Dias (Aguarde…)')
+		{
+			document.getElementById("BtnAguardar10d").disabled=true;
+		}
+		else
+		{
+			document.getElementById("BtnAguardar10d").value='Aguardar 10 Dias (Aguarde…)';
+			
+			document.getElementById("BtnAprovar").disabled=true;
+			document.getElementById("BtnRejeitar").disabled=true;
+			document.getElementById("BtnQuestionar").disabled=true;
+			document.getElementById("BtnAguardar5d").disabled=true;
+			document.getElementById("BtnAguardar20d").disabled=true;
+		}
+	}
+	if(aviso == 'Aguardar 20 Dias'){
+		if(document.getElementById("BtnAguardar20d").value == 'Aguardar 20 Dias (Aguarde…)')
+		{
+			document.getElementById("BtnAguardar20d").disabled=true;
+		}
+		else
+		{	
+			document.getElementById("BtnAguardar20d").value='Aguardar 20 Dias (Aguarde…)';
+			
+			document.getElementById("BtnAprovar").disabled=true;
+			document.getElementById("BtnRejeitar").disabled=true;
+			document.getElementById("BtnQuestionar").disabled=true;
+			document.getElementById("BtnAguardar5d").disabled=true;
+			document.getElementById("BtnAguardar10d").disabled=true;
+		}
+	}
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+ 	  document.frm_aprovador.tx_obs.value = aviso
+	  return true;
+    }
+    else
+	{
+	  return true ;	  
+    }
+  }
+  
+  function ObrigarInformar(){
+	if(document.getElementById("BtnRejeitar").value == 'Rejeitar (Aguarde…)')
+	{
+		document.getElementById("BtnRejeitar").disabled=true;
+	}
+	else
+	{
+		document.getElementById("BtnRejeitar").value='Rejeitar (Aguarde…)';
+		
+		document.getElementById("BtnAprovar").disabled=true;
+		document.getElementById("BtnQuestionar").disabled=true;
+		document.getElementById("BtnAguardar5d").disabled=true;
+		document.getElementById("BtnAguardar10d").disabled=true;
+		document.getElementById("BtnAguardar20d").disabled=true;
+	}
+	
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+		document.frm_aprovador.tx_obs.value = 'Rejeitado';
+		return true;
+    }
+    else{
+		return true;
+    }
+  }  
+  
+  function Questionar(){
+    if(document.frm_aprovador.tx_obs.value == '')
+	{
+      window.alert('Para questionamento por favor preencher o campo Observação');
+	  return false;
+    }
+    else{
+		if(document.getElementById("BtnQuestionar").value == 'Questionar (Aguarde…)')
+		{
+			document.getElementById("BtnQuestionar").disabled=true;
+		}
+		else
+		{
+			document.getElementById("BtnQuestionar").value='Questionar (Aguarde…)';
+			
+			document.getElementById("BtnAprovar").disabled=true;
+			document.getElementById("BtnAguardar5d").disabled=true;
+			document.getElementById("BtnAguardar10d").disabled=true;
+			document.getElementById("BtnAguardar20d").disabled=true;
+			document.getElementById("BtnRejeitar").disabled=true;
+			return true ;	  
+		}
+    }
+  }  
+
+//-->
+</script>
+</head>
+<!--  SEMPRE SALVAR ESTE ARQUIVO SALVAR EM ISO ANSI -->
+<style type="text/css">
+table.bordasimples { border-collapse: collapse }
+table.bordasimples tr td { border:1px solid #777777 } 
+td.grupos	{ font-family:VERDANA; font-size:20px; text-align:middle; background-color: #FFFFFF; color:#000080; }
+td.titulos	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+td.itens	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.itenspc	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+td.totais	{ font-family:VERDANA; font-size:12px; text-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+.but-primary { color: #FFF; background-color: #36F; }
+.but-success { color: #fff; background-color: #009835;}
+.but-error {color: #fff;background-color: #CC0000;}
+.but-warning {color: #fff;background-color: #F28E00;}
+.but-quest {color: #FFF;background-color: #0066FF;}
+.but-shadow { box-shadow: 1px 1px 1px #999; }
+.but-rc { border-radius: 4px; }
+.CellWithComment{position:relative;}
+.CellComment{display:none; position:absolute; z-index:100; border:1px; background-color:rgb(122, 118, 118);  border-style:solid; border-width:1px; border-color:rgb(179, 177, 177); padding:3px; color:rgb(255, 255, 255); top:20px; left:20px;} 
+.CellWithComment:hover span.CellComment{ display:block;} 
+-->
+</style>
+<body>
+<center>
+<form action=mailto:%WFMailTo% method="POST" name="frm_aprovador" >
+	<input type="hidden" name="T1" value="%cNivelAP%">
+	<input type="hidden" name="T1" value="%cUser%">
+<br>
+<table id="tabCrud" width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr height="040px">
+		<td width="035%" class="grupos" rowspan='3'>
+			<center>
+			<!--<img src='http://www.italac.com.br/imagens/logo_novo.png'><br>-->			
+			<img src="!cLogo!"><br>
+			<font style="font-size: 16px; font-weight: bold;">%cNomFil%</font><br>
+			<font style="font-size: 14px;">!cEndFil!</font><br>
+			<font style="font-size: 12px;">CEP:!cCepFil! - !cCidFil!-!cEstFil!</font><br>
+			<font style="font-size: 12px;">TEL:!cTelFil! - FAX:!cFaxFil!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">CNPJ/CPF:!cCGCFil!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">I.E:!cIEFil!</font>
+			</Center>
+		</td>  
+		<td width="055%" BGCOLOR=#4169E1 colspan='3' valign='center'>
+			<center>
+			<font color= #F2FBEF  style="font-size: 16px; font-weight: bold;">PEDIDO DE COMPRAS !cTitulo!</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<font color= #FFFF00  style="font-size: 30px;font-weight: bold;"<B>!cReavaliar!<B></font>
+			</center>
+		</td>
+		
+	</tr>
+	<tr>
+
+		<td width="030%" class="grupos">
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Solicitante: </b>!cNomSol!</font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Aprovador da SC: </b>!cNomApr!</font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Gestor de Compras: </b> !cNomGes! </font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Aplicação:</b>!cAplic!</font><br>	
+			<font !cCorUrgen! style="font-size: 14px;">&nbsp;&nbsp;<b>Urgente:</b> !cUrgen!</font>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Compra Direta:</b> !cCompDir!</font><br>						
+		</td>
+
+		<td width="020%" class="grupos">
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Número SC: </b>!cnumSC!</font><br>			
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Data inclusão SC: </b>!cdtinc!</font><br>
+			<font style="font-size: 14px;">&nbsp;&nbsp;<b>Data aprovação SC: </b> !cdtapr! </font><br>			
+		</td>
+
+		<td width="7%" class="grupos">
+			<center>
+			<font style="font-size: 14px; font-weight: bold;">Nº<br>%NumPC%<br></font><br>
+			</center>
+		</td>
+
+		
+
+		</tr>
+	<tr>
+		<td width="055%" class="grupos" colspan='3' valign='center'>
+			<center>
+			<font style="font-size: 14px; font-weight: bold;">!cNomFor!</font><br>
+			<font style="font-size: 12px;">!cEndFor!</font><br>
+			<font style="font-size: 12px;">CEP:!cCEPFor!- !cCidFor!-!cEstFor!</font><br>
+			<font style="font-size: 12px;">TEL:!cTelFor! FAX:!cFaxFor!</font><br>
+			<font style="font-size: 12px;">CNPJ/CPF:!cCGCFor! I.E.:!cIEFor!</font><br>
+			<font style="font-size: 14px; font-weight: bold;">CONTATO: !cContatFor!</font>
+			<br></center>
+		</td>
+	</tr>
+	<tr>
+		<td colspan='4'>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'> 
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center"> 
+					<td width='01%'><font color="#F2FBEF" </font> Item </td>
+					<td width='07%'><font color="#F2FBEF" </font> Produto</td>
+					<td width='30%'><font color="#F2FBEF" </font> Descrição</td>
+					<td width='01%'><font color="#F2FBEF" </font> UM</td>
+					<td width='07%'><font color="#F2FBEF" </font> Quantidade</td>
+					<td width='10%'><font color="#F2FBEF" </font> Vlr.Unit.</td>
+					<td width='07%'><font color="#F2FBEF" </font> Vlr.Desc.</td>
+					<td width='10%'><font color="#F2FBEF" </font> Vlr.Total</td>
+					<td width='07%'><font color="#F2FBEF" </font> ICMS</td>
+               <!--  <td width='05%'><font color="#F2FBEF" </font> ICMS ST</td> -->
+					<td width='05%'><font color="#F2FBEF" </font> Dt.Entrega</td>
+               <!--  <td width='0%'><font color="#F2FBEF" </font> Dt.Ul.Prc.Compra</td> -->
+               <td width='07%'><font color="#F2FBEF" </font> Ul.Prc.Compra*</td>
+					<td width='05%'><font color="#F2FBEF" </font> Saldo Filial</td>
+					<td width='05%'><font color="#F2FBEF" </font> Saldo Geral</td>
+				</tr>
+				<tr HEIGHT=30 >
+					<td width='01%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.Item!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.Prodpc!</td>
+					<td width='30%' Style="font-family:VERDANA; font-size:12px; " align="left"  > !Itens.DesProd!</td>
+					<td width='01%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.UM!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.Qtde!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrUni!</td>
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrDes!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrTot!</td>
+					<td width='07%' Style="font-family:VERDANA; font-size:12px; " align="center" > !Itens.ICMS!</td>
+               <!--	<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.VlrST!</td>-->
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="center"> !Itens.DtEmis!</td>
+               <td width='07%' Style="font-family:VERDANA; font-size:12px; " align="right" class="CellWithComment"> !Itens.VlrUc!<span class="CellComment"> !Itens.DtUc!</span> </td>
+               <td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.SldAtFil!</td>
+					<td width='05%' Style="font-family:VERDANA; font-size:12px; " align="right" > !Itens.SldAtEmp!</td>					
+				</tr>
+			</table>	
+		</td>
+	</tr>
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr>
+		<td rowspan='3' width='20%' align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;">Condição de Pagamento:</font><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!cCondPG!</font>
+		</td>
+		 <td rowspan='3' width='20%' align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;">Comprador:</font><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!cDigiFor!</font>
+		</td> 
+		 <td rowspan='3' width='10%' align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;">Data de Emissão:</font><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!dDtEmiss!</font>
+		</td> 
+		<td width='25%'><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Total das Mercadorias:</font></td>
+		<td width='25%' align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotMer%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<tr>
+		<td><font Style="border-style: none; font-family:VERDANA; font-size:12px;">IPI:</font></td>
+		<td align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nIPI%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>	
+	<tr>
+		<td><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Total das Mercadorias + IPI:</font></td>
+		<td align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotImp%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+		</tr>
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr>
+		<td BGCOLOR=#4169E1 width="50%" rowspan='5' style="vertical-align: top;">
+			<font color= #F2FBEF Style="border-style: none; font-family:VERDANA; font-size:12px;">OBSERVAÇÕES:</font>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;			
+			<font color= #FFFF00  style="font-size: 20px;"><B>!cReavaliar!</B></font><br>
+			<font color= #F2FBEF Style="border-style: none; font-family:VERDANA; font-size:12px;">%cObs%</font><BR><BR>
+			<font color= #F2FBEF Style="border-style: none; font-family:VERDANA; font-size:12px;">Obs. Aprov. SC -/- Obs. Generica SC:</font><BR>
+			<font color= #F2FBEF Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%cObsSC%</font>
+		</td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">ICMS (incluso):</font></td>
+		<td width="16%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nICMS%&nbsp;&nbsp;&nbsp;</font></td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Outros Imp.:</font></td>
+		<td width="17%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nOutImp%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<tr>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Frete: <b>!cFrete!</b> </font></td>
+		<td width="16%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nVlFrete!&nbsp;&nbsp;&nbsp;</font></td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Descontos:</font></td>
+		<td width="17%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nTotDesc!&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<tr>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">!cGord!</font></td>
+		<td width="16%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nSeguro!&nbsp;&nbsp;&nbsp;</font></td>
+		<td width="09%"><font Style="border-style: none; font-family:VERDANA; font-size:12px;">Despesas:</font></td>
+		<td width="17%" align="right"><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">!nDesp!&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>
+	<!--<tr>
+		<td HEIGHT=30 width="25%" align="right" colspan='2'><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold">TOTAL GERAL:</font></td>
+		<td HEIGHT=30 BGCOLOR=#4169E1 width="25%" colspan='2' align="right"><font color= #F2FBEF  Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotGer%&nbsp;&nbsp;&nbsp;</font></td>
+2	</tr>-->
+	<tr>
+		<td HEIGHT=30 width="25%" align="LEFT" colspan='2'><font Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold">T O T A L&nbsp;&nbsp;&nbsp;&nbsp;G E R A L:</font></td>
+		<td HEIGHT=30 BGCOLOR=#4169E1 width="25%" colspan='2' align="right"><font color= #F2FBEF  Style="border-style: none; font-family:VERDANA; font-size:12px; font-weight: bold;">%nTotGer%&nbsp;&nbsp;&nbsp;</font></td>
+	</tr>	
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr>
+		<td style="vertical-align: top;" rowspan="!nLinhas!">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Transportadora:</font>
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px;">!cTransp!</font><br>
+		</td>
+	</tr>
+</table>
+<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+	<tr height="80px">
+		<td width='16.2%' style="vertical-align: top" align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Nome Aprovador</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold;">!Apr.Aprovador!</font>
+		</td>
+		<td width='17%' style="vertical-align: top"align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Data Aprovação</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold">!Apr.DtAprov!&nbsp;&nbsp;!Apr.HrAprov!</font>
+		</td>
+		<td width='17%' style="vertical-align: top"align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Obs Aprovação</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold">!Apr.ObsAprov!</font>
+		</td>
+		<td width='17%' style="vertical-align: top"align="center">
+			<font Style="border-style: none; font-family:VERDANA; font-size:10px; font-weight: bold;">Situação</font><br><br>
+			<font Style="border-style: none; font-family:VERDANA; font-size:12px;font-weight: bold">!Apr.NivelAprov!</font><br>
+		</td>
+	</tr>
+</table>
+<br>
+   <td width='17%' style="vertical-align: top"align="left">
+		<font Style="border-style: none; font-family:VERDANA; font-size:10px;font-weight: bold">* Campos com informações ocultas. Posicionando sobre o campo as informações são exibidas em um pop-pup.</font><br>
+	</td>
+<br>
+<br>
+<br>
+<br>
+!cQuest!
+<br>
+<br>
+	<table cellpadding='0' cellspacing='0' >
+		<tr>
+			<font color="#333366" face="Verdana" size="4" >Questionamento ou Observação</font> 
+		</tr>
+		<tr>
+			<td width="100" height="100" align="center" >
+				<p <font face="Verdana" >
+					<textarea name="%CR_OBS%" id="tx_obs" TEMPLATE_name="S1" rows="4" cols="96"></textarea></font>
+				</p>
+			</td>
+		</tr>
+		<tr> 
+			<td align="center" width="73%" height="27" >
+				<p>
+					<font face="Verdana">
+						<input class="but but-success but-shadow but-rc" type="submit" id="BtnAprovar"     name="%opcao%" value="Aprovar"          onClick="return avisar('Aprovado')"  >
+						<input class="but but-quest but-shadow but-rc"   type="submit" id="BtnQuestionar"  name="%opcao%" value="Questionar"       onClick="return Questionar()"> 
+						<input class="but but-error but-shadow but-rc"   type="submit" id="BtnRejeitar"    name="%opcao%" value="Rejeitar"         onClick="return ObrigarInformar()"> 
+						<input class="but but-warning but-shadow but-rc" type="submit" id="BtnAguardar5d"  name="%opcao%" value="Aguardar 5 Dias"  onClick="return avisar('Aguardar 5 Dias')">
+						<input class="but but-warning but-shadow but-rc" type="submit" id="BtnAguardar10d" name="%opcao%" value="Aguardar 10 Dias" onClick="return avisar('Aguardar 10 Dias')">
+						<input class="but but-warning but-shadow but-rc" type="submit" id="BtnAguardar20d" name="%opcao%" value="Aguardar 20 Dias" onClick="return avisar('Aguardar 20 Dias')"> 
+					</font>
+				</p>
+			</td>
+		</tr>
+	</table>
+</form>
+</center>
+</body>
+</html>
+
+<br>PC_APROVADOR.HTM / MCOM004<br>

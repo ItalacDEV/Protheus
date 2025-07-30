@@ -1,0 +1,461 @@
+  <html> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<head>
+		<title>Solicitação Lib Preço</title>
+		<script type="text/javascript">
+			<!--
+			function avisar(aviso){
+			var cTemp = ""
+				if(aviso == 'Aprovado'){
+					if(document.getElementById("BtnAprovar").value == 'Aprovar (Aguarde!)')
+					{
+						document.getElementById("BtnAprovar").disabled=true;
+					}
+					else{
+						document.getElementById("BtnAprovar").value='Aprovar (Aguarde!)';
+						
+						document.getElementById("BtnRejeitar").disabled=true;
+					}  
+					
+					if(document.frm_aprovador.tx_obs.value == '')
+					{
+						document.frm_aprovador.tx_obs.value = aviso
+						return true;
+					}
+					else{
+						return true ;	  
+					}
+				}
+
+				if(aviso == 'Rejeitado'){
+					if(document.frm_aprovador.tx_obs.value == '')
+					{
+						window.alert('Para rejeitar preencha o campo Observação');
+						return false;
+					}
+					else
+					{
+						ctemp = document.frm_aprovador.tx_obs.value
+						if(ctemp.length < 11)
+						{
+							window.alert('Tamanho do campo observação da Rejeição inválido.');
+							return false;
+						}
+						else
+						{
+				
+							if(document.getElementById("BtnRejeitar").value == 'Rejeitar (Aguarde!)')
+							{
+								document.getElementById("BtnRejeitar").disabled=true;
+							}
+							else{
+								document.getElementById("BtnRejeitar").value='Rejeitar (Aguarde!)';
+								
+								document.getElementById("BtnAprovar").disabled=true;
+								return true;
+							}  
+						}
+					}
+				}				
+			}
+		</script>
+	    <style type="text/css">
+<!--
+.style1 {
+	color: #FF0000;
+	font-weight: bold;
+}
+-->
+        </style>
+</head>
+
+	<style type="text/css">
+	<!--  SEMPRE SALVAR ESTE ARQUIVO SALVAR EM ISO (ANSI)
+	table.bordasimples { border-collapse: collapse; }
+	table.bordasimples tr td { border:1px solid #777777; }
+	td.grupos	{ font-family:VERDANA; font-size:20px; V-align:middle; background-color: #FFFFFF; color:#000080; }
+	td.titulos	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #EEDD82; }
+	td.itens	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+	td.itenspc	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #DDDDDD; }
+	td.totais	{ font-family:VERDANA; font-size:12px; V-align:middle; margin-right: 15px; margin-left: 15px; background-color: #7f99b2; color:#FFFFFF; }
+	.but { display: inline-block; background-color: #ccc; color: #444; padding: 10px 20px; text-decoration: none; box-sizing: border-box; font-family: Helvetica, Arial, sans-serif; font-size: 14px; border: 0px; }
+	.but:hover { background-image: linear-gradient(to bottom, transparent, rgba(0,0,0,.15)); cursor: pointer;  }
+	.but-primary { color: #FFF; background-color: #36F; }
+	.but-success { color: #fff; background-color: #009835;}
+	.but-error {color: #fff;background-color: #CC0000;}
+	.but-warning {color: #fff;background-color: #F28E00;}
+	.but-shadow { box-shadow: 1px 1px 1px #999; }
+	.but-rc { border-radius: 4px; }
+.style2 {color: #FFFF00}
+.style3 {color: #4169E1}
+	-->
+	</style>
+	<!-- Corpo do HTML -->
+	<body>
+	<form action=mailto:%WFMailTo% method="POST" name="frm_aprovador" >
+	<input type="hidden" name="T1" value="%cCodSol%">
+	<input type="hidden" name="T1" value="%cCodApr%">
+	<input type="hidden" name="T1" value="%cTipOper%">
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr height="040px">
+					<td width="28%"bgcolor="#FFFFFF">
+						<center>
+						<!--<div align="center"><img src="!cLogo!" align="middle"><br>-->
+						<div align="center"><img src="!cLogo!" align="middle"><br>
+				        </div></td>
+					<td width="72%" bgcolor="#4169E1">
+						<center>
+						  <h2>Solicitação de Liberação de Preço - Pedido Portal %cNumPV% </h2>
+						  <p align="left">Solicitado por: %cNomSol% - Em: (!cDtAtu!) E-Mail <a href="mailto:!cMaiSol!?Subject=Liberação Preço !cFilSol! - PV Número:  !cNumPVSol!"> <font color= "#F2FBEF"> !cMaiSol! </font></a> <br>
+						  Aprovador&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: %cNomApr% - !cTipo! </p>
+						</center>
+				  </td>
+				</tr>
+			</table>
+	  <div id="espelho_pedido">
+
+	  <h4>Informações Gerais</h4>
+
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="left">
+					<td width="30%"><font color="#F2FBEF">Código / Representante:</font></td>
+					<td width="35%" bgcolor="#4169E1"><font color="#F2FBEF">Código / Coordenador:</font></td>
+					<td width="35%"><font color="#F2FBEF">Código / Gerente:</font></td>
+				</tr>
+				<tr>
+					<td>!cCodRep! / !cNomRep!</td>
+					<td>!cCodCoo! / !cNomCoo!</td>
+					<td>!cCodGer! / !cNomGer!</td>
+				</tr>
+			</table>
+
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td style="width: 15%;"><font color="#F2FBEF">Número:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Tipo de Venda:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Filial Faturamento:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Emissão:</font></td>
+					<td><font color="#F2FBEF">Cond. Pagto Pedido:</font></td>
+					<td><font color="#F2FBEF">Cond. Pagto Padrão:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Envio/Reenvio :</font></td>																									   
+				</tr>
+				<tr>
+					<td><div align="center"><strong><em>%cNumPV%</em></strong></div></td>
+					<td><div align="center"><strong><em>!cTipoPV!</em></strong></div></td>
+					<td><div align="center"><strong><em>%cFilPV%</em></strong></div></td>
+					<td><div align="center"><strong><em>!cEmisPV!</em></strong></div></td>
+					<td><div align="center"><strong><em>!cCondPG!</em></strong></div></td>
+					<td><div align="center"><strong><em>!cCondPgPad!</em></strong></div></td>
+					<td><div align="center"><strong><em>!cEnvio!</em></strong></div></td>																</tr>
+					<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td style="width: 15%;"><font color="#F2FBEF">Troca Nota:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Filial Carregamento:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Tabela de Preços:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Descrição Tabela de Preço:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Faixa:</font></td>					
+					<td style="width: 15%;"><font color="#F2FBEF">Peso da Faixa:</font></td>										
+					<td style="width: 15%;"><font color="#F2FBEF">Tipo de Carga :</font></td>					
+				</tr>
+				<tr>
+					<td><div align="center"><strong><em>!ctrocanf!</em></strong></div></td>
+					<td><div align="center"><strong><em>%cFilCarregamento%</em></strong></div></td>
+					<td><div align="center"><strong><em>%cTabPrc%</em></strong></div></td>
+					<td><div align="center"><strong><em>%cDecPrc%</em></strong></div></td>
+					<td><div align="center"><strong><em>%nFaixa%</em></strong></div></td>					
+					<td><div align="center"><strong><em>%nPesoFaixa%</em></strong></div></td>										
+					<td><div align="center"><strong><em>!cCarga!</em></strong></div></td>		
+				</tr>
+	
+			</table>
+
+	
+			<div style="clear: both;"></div>
+	  <h4>Informações do Cliente</h4>
+
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td style="width: 33.33%;"><div align="left"><font color="#F2FBEF">Cód.Loja / Razão Social / Fantasia / CPF/CNPJ / Rede: / Calcula Suframa</font></div></td>
+				</tr>
+				<tr>
+					<td>!cCodCli! - !cLojCli! / !cNomCli! / !cNomRed! / !cCnpjCli! / !cGrpVen! / !cSuframa!</td>
+				</tr>
+			</table>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td style="width: 33.33%;"><div align="left"><font color="#F2FBEF">Contato / Tel. / E-mail: </font></div></td>
+				</tr>
+				<tr>
+					<td>!cContatCli! / !cFoneCli! / !cEmailCli!</td>
+				</tr>
+			</table>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td style="width: 33.33%;"><div align="left"><font color="#F2FBEF">Endereço / Cidade / Estado:</font></div></td>
+				</tr>
+				<tr>
+				  <td>!cEndCli! / !cCidCli! / !cEstCli!</td>
+			  </tr>
+				<tr>
+				  <td bgcolor="#4169E1"><font color="#F2FBEF">Análise de Crédito :</font></td>
+			  </tr>
+				<tr>
+					<td>!cAnaCre!</td>
+				</tr>
+			</table>
+			<br>
+			<table width="100%">
+				<tr>
+					<td width="51%" valign="top">
+						<h4>Informações Financeiras</h4>
+
+						<table width="98%" class='bordasimples' cellpadding='0' cellspacing='0'>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Limite de Crédito:</font></td>
+								<td align="right">!nLimCrd!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Tit Protestados:</font></td>
+								<td align="right">!nTitProt!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Saldo Títulos:</font></td>
+								<td align="right">!nTitAber!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Cheque Devolvidos:</font></td>
+								<td align="right">!nChqDev!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Pedidos Aprovados:</font></td>
+								<td align="right">!nTitVenc!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Maior Compra:</font></td>
+								<td align="right">!nMComp!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Saldo Lim Crédito:</font></td>
+								<td align="right">!nSLimCrd!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Maior Duplicata:</font></td>
+								<td align="right">!nMDuplic!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><span class="style1 style2">Pedido Atual:</span></td>
+								<td align="right"><span class="style1 style3">!nPedAtu!</span></td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Média de Atraso:</font></td>
+								<td align="right">!nMAtras!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Saldo Não Faturado:</font></td>
+								<td align="right">!nSalNFat!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Vencto. Lim. Crédito:</font></td>
+								<td align="right">!cVenLCr!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Lim de Cred em Cheque:</font></td>
+								<td align="right">!nLimCChe!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Data Limite Liberação:</font></td>
+								<td align="right">!cDtLiLib!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Saldo em Cheques:</font></td>
+								<td align="right">!nSldChq!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Atraso Atual:</font></td>
+								<td align="right">!nAtraAtu!</td>
+							</tr>
+						</table>
+					</td>
+					<td width="49%" valign="top">
+						<h4>Posição do Cliente</h4>
+			
+						<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Limite Crédito:</font></td>
+								<td align="right">!nLimCrl!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Primeira Compra:</font></td>
+								<td align="right">!cPriCom!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Saldo Histórico:</font></td>
+								<td align="right">!nSldHist!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Última Compra:</font></td>
+								<td align="right">!cUltCom!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Lim Cred Sec:</font></td>
+								<td align="right">!nLimcSec!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Maior Atraso:</font></td>
+								<td align="right">!nMaiAtr!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Saldo LC Sec:</font></td>
+								<td align="right">!nSldLcSe!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Média de Atraso:</font></td>
+								<td align="right">!nMedAtr!</td>
+							</tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+							  <td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Maior Compra:</font></td>
+							  <td align="right">!nMaiCom!</td>
+							  <td align="left" BGCOLOR=#4169E1 style="width: 25%;"><font color="#F2FBEF">Grau de Risco:</font></td>
+							  <td align="right">!cGrauRis!</td>
+						  </tr>
+							<tr Style="font-family:VERDANA; font-size:12px;">
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;"><font color="#F2FBEF">Maior Saldo:</font></td>
+								<td align="right">!nMaiSld!</td>
+								<td BGCOLOR=#4169E1 align="left" style="width: 25%;">&nbsp;</td>
+								<td align="right">&nbsp;</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			<div style="clear: both;"></div>
+
+	  <h4>Informações do Pedido</h4>
+		<table width="100%" height="169" cellpadding='0' cellspacing='0' class='bordasimples'>
+
+			<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+				<td width="17%" bgcolor="#4169E1"><font color="#F2FBEF">Tipo Frete</font></td>
+				<td width="25%" bgcolor="#4169E1"><font color="#F2FBEF">Tipo de Carga</font></td>
+				<td width="20%" bgcolor="#4169E1"><font color="#F2FBEF">Quant. Chapa</font></td>
+				<td width="17%" bgcolor="#4169E1"><font color="#F2FBEF">Hora da Descarga</font></td>
+				<td width="21%" bgcolor="#4169E1"><font color="#F2FBEF">Custo da Carga</font></td>
+			</tr>
+
+			<tr>
+				<td valign="top">!cFrete!</td>
+				<td valign="top">!cTpCarga!</td>
+				<td valign="top">!nQtdChap!</td>
+				<td valign="top">!cHrDescg!</td>
+				<td valign="top">!nCusCarg!</td> 
+			</tr>
+
+			<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+				<td colspan="3" bgcolor="#4169E1"><font color="#F2FBEF">Entrega</font></td>
+			<tr>
+				<td colspan="3" bgcolor="#FF0000" >Data: !dDtEntrega!				 | Hora: !cHrEntrega!				 | Senha: !cSenhaEntr!   | Tipo !cTipoAgenda!</td>
+		    </tr>
+			<tr>
+				<td colspan="5" bgcolor="#4169E1"><font color="#F2FBEF">Mensagem da Nota Fiscal</font></td>
+		    </tr>
+			<tr>
+			  <td colspan="5">!cMensNF!</td>
+		  </tr>
+			<tr>
+			  <td colspan="5" bgcolor="#4169E1"><font color="#F2FBEF">Observação (Comercial)</font></td>
+		  </tr>
+			<tr>
+				<td colspan="5">!cObsPed!</td>
+		    </tr>
+
+			<tr>
+			  <td colspan="5" bgcolor="#4169E1"><font color="#F2FBEF">Peso Bruto</font></td>
+		  </tr>
+			<tr>
+				<td colspan="5">!nPesoBruto!</td>
+		    </tr>
+	    </table>
+		<div style="clear: both;"></div>
+
+	  <h4>Produtos</h4>
+
+	  <table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<thead>
+					<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+						<td style="width:3%;"><font color="#F2FBEF">Item</font></td>
+						<td style="width:8%;"><font color="#F2FBEF">Código</font></td>
+						<td style="width:35%;"><font color="#F2FBEF">Descrição</font></td>
+						<td style="width:8%;"><font color="#F2FBEF">Preço Venda</font></td>
+						<td style="width:4%;"><font color="#F2FBEF">% Contrato</font></td>
+						<td style="width:8%;"><font color="#F2FBEF">Preço Net</font></td>
+						<td style="width:8%;"><font color="#F2FBEF">Preço Net por KG</font></td>
+						<td style="width:8%;"><font color="#F2FBEF">Preço Tabela</font></td>
+						<td style="width:10%;"><font color="#F2FBEF">Quant.</font></td>
+						<td style="width:8%;"><font color="#F2FBEF">Total</font></td>
+						<td style="width:6%;"><font color="#F2FBEF">Pedido Cliente</font></td>
+
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td align="center"><font !Itens.cCor!>!Itens.cItem!</font></td>		
+						<td align="center"><font !Itens.cCor!>!Itens.cProdPV!</font></td>
+						<td align="left"><font !Itens.cCor!>!Itens.cDescPV!</font></td>
+						
+						<td align="right"><font !Itens.cCor!>!Itens.nPrcVen!</font></td>
+						<td align="right"><font !Itens.cCor!>!Itens.nPerCon!</font></td>
+						<td align="right"><font !Itens.cCor!>!Itens.nPrcNet!</font></td>
+						<td align="right"><font !Itens.cCor!>!Itens.nPrcNetKG!</font></td>
+						<td align="right"><font !Itens.cCor!>!Itens.nPrcMin!</font></td>
+						<td align="center"><font !Itens.cCor!>!Itens.nQuantPV!  !Itens.cUM!</font></td>
+						<td align="right"><font !Itens.cCor!>!Itens.nTotalPV!</font></td>
+						
+						<td align="center"><font !Itens.cCor!>!Itens.cNumPCli!</font></td>						
+					</tr>
+				</tbody>
+		</table>
+		<p>&nbsp;</p>
+		<center>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td><font color="#F2FBEF">% LEITE MAGRO</font></td>
+				</tr>
+				<tr>
+					<td><div align="center"><strong><em>!nGetMagro!</em></strong></div></td>
+				</tr>
+			</table>
+		</center>
+		<p>&nbsp;</p>		  
+		<center>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td><font color="#F2FBEF">Motivo da Solicitação</font></td>
+				</tr>
+				<tr>
+					<td>!cGetSol!</td>
+				</tr>
+			</table>
+		</center>
+		<p>&nbsp;</p>
+		<center>
+			<table width="100%" class='bordasimples' cellpadding='0' cellspacing='0'>
+				
+				</tr>
+					<tr BGCOLOR=#4169E1  Style="font-family:VERDANA; font-size:12px;" align="center">
+					<td style="width: 70%;"><font color="#F2FBEF">Aprovação </font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Data:</font></td>
+					<td style="width: 15%;"><font color="#F2FBEF">Hora: </font></td>
+				</tr>
+				<tr>
+					<td><div align="center"><strong><em>!cGetObsCoord!</em></strong></div></td>
+					<td><div align="center"><strong><em>!cDataAprov!</em></strong></div></td>
+					<td><div align="center"><strong><em>!cHoraAprov!</em></strong></div></td>
+				</tr>
+			</table>
+		</center>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+		<p>&nbsp;</p>
+
+		<center>
+        <table cellpadding='0' cellspacing='0' >
+		            <tr>
+    		            <font color="#333366" face="Verdana" size="4" >Observação</font> 
+            		</tr>
+		            <tr>
+        	 	       <td width="100" height="100" align="center" >
+                		    <p> <font face="Verdana" >
+                        		<textarea name="%CR_OBS%" id="tx_obs" TEMPLATE_name="S1" rows="4" cols="96"></textarea></font>
+                    		</p>
+       	    	      </td>
+	            	</tr>
+    		        <tr> 
+            		    <td align="center" width="73%" height="27" >
+                    		<p>
+		                        <font face="Verdana">
+                            		<input class="but but-success but-shadow but-rc" id="BtnAprovar"  type="submit" name="%opcao%" value="Aprovar"  onClick="return avisar('Aprovado')"> 
+    	                        	<input class="but but-error but-shadow but-rc"   id="BtnRejeitar" type="submit" name="%opcao%" value="Rejeitar" onClick="return avisar('Rejeitado')"> 
+	     	        			</font>
+							</p>
+                </td>
+            </tr>
+        </table>
+	</center>
+</form>
+</body>
+
+</html>

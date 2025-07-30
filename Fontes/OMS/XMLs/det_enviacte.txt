@@ -1,0 +1,1 @@
+            '<wsit:Xml><![CDATA['+ZG0->ZG0_XMLCTE+']]></wsit:Xml>'

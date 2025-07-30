@@ -1,0 +1,41 @@
+				'<tem:cliente>
+					<wsit:ABREVI>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_NREDUZ))})+'</wsit:ABREVI>
+					<wsit:AGENCIA>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_AGENCI))})+'</wsit:AGENCIA>
+					<wsit:ATIVID>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_ATIVID))})+'</wsit:ATIVID>
+					<wsit:ATIVO>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_MSBLQL))})+'</wsit:ATIVO>
+					<wsit:BAIENT>'+Eval({|| EncodeUTF8(substr(AllTrim(ZFH->ZFH_BAIRRE),1,20))})+'</wsit:BAIENT>
+					<wsit:BAIRRO>'+Eval({|| EncodeUTF8( substr(AllTrim(ZFH->ZFH_BAIRRO),1,20))})+'</wsit:BAIRRO>
+					<wsit:BANCO>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_BANCO))})+'</wsit:BANCO>
+					<wsit:CALIMP>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CALIMP))})+'</wsit:CALIMP>
+					<wsit:CENTRO>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CENTRO))})+'</wsit:CENTRO>
+					<wsit:CEP>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_CEP))})+'</wsit:CEP>
+					<wsit:CEPENT>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CEPE))})+'</wsit:CEPENT>
+					<wsit:CGC>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CGC))})+'</wsit:CGC>
+					<wsit:CODPAG>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CODPAG))})+'</wsit:CODPAG>
+					<wsit:CONTA>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_CONTA))})+'</wsit:CONTA>
+					<wsit:CONTRI>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CONTRI))})+'</wsit:CONTRI>
+					<wsit:CPRIMARIA>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CPRIMA))})+'</wsit:CPRIMARIA>
+					<wsit:DDFONE>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_DDD))})+'</wsit:DDFONE>
+					<wsit:DESCARGA>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_DESCA))})+'</wsit:DESCARGA>
+					<wsit:DN>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_COD))})+'</wsit:DN>
+					<wsit:ENDENT>'+Eval({|| EncodeUTF8( substr(AllTrim(ZFH->ZFH_ENDENT),1,40))})+'</wsit:ENDENT>
+					<wsit:ENDERE>'+Eval({|| EncodeUTF8( substr(AllTrim(ZFH->ZFH_END),1,40))})+'</wsit:ENDERE>
+					<wsit:GMULTA>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_GERMU))})+'</wsit:GMULTA>
+					<wsit:IBGECLI>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_CMUNC))})+'</wsit:IBGECLI>
+					<wsit:IBGEENT>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_CMUEN))})+'</wsit:IBGEENT>
+					<wsit:INSEST>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_INSCR))})+'</wsit:INSEST>
+					<wsit:NFONE>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_TEL))})+'</wsit:NFONE>
+					<wsit:NOME>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_NOME))})+'</wsit:NOME>
+					<wsit:NUMENT>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_NUMENT))})+'</wsit:NUMENT>
+					<wsit:NUMERO>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_NUMERO))})+'</wsit:NUMERO>
+					<wsit:PALLET>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_CHEP))})+'</wsit:PALLET>
+					<wsit:RECEITAP>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_RECEPR))})+'</wsit:RECEITAP>
+					<wsit:REPRESENTANTE>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_REPRES))})+'</wsit:REPRESENTANTE>
+					<wsit:TAXADIFI>'+Eval({|| EncodeUTF8( AllTrim(Str(ZFH->ZFH_TXDIF,13,4)))})+'</wsit:TAXADIFI>
+					<wsit:TIPOEQT>
+						<arr:string>'+Eval({|| EncodeUTF8( AllTrim(ZFH->ZFH_TPEQP))})+'</arr:string>						
+					</wsit:TIPOEQT>
+					<wsit:TPOCLI>'+Eval({|| EncodeUTF8("1")})+'</wsit:TPOCLI>
+					<wsit:TPOPES>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_PESSOA))})+'</wsit:TPOPES>
+					<wsit:UNIDADE>'+Eval({|| EncodeUTF8(AllTrim(ZFH->ZFH_UNIDAD))})+'</wsit:UNIDADE>
+				</tem:cliente>'

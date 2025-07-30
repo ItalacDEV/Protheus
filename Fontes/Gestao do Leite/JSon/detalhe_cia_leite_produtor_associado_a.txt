@@ -1,0 +1,36 @@
+'{
+                "situacao": "' + Eval({|| EncodeUTF8(AllTrim(_cSitProp))}) + '" , 
+				"classificacao_produtor": "' + Eval({|| EncodeUTF8(AllTrim(_cClasProp))}) + '" , 
+                "nome_propriedade_rural": "' + Eval({|| EncodeUTF8(AllTrim(_cNomeProp))}) + '",
+				"matricula_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cMatLatic))}) + '",
+                "nirf": "' + Eval({|| EncodeUTF8(AllTrim(_cNIRF))}) + '",
+                "sigsif": "' + Eval({|| EncodeUTF8(AllTrim(_cSigSif))}) + '",
+				"latitude_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cLatitude))}) + '",
+                "longitude_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cLongitud))}) + '",
+				"informacoes_adicionais": "",
+                "area": "' + Eval({|| EncodeUTF8(AllTrim(_cArea))}) + '",
+                "recria": "' + Eval({|| EncodeUTF8(AllTrim(_cRecria))}) + '",
+                "vaca_seca": "' + Eval({|| EncodeUTF8(AllTrim(_cVacaSeca))}) + '",
+                "vaca_lactacao": "' + Eval({|| EncodeUTF8(AllTrim(_cVacaLacta))}) + '",                
+                "raca_propriedade": "' + Eval({|| EncodeUTF8(AllTrim(_cRacaProp))}) + '",
+                "frequencia_coleta": "' + Eval({|| EncodeUTF8(AllTrim(_cFreqCol))}) + '",
+                "producao_media_diaria": "' + Eval({|| EncodeUTF8(AllTrim(_cProdDia))}) + '",
+                "area_utilizada_producao": "' + Eval({|| EncodeUTF8(AllTrim(_cAreaUti))}) + '",
+                "titular_tanque_comunitario":{
+                        "cpf_cnpj": "' + Eval({|| EncodeUTF8(AllTrim(_cTitTanq))}) + '",
+                        "matricula_laticinio": "' + Eval({|| EncodeUTF8(AllTrim(_cMatrLat))}) + '"
+                    },
+				"endereco": {
+                   "complemento": "' + Eval({|| EncodeUTF8(AllTrim(_cComplemD))}) + '",
+                   "endereco": "' + Eval({|| EncodeUTF8(AllTrim(_cEnderecD))}) + '",
+                   "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cNrEndD))}) + '",
+                   "bairro": "' + Eval({|| EncodeUTF8(AllTrim(_cBairroD))}) + '",
+                   "cep": "' + Eval({|| EncodeUTF8(AllTrim(_cCepD))}) + '",
+			       "cidade_uf": "' + Eval({|| EncodeUTF8(AllTrim(_cCidUFD))}) + '",	
+                   "codigo_ibge_cidade": "' + Eval({|| EncodeUTF8(AllTrim(_cCodIbgeD))}) + '"				   
+                   },
+                "telefones": [{
+			       "numero": "' + Eval({|| EncodeUTF8(AllTrim(_cTelefonD))}) + '",
+			       "whatsapp": "' + Eval({|| EncodeUTF8(AllTrim(_cWhatsAp1))}) + '"
+			       }],
+			    "emails": ['

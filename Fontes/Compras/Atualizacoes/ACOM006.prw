@@ -12,6 +12,11 @@ Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada estática no nome das 
 
 #include "protheus.ch"
 
+
+
+
+
+
 /*
 ===============================================================================================================================
 Programa----------: ACOM006
@@ -80,6 +85,9 @@ EndIf
 // Geração do código da loja do fornecedor.
 //====================================================================== 
 U_ITLOGACS('ACOM006')
+
+
+
 
 RestArea(_aArea)  
 

@@ -11,6 +11,7 @@ Lucas Borges  |23/07/2025| Chamado 51340. Ajustar função para validação de ambie
 ===============================================================================================================================
 */
 
+
 #Include 'FWMVCDEF.CH'
 #INCLUDE "PROTHEUS.CH"
 

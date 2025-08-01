@@ -20,6 +20,7 @@ Bremmer  - Julio Paz     - 27/09/24 - 29/09/24 -  48652  - Alterar campo de vali
 
 Static _cAliasMrk	:= ""
 
+
 /*
 ===============================================================================================================================
 Programa----------: ACOM016
@@ -74,6 +75,7 @@ _cSolicIni		:= MV_PAR04
 _cSolicFim		:= MV_PAR05
 _cProDe		    := MV_PAR06
 _cProAte		:= MV_PAR07
+
 
 //==================================================================
 //Carrega blocos de código para o browse

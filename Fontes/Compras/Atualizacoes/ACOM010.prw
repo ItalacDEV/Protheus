@@ -12,6 +12,7 @@ Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada estática no nome das 
 
 #Include 'Protheus.ch'
 
+
 /*
 ===============================================================================================================================
 Programa----------: ACOM010
@@ -60,6 +61,8 @@ Local aDadTot	:= {}
 Local aCampos	:= {}
 Local aFiliais  := {}
 Local _nX		:= 0
+
+
 
 aAdd(aCampos, "ÍNDICE")
 aAdd(aCampos, "COMPRADOR")

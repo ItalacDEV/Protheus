@@ -22,6 +22,8 @@ Lucas Borges  | 17/10/2019 | Chamado 28346. Removidos os Warning na compilação d
 #define	MB_OK				0
 #define MB_ICONASTERISK		64
 
+
+
 /*
 ===============================================================================================================================
 Programa----------: ACOM004
@@ -143,6 +145,7 @@ Parametros--------: cGet1
 Retorno-----------: _lRet := .T. OU .F. 
 ===============================================================================================================================
 */
+
 STATIC FUNCTION VLDUSER(cGet1)
 LOCAL _lRet:=.T.
 IF ZZL->(FIELDPOS("ZZL_AUDTFA")) <> 0 .AND. EMPTY(cGet1)

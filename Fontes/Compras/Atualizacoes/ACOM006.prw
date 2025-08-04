@@ -84,3 +84,11 @@ U_ITLOGACS('ACOM006')
 RestArea(_aArea)  
 
 Return(_cRetorno)
+
+
+
+
+
+
+
+

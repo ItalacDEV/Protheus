@@ -64,6 +64,9 @@ Local _nX		:= 0
 aAdd(aCampos, "ÍNDICE")
 aAdd(aCampos, "COMPRADOR")
 
+
+
+
 //============================================================
 // Query para montar Lista de Compradores com movimento de SC 
 //============================================================
@@ -251,5 +254,9 @@ If len(aDadTot) > 0
 Else
 	u_itmsg("Não foram localizados dados com os filtros selecionados!","Atenção",,1)
 EndIf
+
+
+
+
 
 Return

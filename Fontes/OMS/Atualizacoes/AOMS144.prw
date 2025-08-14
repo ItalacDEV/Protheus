@@ -6,6 +6,7 @@
 -------------------------------------------------------------------------------------------------------------------------------          
  Julio Paz    | 15/03/2024 | Chamado 45229. Desenvolver uma rotina para integrar notas fiscais informando um Numero de Carga.
  Igor Melgaço | 16/07/2024 | Chamado 46112. Novo metodo para Liberar Emissao Sem NFe (Carga Integrada)
+ Lucas Borges | 01/08/2025 | Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode
 ============================================================================================================================================================
 Analista         - Programador     - Inicio     - Envio    - Chamado - Motivo da Alteração
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1823,7 +1824,7 @@ Begin Sequence
 
                      _cXml := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
                      _cXml += '   <soapenv:Header>'
-                     _cXml += '      <Token xmlns="Token">'+Eval({|| EncodeUTF8(AllTrim(_cToken))})+'</Token>'
+                     _cXml += '      <Token xmlns="Token">'+Eval({|| FWHttpEncode(AllTrim(_cToken))})+'</Token>'
                      _cXml += '   </soapenv:Header>'
                      _cXml += '   <soapenv:Body>'
                      _cXml += '      <tem:EnviarArquivoXMLNFe>'
@@ -2149,11 +2150,11 @@ Begin Sequence
 
                      _cXML := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
                      _cXML += '<soapenv:Header>'
-                     _cXML += '<Token xmlns="Token">'+EncodeUTF8(AllTrim(_cToken))+'</Token>'
+                     _cXML += '<Token xmlns="Token">'+FWHttpEncode(AllTrim(_cToken))+'</Token>'
                      _cXML += '</soapenv:Header>'
                      _cXML += '<soapenv:Body>'
                      _cXML += '<tem:InformarCancelamentoNotaFiscal>'
-                     _cXML += '<tem:protocoloNFe>'+ EncodeUTF8(AllTrim(_cProtocolo)) +'</tem:protocoloNFe>'
+                     _cXML += '<tem:protocoloNFe>'+ FWHttpEncode(AllTrim(_cProtocolo)) +'</tem:protocoloNFe>'
                      _cXML += '</tem:InformarCancelamentoNotaFiscal>'
                      _cXML += '</soapenv:Body>'
                      _cXML += '</soapenv:Envelope>'
@@ -3143,11 +3144,11 @@ Begin Sequence
 
                      _cXML := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
                      _cXML += '<soapenv:Header>'
-                     _cXML += '<Token xmlns="Token">'+EncodeUTF8(AllTrim(_cToken))+'</Token>'
+                     _cXML += '<Token xmlns="Token">'+FWHttpEncode(AllTrim(_cToken))+'</Token>'
                      _cXML += '</soapenv:Header>'
                      _cXML += '<soapenv:Body>'
                      _cXML += '<tem:LiberarEmissaoSemNFe>'
-                     _cXML += '<tem:protocoloIntegracaoCarga>'+ EncodeUTF8(AllTrim(_cProtocolo)) +'</tem:protocoloIntegracaoCarga>'
+                     _cXML += '<tem:protocoloIntegracaoCarga>'+ FWHttpEncode(AllTrim(_cProtocolo)) +'</tem:protocoloIntegracaoCarga>'
                      _cXML += '</tem:LiberarEmissaoSemNFe>'
                      _cXML += '</soapenv:Body>'
                      _cXML += '</soapenv:Envelope>'
@@ -3512,7 +3513,7 @@ Begin Sequence
       //=============================================================
       _cXml := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
       _cXml += '   <soapenv:Header>'
-      _cXml += '      <Token xmlns="Token">'+Eval({|| EncodeUTF8(AllTrim(_cToken))})+'</Token>'
+      _cXml += '      <Token xmlns="Token">'+Eval({|| FWHttpEncode(AllTrim(_cToken))})+'</Token>'
       _cXml += '   </soapenv:Header>'
       _cXml += '   <soapenv:Body>'
       _cXml += '      <tem:EnviarArquivoXMLNFe>'
@@ -4156,11 +4157,11 @@ Begin Sequence
 
                      _cXML := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
                      _cXML += '<soapenv:Header>'
-                     _cXML += '<Token xmlns="Token">'+EncodeUTF8(AllTrim(_cToken))+'</Token>'
+                     _cXML += '<Token xmlns="Token">'+FWHttpEncode(AllTrim(_cToken))+'</Token>'
                      _cXML += '</soapenv:Header>'
                      _cXML += '<soapenv:Body>'
                      _cXML += '<tem:LiberarEmissaoSemNFe>'
-                     _cXML += '<tem:protocoloIntegracaoCarga>'+ EncodeUTF8(AllTrim(_cProtocolo)) +'</tem:protocoloIntegracaoCarga>'
+                     _cXML += '<tem:protocoloIntegracaoCarga>'+ FWHttpEncode(AllTrim(_cProtocolo)) +'</tem:protocoloIntegracaoCarga>'
                      _cXML += '</tem:LiberarEmissaoSemNFe>'
                      _cXML += '</soapenv:Body>'
                      _cXML += '</soapenv:Envelope>'

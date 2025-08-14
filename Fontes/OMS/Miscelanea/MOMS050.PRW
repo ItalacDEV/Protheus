@@ -4,65 +4,27 @@
 ===============================================================================================================================
   Autor      |   Data   |                                             Motivo                                           
 -------------------------------------------------------------------------------------------------------------------------------
-Jerry        | 03/06/20 | Chamado 32283. Ajustes nas funcionalidades. 
--------------------------------------------------------------------------------------------------------------------------------
-Igor Melgaço | 13/08/21 | Chamado 37416. Retirado validação da Filial DA0 e DA1. 
--------------------------------------------------------------------------------------------------------------------------------
-Jerry        | 30/09/21 | Chamado 37416. Validação do Preço por Faixa. 
--------------------------------------------------------------------------------------------------------------------------------
-Igor Melgaço | 20/10/21 | Chamado 37964. Ajuste na validação de preço, configurar o pedido como já impresso. 
--------------------------------------------------------------------------------------------------------------------------------
-Alex Wallauer| 14/12/21 | Chamado 38612. Ajustes do retorno de varivel dos htms . 
-------------------------------------------------------------------------------------------------------------------------------- 
-Alex Wallauer| 28/01/22 | Chamado 39057. Correção/alteração do tratamento da função BLQPRC() e do envio do E-mail. 
-------------------------------------------------------------------------------------------------------------------------------- 
-Alex Wallauer| 03/02/22 | Chamado 39057. Correção/alteração do tratamento da função BLQPRC() e do envio do E-mail. 
-------------------------------------------------------------------------------------------------------------------------------- 
-Jerry        | 08/04/22 | Chamado 38883. Adicionado Chamada para o Scheduler de Recusa de Pedido e Efetivação Automática. 
---------------------------------------------------------------------------------------------------------------------------- 
-Jerry        | 11/04/22 | Chamado 38883 - Adicionado Parametro para Habilitar/Desabilitar Efetivação Automatica. 
-------------------------------------------------------------------------------------------------------------------------------- 
-Jerry        | 29/04/22 | Chamado 38883. Ajuste na Efetivação Automatica Pedido Portal retirando paradas em tela. 
--------------------------------------------------------------------------------------------------------------------------------
-Igor Melgaço | 03/06/22 | Chamado 38887. Ajuste para gravação de dados da aprovação do Gerente na Bonificação. 
--------------------------------------------------------------------------------------------------------------------------------
-Jerry        | 23/11/22 | Chamado 41937. Adicionado E-mail no envio do WF de Validação de Preço do Pedido do Portal.. 
--------------------------------------------------------------------------------------------------------------------------------
-Jerry        | 28/11/22 | Chamado 41937. Correção Envio WF de Bonificação e Gravação do Preço de Tabela. 
-------------------------------------------------------------------------------------------------------------------------------- 
 Jerry        | 05/01/23 | Chamado 42427. Retirado envio com Copia. 
--------------------------------------------------------------------------------------------------------------------------------
 Jerry        | 07/03/23 | Chamado 43214. Ajustar Retorno para quando existir um Reenvio pendente nao gravar aprovação. 
--------------------------------------------------------------------------------------------------------------------------------
 Jerry        | 10/04/23 | Chamado 43503. Ajustar para mostrar no HTML o Preço Net que constar no campo ZW_I_PRNET. 
--------------------------------------------------------------------------------------------------------------------------------
 Jerry        | 09/05/23 | Chamado 43585. Adicionar na Pag Principal informaçao de % de Leite Magro. 
--------------------------------------------------------------------------------------------------------------------------------
 Jerry        | 04/07/23 | Chamado 44382. Ajuste Gravação Data/Hora Aprov e no htm de pedido. 
--------------------------------------------------------------------------------------------------------------------------------
 Jerry        | 26/07/23 | Chamado 44382. Ajuste Gravação Motivo de Recusa e Data/Hora Aprov. Coord. 
--------------------------------------------------------------------------------------------------------------------------------
 Igor Melgaço | 22/11/23 | Chamado 44051. Ajuste para inclusão do campo Preço netto por Kg.
-------------------------------------------------------------------------------------------------------------------------------- 
 Alex Wallauer| 10/01/23 | Chamado 46034. Jerry. Ajuste p/ quando o coordenador e gerente são o mesmo já aprovar o gerente.
--------------------------------------------------------------------------------------------------------------------------------
 Alex Wallauer| 08/02/24 | Chamado 44782. Jerry. Ajustes para a nova opcao de tipo de entrega: O = Agendado pelo Op.Log.
--------------------------------------------------------------------------------------------------------------------------------
 Alex Wallauer| 28/02/24 | Chamado 46249. Vanderlei. Correção de ERROR.LOG. 
--------------------------------------------------------------------------------------------------------------------------------
 Igor Melgaço | 12/03/24 | Chamado 45575. Ajuste para conversão de texto do Assunto do email em padrao UTF8.
- ------------------------------------------------------------------------------------------------------------------------------
 Alex Wallauer| 29/07/24 | Chamado 48024. Jerry. Retirado os IFs de testes para enviar e-mail para os sistema.
-------------------------------------------------------------------------------------------------------------------------------
 Igor Melgaço | 01/07/24 | Chamado 47184 - Ajuste para gravação do campo ZW_I_PRMP
-------------------------------------------------------------------------------------------------------------------------------
 Jerry        | 29/01/25 | Chamado 49752 - Ajuste regra para validar se Coordenador utilizar Portal Novo (A3_I_WF = 3)
-------------------------------------------------------------------------------------------------------------------------------
 Lucas Borges | 23/07/25 | Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges | 01/08/25 | Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ================================================================================================================================================================================================
 Analista      - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
 ================================================================================================================================================================================================
 Jerry         - Julio Paz     - 08/04/25 - 11/04/25 - 49837   - Inclusão da nova Tag ITEMKITPORTAL e gravação nos campos ZW_KIT e C6_I_KIT. Alterar as validações para utilizar estes campos.
+Lucas         - Alex Wallauer - 11/08/25 - 12/08/25 - 51742   - Retirada da gravação da TAG CRESPPED pq ela não existe nos htmls [\workflow\htm\libportal_prc.htm / libportal_bon.HTM].
 ================================================================================================================================================================================================
 */
 
@@ -861,7 +823,7 @@ User Function MOMS50ML(_cFilial, _cNumPV, _cOpcao, _cObs, _cCodApr, _cCodSol, _c
 // Informamos o assunto do email.  
 //===============================
 
-	oProc:cSubject	:= U_ITEncode(_cAssunto)
+	oProc:cSubject	:= FWHttpEncode(_cAssunto)
 
 //===============================================
 // Informamos o arquivo a ser atachado no e-mail.
@@ -1061,7 +1023,6 @@ User Function MOMS050O(_cFil,_cCodVen, _cTipoApr, _cMailApr,_cNumPV,_RECNO, _cOb
 	dbSetOrder(1)
 	dbSeek(xFilial("SE4") + SA1->A1_COND)
 	_oProcess:oHtml:ValByName("cCondPgPad"		, SE4->E4_CODIGO + " - " + SE4->E4_DESCRI	)
-	_oProcess:oHtml:ValByName("cRespPed"		, "--------"	)
 
 	If SA1->A1_CALCSUF = "I"
 		_cCalculSuframa:= "ICMS"
@@ -1421,7 +1382,7 @@ User Function MOMS050O(_cFil,_cCodVen, _cTipoApr, _cMailApr,_cNumPV,_RECNO, _cOb
     // Informamos o assunto do email.    
     //===============================  
  
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	_cMailID	:= _oProcess:fProcessId
 	_cTaskID	:= _oProcess:fTaskID
@@ -1710,7 +1671,7 @@ User Function MOMS50RP()
 			//===============================
 			// Informamos o assunto do email. 
 			//===============================
-			_oProcess:cSubject	:= U_ITEncode(_cAssunto) 
+			_oProcess:cSubject	:= FWHttpEncode(_cAssunto) 
 
 			_cMailID	:= _oProcess:fProcessId
 			_cTaskID	:= _oProcess:fTaskID
@@ -2185,7 +2146,6 @@ User Function MOMS050B(_cFil,_cCodVen, _cTipoApr, _cMailApr,_cNumPV,_RECNO, _cOb
 	dbSetOrder(1)
 	dbSeek(xFilial("SE4") + SA1->A1_COND)
 	_oProcess:oHtml:ValByName("cCondPgPad"		, SE4->E4_CODIGO + " - " + SE4->E4_DESCRI	)
-	_oProcess:oHtml:ValByName("cRespPed"		, "--------"	)
 
 	If SA1->A1_CALCSUF = "I"
 		_cCalculSuframa:= "ICMS"
@@ -2538,7 +2498,7 @@ User Function MOMS050B(_cFil,_cCodVen, _cTipoApr, _cMailApr,_cNumPV,_RECNO, _cOb
 	// Informamos o assunto do email.
 	//===============================
  
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	_cMailID	:= _oProcess:fProcessId
 	_cTaskID	:= _oProcess:fTaskID

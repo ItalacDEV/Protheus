@@ -7,12 +7,15 @@
 Alex Wallauer |12/03/2024| Chamado 46289. Jerry. Alteracao da ordem de execucao dos campos C6_QTDVEN e C6_UNSVEN.
 Igor Melgaço  |27/08/2024| Chamado 48317. Jerry. Ajuste para tratar a variavel _lMsgEmTela e exibir a msg ao executar o ITMSG. 
 Lucas Borges  |08/10/2024| Chamado 48465. Retirada manipulação do SX1
-==============================================================================================================================================================
+==========================================================================================================================================================================================
 Analista         - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
-==============================================================================================================================================================
+==========================================================================================================================================================================================
 Alex Wallauer    - Alex Wallauer - 30/01/25 - 10/06/25 - 49966   - CORREÇÃO DE ERROR.LOG: array out of bounds [1] of [0]  on AOMS109CI(AOMS109.PRW) 08/10/2024 16:11:33 line : 4492
 Vanderlei Alves  - Igor Melgaço  - 06/06/25 - 10/06/25 - 45229   - Ajuste do parâmetro p/determinar se a integração WebS.será TMS Multiembarcador ou RDC
-==============================================================================================================================================================
+Jerry Santiago   - Julio Paz     - 24/07/25 - 11/08/25 - 50344   - Ajustar a Rotina para Integrar a Solicitação de Retorno de Pedido de Vendas do TMS. Criar um novo botão para isso.
+Jerry Santiago   - julio Paz     - 28/07/25 - 11/08/25 - 50431   - Inclusão de uma nova opção de filtro para Pedidos de Vendas Integrados ou não para o TMS. 
+Jerry Santiago   - julio Paz     - 29/07/25 - 11/08/25 - 51462   - Correção de Erro Log e ajustes na rotina para permitir o usuário selecionar um número ilimitado de pedidos.
+==========================================================================================================================================================================================
 */
 
 //====================================================================================================
@@ -79,6 +82,9 @@ Private aCampos		:= {}
 //Grava log de utilização da rotina
 //==========================================
 U_ITLOGACS()
+
+AjustaX1(cPerg)    
+Pergunte(cPerg,.F.) 
 
 AOMS109PRC()
 
@@ -153,9 +159,11 @@ Private oMark		:= Nil
 Private nQtdTit		:= 0
 Private nPesTit	    := 0
 Private nValTit     := 0
+Private _nQtdPvSel  := 0
 Private oQtda		:= Nil
 Private oPesa		:= Nil
 Private oValor      := Nil
+Private oQtdPvSel   := Nil
 
 //================================================================================
 // Botoes da tela.
@@ -174,6 +182,7 @@ Aadd( aBotoes , { "" , {|| AOMS109C(13) 	}	, "" , "Manutenção"       } )
 Aadd( aBotoes , { "" , {|| AOMS109C(08) 	}	, "" , "Cortar"           } )
 Aadd( aBotoes , { "" , {|| AOMS109C(09) 	}	, "" , "Pre_Nota"         } ) 
 Aadd( aBotoes , { "" , {|| AOMS109C(14) 	}	, "" , "Devolve TMS"      } )
+Aadd( aBotoes , { "" , {|| AOMS109C(23) 	}	, "" , "Solicita Retorno PV TMS" } )
 Aadd( aBotoes , { "" , {|| AOMS109C(15) 	}	, "" , "Exporta Excel"    } )
 Aadd( aBotoes , { "" , {|| AOMS109C(16) 	}	, "" , "Desmembramento"    } )
 Aadd( aBotoes , { "" , {|| AOMS109C(17) 	}	, "" , "Altera pedido"     } )
@@ -182,6 +191,7 @@ Aadd( aBotoes , { "" , {|| AOMS109C(19) 	}	, "" , "Retirar Plan.Logístico"  } )
 Aadd( aBotoes , { "" , {|| AOMS109C(20) 	}	, "" , "Histórico pedido"    } )
 //Aadd( aBotoes , { "" , {|| AOMS109C(21) 	}	, "" , "Transferência"    } ) // Solicitação chamado 44388.
 Aadd( aBotoes , { "" , {|| AOMS109C(22) 	}	, "" , "Altera Armazem" } )
+//Aadd( aBotoes , { "" , {|| AOMS109C(23) 	}	, "" , "Solicita Retorno PV TMS" } )
 
 //================================================================================
 // Faz o calculo automatico de dimensoes de objetos
@@ -205,9 +215,8 @@ _ctitulo := "CENTRAL DE PEDIDOS DE VENDAS PARA LOGISTICA"
 	
 	@0.8,0024 Say OemToAnsi("Valor:")						OF oPanel
 	@0.8,0027 Say oValor	VAR nValTit		Picture "@E 999,999,999.99"	OF oPanel SIZE 60,8
-	
-	
-	If FlatMode()
+
+    If FlatMode()
 	
 		aCoors	:= GetScreenRes()
 		nHeight	:= aCoors[2]
@@ -253,178 +262,116 @@ Retorno-----------: Nenhum
 */
 Static Function AOMS109EXE(oproc)
 //Local _lWsTms := U_ITGETMV( 'IT_WEBSTMS' , .F.) // Indica se rotina de integração WebService é TMS Multi-Embarcador ou RDC.
+Local _aLstPedV := {}
+Local _nI 
 
 Private lMsErroAuto	:= .F.                        
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
 
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-	//================================================================================
-	// Somente pedidos selecionados pelo usuario
-	//================================================================================
-	If IsMark( "TRBF_OK" , cMarkado )
-		    
-	    //================================================================================
-	    // A filial dos pedidos eh sempre a mesma
-	    //================================================================================
-		_cFilPed	:= TRBF_FILIA
-		_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-	EndIf
-		
-  	TRBF->( DBSkip() )
-
-EndDo
-
-//Se não tem registros já retorna
-If 	empty(_cNumPed)
-
-	u_itmsg("Nenhum registro selecionado","Atenção",,1)
-	TRBF->(Dbgotop())
-	Return
-	
-Endif
-	
-//================================================================================
-// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-//================================================================================
-If Select("QRYCABEC") <> 0
-   QRYCABEC->( DBCloseArea() )
+//==================================
+// Se não tem registros já retorna
+//==================================
+If Empty(_aLstPedV)	 // empty(_cNumPed)
+   U_ItMsg("Nenhum registro selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
 EndIf
-	
-//================================================================================
-// Query para selecao dos dados do cabecalho do pedido de venda
-//================================================================================
-_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-_cQuery += " WHERE	D_E_L_E_T_ = ' '
-// Filtro para selecao dos dados do pedido de venda
-_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
 
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-QRYCABEC->( DBGoTop() )
-	
-//================================================================================
-// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
-//================================================================================
+//============================================================
+// Faz o estorno de liberação por grupos de pedidos de vendas.
+//============================================================	
 Begin Transaction
+   //================================================================================
+   // Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
+   //================================================================================
+   _npv := 0
+   _alista := {}
+   SC5->(DBSETORDER(1))
+   SA1->(DBSETORDER(1))
+   SC9->(DBSETORDER(1))
 	
-_npv := 0
-_alista := {}
-SC5->(DBSETORDER(1))
-SA1->(DBSETORDER(1))
-SC9->(DBSETORDER(1))
-	
-DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
-		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
-		
-		_aAreaCabec := QRYCABEC->( GetArea() )
+   For _nI := 1 To Len(_aLstPedV)
 
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       ( SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) )
-					
-            _nSalvaRecRDC:=0
-  			IF SC5->C5_I_ENVRD = "S"
-			   SC5->(Reclock("SC5",.F.))
-			   SC5->C5_I_ENVRD := "N"
-			   SC5->(Msunlock())
-               _nSalvaRecRDC:=SC5->(RECNO())
-            ENDIF
+	   SC5->(DbGoto(_aLstPedV[_nI,3]))	
+       
+	   _cNumPed := SC5->C5_NUM
 
-		    oproc:cCaption := ("Estornando liberação para PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		    ProcessMessages()
+	   _npv++
+		
+	   //Atualiza régua
+	   oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	   ProcessMessages()
+		
+	   _aAreaCabec := SC5->( GetArea() )
+
+	   //=======================================================================================================
+	   // Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+	   // filtrado os dados
+	   //========================================================================================================
+	   If EMPTY(SC5->C5_NOTA) .AND. ( SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) // ( SC5->(DBSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. 
+          _nSalvaRecRDC:=0
+  	      IF SC5->C5_I_ENVRD = "S"
+	         SC5->(Reclock("SC5",.F.))
+		     SC5->C5_I_ENVRD := "N"
+		     SC5->(Msunlock())
+             _nSalvaRecRDC:=SC5->(RECNO())
+          ENDIF
+
+		  oproc:cCaption := ("Estornando liberação para PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+		  ProcessMessages()
             
-  	      	 lMsErroAuto := .F.
-             AOMS109R()//Estorna o bloqueio de estoque para o item de pedido de vendas
+  	      lMsErroAuto := .F.
+          AOMS109R()//Estorna o bloqueio de estoque para o item de pedido de vendas
 
-			U_MOMS042P("N")
+	      U_MOMS042P("N")
 
-  			IF _nSalvaRecRDC <> 0
-  			   SC5->(DBGOTO(_nSalvaRecRDC))
-			   SC5->(Reclock("SC5",.F.))
-			   SC5->C5_I_ENVRD := "S"               
-            ENDIF
-		    SC5->( MSUnlock() )
-						
-			If lMsErroAuto 
-		
-	            _cErro:="Erro ao estornar liberação do PV: "
-	            _cErro+="["+MostraErro(Upper(GetSrvProfString("STARTPATH","")),"Mata410.LOG")+"]"
-				AADD(_alista,{_cNumPed,_cErro})
-						
-			Else  
-				
-				AADD(_alista,{_cNumPed, "LIBERACAO ESTORNADA COM SUCESSO"})
-				IF _nSalvaRecRDC <> 0
-				   If !u_IT_TMS(SC5->C5_I_LOCEM)  //! _lWsTms
-					  oproc:cCaption := ("Enviando Status RDC do PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-				   Else 
-                      oproc:cCaption := ("Enviando Status TMS Multi-Embarcador do PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]") 
-				   EndIf 
+  		  IF _nSalvaRecRDC <> 0
+  		     SC5->(DBGOTO(_nSalvaRecRDC))
+		     SC5->(Reclock("SC5",.F.))
+		     SC5->C5_I_ENVRD := "S"               
+			 SC5->( MSUnlock() ) 
+          ENDIF
+		  						
+		  If lMsErroAuto 
+		     _cErro:="Erro ao estornar liberação do PV: "
+	         _cErro+="["+MostraErro(Upper(GetSrvProfString("STARTPATH","")),"Mata410.LOG")+"]"
+		     AADD(_alista,{_cNumPed,_cErro})
+          Else  
+             AADD(_alista,{_cNumPed, "LIBERACAO ESTORNADA COM SUCESSO"})
+			 IF _nSalvaRecRDC <> 0
+			    If !u_IT_TMS(SC5->C5_I_LOCEM)  //! _lWsTms
+			       oproc:cCaption := ("Enviando Status RDC do PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+				Else 
+                   oproc:cCaption := ("Enviando Status TMS Multi-Embarcador do PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]") 
+				EndIf 
 
-					ProcessMessages()
-					U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
-				ELSE
-					SC5->( MSUnlock() )
-				ENDIF
-
-			EndIf
-		
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-			
-			Elseif !SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM))
-			
-				AADD(_alista,{_cNumPed, "LIBERACAO ESTORNADA COM SUCESSO"})
-			
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
+				ProcessMessages()
+				U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
+             ENDIF
+          EndIf
+	   Else
+		  //Registra problema com pedido
+		  If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		     AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		  ELSEIF !EMPTY(SC5->C5_NOTA) 
+		     AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+  		  ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+  			 AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+		  ElseIf !SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM))
+		     AADD(_alista,{_cNumPed, "LIBERACAO ESTORNADA COM SUCESSO"})
+	      EndIf
+	   EndIf
+    Next
 
 End Transaction
 
 If len(_alista) > 0
 	U_ITListBox( "Pedidos com liberação estornada" , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
-	
-QRYCABEC->( DBCloseArea() )
 
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
@@ -511,10 +458,12 @@ If lMarcado
 	nQtdTit++
 	nPesTit	+= TRBF->C5_I_PESBR
 	nValTit += TRBF->TRBF_VALOR
+	_nQtdPvSel += 1 
 Else
 	nQtdTit--
 	nPesTit	-= TRBF->C5_I_PESBR
 	nValTit -= TRBF->TRBF_VALOR
+	_nQtdPvSel -= 1 
 EndIf
 
 oQtda:Refresh()
@@ -545,6 +494,8 @@ Local lMarcado := .F.
 DBSelectArea("TRBF")
 TRBF->( DBGoTop() )
 
+_nQtdPvSel := 0  
+
 While TRBF->( !Eof() )
 	
 	lMarcado := IsMark( "TRBF_OK" , cMarca , lInverte )
@@ -560,7 +511,8 @@ While TRBF->( !Eof() )
 		nValTit -= TRBF->TRBF_VALOR
 		
 	Else
-	
+	    _nQtdPvSel += 1 
+
 		//TRBF->( RecLock( "TRBF" , .F. ) )
 		TRBF->TRBF_OK := cMarca
 		//TRBF->( MsUnLock() )
@@ -569,11 +521,11 @@ While TRBF->( !Eof() )
 		nPesTit	+= TRBF->C5_I_PESBR
 		nValTit += TRBF->TRBF_VALOR
 		
-	EndIf
+   EndIf
+
+   nQtdTit := IIf( nQtdTit < 0 , 0 , nQtdTit )
 	
-	nQtdTit := IIf( nQtdTit < 0 , 0 , nQtdTit )
-	
-TRBF->( DBSkip() )
+   TRBF->( DBSkip() )
 EndDo
 
 TRBF->( DBGoto(nReg) )
@@ -581,6 +533,7 @@ TRBF->( DBGoto(nReg) )
 oQtda:Refresh()
 oPesa:Refresh()
 oValor:Refresh()
+
 oMark:oBrowse:Refresh(.T.)
 
 Return()
@@ -654,6 +607,7 @@ AADD( aEstru , { "QTDBLOQEST"	, 'N' , 15 , 5 } )
 AADD( aEstru , { "C5_LIBEROK"	, 'C' , 01 , 0 } ) 
 AADD( aEstru , { "C5_I_PESBR"	, 'N' , 15 , 5 } ) 
 AADD( aEstru , { "C5_I_PVREM"	, 'C' , 06 ,0  } ) 
+AADD( aEstru , { "TRBF_REGC5"	, 'N' , 12 ,0  } )  
 
 //================================================================================
 // Armazena no array aCampos o nome, picture e descricao dos campos
@@ -715,7 +669,7 @@ _otemp:Create()
 //================================================================================
 // Filtra Filiais
 //================================================================================
-cFiltro += " AND C5.C5_FILIAL	= '"+ xFilial("SC5") +"' "
+cFiltro += " AND C5.C5_FILIAL	= '"+ xFilial("SC5") +"' " 
 
 //================================================================================
 // Emissao de - Ate
@@ -925,7 +879,16 @@ EndIf
 // alterados.
 //================================================================================
 cFiltro += " AND C5.C5_TIPO = 'N' "
-                                        
+
+//================================================================================
+// Filtra Pedidos de Vendas Integrados ou não para o sistema TMS. 
+//================================================================================
+If MV_PAR32 == 1 // Sim
+   cFiltro += " AND C5.C5_I_ENVRD = 'S' "
+ElseIf MV_PAR32 == 2 // Não
+   cFiltro += " AND (C5.C5_I_ENVRD = 'N' OR C5.C5_I_ENVRD = ' ') "
+EndIf 
+
 //================================================================================
 // Verifica se ja existe um arquivo com mesmo nome, se sim deleta.
 //================================================================================
@@ -969,7 +932,10 @@ _cquery += "	ORDER BY	C5_FILIAL,C5_NUM
 oproc:cCaption := ("Carregando query de pedidos...")
 ProcessMessages()
 
-TCQUERY _cquery NEW ALIAS "QRYPED"
+//TCQUERY _cquery NEW ALIAS "QRYPED"
+MPSysOpenQuery( _cquery , "QRYPED")
+
+DBSelectArea("QRYPED")
 
 oproc:cCaption := ("Contando os pedidos...")
 ProcessMessages()
@@ -1158,6 +1124,7 @@ DO While QRYPED->(!EOF())
     TRBF->TRBF_DTNES    := _dneces
     TRBF->TRBF_VALOR    := _nvalsc5
 	TRBF->C5_I_PVREM    := QRYPED->C5_I_PVREM
+	TRBF->TRBF_REGC5    := QRYPED->C5REC   
 	
     QRYPED->( DBSkip() )
 	
@@ -1780,7 +1747,12 @@ Case _nopc == 22
     //U_ItMsg("Alteração de Armazens","Atenção",,1)
     //U_AOMS109G(oproc)
     FWMSGRUN( , {|oproc| U_AOMS109G(oproc) }, "Aguarde!" , 'Processando alterações de armazens...' )
-	
+
+Case _nopc == 23 
+    If U_Itmsg("Confirma o processamento da rotina de solicitação de retorno dos pedidos de vendas, do TMS para o Protheus?","Atenção",,3,2,2) 
+       FWMSGRUN( , {|oproc| U_AOMS109Y(oproc) }, "Aguarde!" , 'Processando Webservice Retorno PV do TMS para o Protheus...' )
+	EndIf
+
 Otherwise
    _lMsgEmTela := .T.
 	u_itmsg("Função em Desenvolvimento","Atenção",,1)
@@ -1944,172 +1916,107 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109EX2(oproc)
-//Local _lWsTms := U_ITGETMV( 'IT_WEBSTMS' , .F.) // Indica se rotina de integração WebService é TMS Multi-Embarcador ou RDC.
+Local _aLstPedV := {}
+Local _nI 
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
-	
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
+
+//=================================================
+// Se não tem pedido selecionado já sai da rotina
+//=================================================
+If Empty(_aLstPedV) // empty(_cNumPed)
+   u_itmsg("Nenhum pedido selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
+Endif
+
+//============================================================
+// Faz a liberação por grupos de pedidos de vendas.
+//============================================================	
+
 //================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
+// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
 //================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-		//================================================================================
-		// Somente pedidos selecionados pelo usuario
-		//================================================================================
-		If IsMark( "TRBF_OK" , cMarkado )
-		    
-		    //================================================================================
-		    // A filial dos pedidos eh sempre a mesma
-		    //================================================================================
-			_cFilPed	:= TRBF_FILIA
-			_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-		EndIf
-		
-     	TRBF->( DBSkip() )
-	EndDo
-	
-	//Se não tem pedido selecionado já sai da rotina
-	If empty(_cNumPed)
-	
-		u_itmsg("Nenhum pedido selecionado","Atenção",,1)
-		TRBF->(Dbgotop())
-		Return
-		
-	Endif
-	
-	//================================================================================
-	// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-	//================================================================================
-	If Select("QRYCABEC") <> 0
-	   QRYCABEC->( DBCloseArea() )
-	EndIf
-	
-	//================================================================================
-	// Query para selecao dos dados do cabecalho do pedido de venda
-	//================================================================================
-	_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-	_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-	_cQuery += " WHERE	D_E_L_E_T_ = ' '
-	// Filtro para selecao dos dados do pedido de venda
-	_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-	_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-	_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
+Begin Transaction
+   _npv := 0
+   _alista := {}
+   SC5->(DBSETORDER(1))
+   SA1->(DBSETORDER(1))
+   SC9->(DBSETORDER(1))
+   
+   For _nI := 1 To Len(_aLstPedV)	
 
-    DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-	QRYCABEC->( DBGoTop() )
-	
-	//================================================================================
-	// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
-	//================================================================================
-	Begin Transaction
-	
-	_npv := 0
-	_alista := {}
-	SC5->(DBSETORDER(1))
-	SA1->(DBSETORDER(1))
-	SC9->(DBSETORDER(1))
-	
-	DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
+	   SC5->(DbGoto(_aLstPedV[_nI,3]))	
+	   _cNumPed := SC5->C5_NUM         
+	   _npv++
 		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
+	   // Atualiza régua
+	   oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	   ProcessMessages()
 		
-		_aAreaCabec := QRYCABEC->( GetArea() )
-
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       (!SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) )
+	   //=======================================================================================================
+	   // Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+	   // filtrado os dados
+	   //========================================================================================================
+	   If EMPTY(SC5->C5_NOTA) .AND. (!SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) ) // ( SC5->(DBSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. 
 					
-            _nSalvaRecRDC:=0
-  			IF SC5->C5_I_ENVRD = "S"
-			   SC5->(Reclock("SC5",.F.))
-			   SC5->C5_I_ENVRD := "N"
-			   SC5->(Msunlock())
-               _nSalvaRecRDC:=SC5->(RECNO())
-            ENDIF
+          _nSalvaRecRDC := 0
+  		  IF SC5->C5_I_ENVRD = "S"
+		     SC5->(Reclock("SC5",.F.))
+		     SC5->C5_I_ENVRD := "N"
+		     SC5->(Msunlock())
+             _nSalvaRecRDC:=SC5->(RECNO())
+          ENDIF
 
-		    oproc:cCaption := ("Liberando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		    ProcessMessages()
+		  oproc:cCaption := ("Liberando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+		  ProcessMessages()
             
-             _cmsglibpv := AOMS109LP(oproc)//faz liberação de estoque para o item de pedido de vendas
+          _cmsglibpv := AOMS109LP(oproc)//faz liberação de estoque para o item de pedido de vendas
 
-			U_MOMS042P("S")
+		  U_MOMS042P("S")
 
-  			IF _nSalvaRecRDC <> 0
-  			   SC5->(DBGOTO(_nSalvaRecRDC))
-			   SC5->(Reclock("SC5",.F.))
-			   SC5->C5_I_ENVRD := "S"               
-            ENDIF
-		    SC5->( MSUnlock() )
+  		  IF _nSalvaRecRDC <> 0
+  		     SC5->(DBGOTO(_nSalvaRecRDC))
+		     SC5->(Reclock("SC5",.F.))
+		     SC5->C5_I_ENVRD := "S"               
+			 SC5->( MSUnlock() )
+          ENDIF
 						
-			If !empty(_cmsglibpv) 
-		
-	            _cErro:="Erro ao liberar o PV: "
-	            _cErro+=_cmsglibpv
-				AADD(_alista,{_cNumPed,_cErro})
-						
-			Else  
-				
-				AADD(_alista,{_cNumPed, "LIBERADO COM SUCESSO"})
-				IF _nSalvaRecRDC <> 0
-
-				    oproc:cCaption := ("Enviando Status TMS do PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+          If ! Empty(_cmsglibpv) 
+		     _cErro:="Erro ao liberar o PV: "
+	         _cErro+=_cmsglibpv
+			 AADD(_alista,{_cNumPed,_cErro})
+		  Else  
+		     AADD(_alista,{_cNumPed, "LIBERADO COM SUCESSO"})
+		     IF _nSalvaRecRDC <> 0
+			    oproc:cCaption := ("Enviando Status TMS do PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
 				    
-					ProcessMessages()
-					U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
-				ELSE
-					SC5->( MSUnlock() )
-				ENDIF
-
-			EndIf
-		
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-			
-			Elseif !SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM))
-			
-				AADD(_alista,{_cNumPed, "Falha na liberação do pedido"})
-			
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
+			    ProcessMessages()
+			    U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
+			 ENDIF
+		  EndIf
+	   Else
+		  //Registra problema com pedido
+		  If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		     AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		  ELSEIF !EMPTY(SC5->C5_NOTA) 
+		     AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+  		  ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+  		     AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+		  Elseif !SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM))
+		     AADD(_alista,{_cNumPed, "Falha na liberação do pedido"})
+	      Endif
+	   EndIf
+   Next	
 
 End Transaction
 
 If len(_alista) > 0
 	U_ITListBox( "Pedidos liberados" , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
-	
-QRYCABEC->( DBCloseArea() )
 
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
@@ -2565,130 +2472,71 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109WF(oproc)
+Local _aLstPedV := {}
+Local _nI 
 
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
-	
+//Se não tem pedido selecionado já sai da rotina
+If Empty(_aLstPedV) //empty(_cNumPed)
+   U_Itmsg("Nenhum pedido selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
+EndIf
+
+//============================================================
+// Envia Wf de liberação por grupos de pedidos de vendas.
+//============================================================	
+
 //================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
+// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
 //================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-		//================================================================================
-		// Somente pedidos selecionados pelo usuario
-		//================================================================================
-		If IsMark( "TRBF_OK" , cMarkado )
-		    
-		    //================================================================================
-		    // A filial dos pedidos eh sempre a mesma
-		    //================================================================================
-			_cFilPed	:= TRBF_FILIA
-			_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-		EndIf
-		
-     	TRBF->( DBSkip() )
-	EndDo
-	
-	//Se não tem pedido selecionado já sai da rotina
-	If empty(_cNumPed)
-	
-		u_itmsg("Nenhum pedido selecionado","Atenção",,1)
-		TRBF->(Dbgotop())
-		Return
-		
-	Endif
-	
-	//================================================================================
-	// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-	//================================================================================
-	If Select("QRYCABEC") <> 0
-	   QRYCABEC->( DBCloseArea() )
-	EndIf
-	
-	//================================================================================
-	// Query para selecao dos dados do cabecalho do pedido de venda
-	//================================================================================
-	_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-	_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-	_cQuery += " WHERE	D_E_L_E_T_ = ' '
-	// Filtro para selecao dos dados do pedido de venda
-	_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-	_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-	_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
+Begin Transaction
+   _npv := 0
+   _alista := {}
+   SC5->(DBSETORDER(1))
+   SA1->(DBSETORDER(1))
+   SC9->(DBSETORDER(1))
+	   
+   For _nI := 1 To Len(_aLstPedV) 		
 
-
-    DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-	QRYCABEC->( DBGoTop() )
-	
-	//================================================================================
-	// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
-	//================================================================================
-	Begin Transaction
-	
-	_npv := 0
-	_alista := {}
-	SC5->(DBSETORDER(1))
-	SA1->(DBSETORDER(1))
-	SC9->(DBSETORDER(1))
-	
-	DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
+       SC5->(DbGoto(_aLstPedV[_nI,3]))
+	   
+	   _cNumPed := SC5->C5_NUM         
+	   _npv++
 		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	    //Atualiza régua
+        oproc:cCaption := ("Processando PV: " + SC5->C5_NUM + " [" + StrZero(_npv,6) + "] de [" + StrZero(nQtdTit,6) + "]")
 		ProcessMessages()
-		
-		_aAreaCabec := QRYCABEC->( GetArea() )
 
-		//=======================================================================================================
+        //=======================================================================================================
 		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
 		// filtrado os dados
 		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       (!SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) )
+		If EMPTY(SC5->C5_NOTA) .AND. (!SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) ) // ( SC5->(DBSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. 
 					
-
-		    oproc:cCaption := ("Enviando WF liberação para PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		    ProcessMessages()
+		   oproc:cCaption := ("Enviando WF liberação para PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+		   ProcessMessages()
             
-             _cmsglibpv := AOMS109EX3(oproc)//faz liberação de estoque para o item de pedido de vendas
+           _cmsglibpv := AOMS109EX3(oproc)//faz liberação de estoque para o item de pedido de vendas
 			
-			If !empty(_cmsglibpv)
-						
-				AADD(_alista,{_cNumPed,_cmsglibpv})
-				
-			Endif
-						
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-						
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
+		   If !empty(_cmsglibpv)
+			  AADD(_alista,{_cNumPed,_cmsglibpv})
+		   EndIf
+        Else
+		   //Registra problema com pedido
+		   If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		      AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		   ELSEIF !EMPTY(SC5->C5_NOTA) 
+			  AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+  		   ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+  			  AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+           Endif
+ 	   EndIf
+   Next
 
 End Transaction
 
@@ -2696,8 +2544,6 @@ If len(_alista) > 0
 	U_ITListBox( "Pedidos com WF liberação enviados" , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
 	
-QRYCABEC->( DBCloseArea() )
-
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
 
@@ -2860,19 +2706,27 @@ private cPerg		:= "ROMS007"
 private cComboTpCa	:= {}
 private _aTpCarga 	:= {}
 
-//Utilizado para pegar dinamicamento o tipo da carga
-dbSelectArea("SX3")
-SX3->(dbSetOrder(2))
-if SX3->(dbSeek("DAK_I_TPCA"))
-		cComboTpCa := X3Cbox()
-endif     
+Begin Sequence 
+
+   If _nQtdPvSel > 800
+      U_ItMsg("Foram seleciondos mais de 800 Pedidos de Vendas para Impressão.","Atenção", "Selecione no máximo 800 registros para impressão.",1)
+	  Break
+   EndIf 
+   
+   //Utilizado para pegar dinamicamento o tipo da carga
+   dbSelectArea("SX3")
+   SX3->(dbSetOrder(2))
+   if SX3->(dbSeek("DAK_I_TPCA"))
+	  cComboTpCa := X3Cbox()
+   endif     
 		
-_aTpCarga := STRTOKARR(cComboTpCa, ';')  
+   _aTpCarga := STRTOKARR(cComboTpCa, ';')  
 
-oReport := U_ROMS007R()
-oReport:PrintDialog()
+   oReport := U_ROMS007R()   
+   oReport:PrintDialog()
 
-TRBF->(Dbgotop())
+   TRBF->(Dbgotop())
+End Sequence 
 
 Return
 
@@ -2894,6 +2748,9 @@ Static Function AOMS109AT(oproc)
 Local _oDlg2 		:= nil
 Local nLinha:=10
 Local _nCol:=15
+Local _aLstPedV  := {}
+Local _nI 
+Local _nJ 
 
 Private _ccomps		:= ""
 Private _ccompd		:= ""
@@ -2903,93 +2760,64 @@ Private _Acompd       := {}
 Private _ocompd       := nil
 Private _lsai         := .T.
 
-//Carrega produtos dos pedidos selecionados
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV  := RetSelecPV() 
 
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-	//================================================================================
-	// Somente pedidos selecionados pelo usuario
-	//================================================================================
-	If IsMark( "TRBF_OK" , cMarkado )
-		    
-		_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-	EndIf
-		
-  	TRBF->( DBSkip() )
-
-EndDo
-
-//Se não tem registros já retorna
-If 	empty(_cNumPed)
-
-	u_itmsg("Nenhum registro selecionado","Atenção",,1)
-	TRBF->(Dbgotop())
-	Return
-	
+//======================================
+// Se não tem registros já retorna
+//======================================
+If Empty(_aLstPedV )	// empty(_cNumPed)
+   u_itmsg("Nenhum registro selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
 Endif
-	
-//================================================================================
-// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-//================================================================================
-If Select("QRYCABEC") <> 0
-   QRYCABEC->( DBCloseArea() )
-EndIf
-	
-//================================================================================
-// Query para selecao dos dados do cabecalho do pedido de venda
-//================================================================================
-_cQuery := " SELECT DISTINCT C6_PRODUTO,C6_DESCRI
-_cQuery += " FROM  "+ RetSqlName('SC6') +' C6 '
-_cQuery += " WHERE	D_E_L_E_T_ = ' '
-// Filtro para selecao dos dados do pedido de venda
-_cQuery += " AND C6_FILIAL = '"+ xfilial("SC6") +"' "
-_cQuery += " AND C6_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-_cQuery += " ORDER BY C6_PRODUTO "
 
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-QRYCABEC->( DBGoTop() )
+//============================================================
+// Faz a alteração em massa de produtos do pedidos de vendas.
+//============================================================	
+SC6->(DbSetOrder(1))
 
-		
-DO While QRYCABEC->( !Eof() )
+//================================================================================
+// Monta o cabecalho do pedido de venda
+//================================================================================
+For _nI := 1 To Len(_aLstPedV )
+    
+	SC6->(MsSeek(_aLstPedV[_nI,1] + _aLstPedV[_nI,2]))
 
-	AADD(_ACOMPS,QRYCABEC->C6_PRODUTO + " - " + QRYCABEC->C6_DESCRI )
-	QRYCABEC->( DBSkip() )
-	
-Enddo
+    Do While ! SC6->(Eof()) .And. SC6->C6_FILIAL + SC6->C6_NUM == _aLstPedV[_nI,1] + _aLstPedV[_nI,2]
+	   _nJ := Ascan(_ACOMPS,{|x| Substr(x,1,15) == SC6->C6_PRODUTO})
+	   If _nJ == 0
+          Aadd(_ACOMPS,SC6->C6_PRODUTO + " - " + SC6->C6_DESCRI )
+	   EndIf 
 
+       SC6->(DbSkip())
+	EndDo 
+Next 
 
 DEFINE MSDIALOG _oDlg2 TITLE ("Alteração de produto em PVs") From 0,0 To 285, 650 OF oMainWnd PIXEL
-                                                                       
-@ nLinha,_nCol Say OemToAnsi("Selecione o produto de origem:")
-nLinha+=12
+    @ nLinha,_nCol Say OemToAnsi("Selecione o produto de origem:")
+    nLinha+=12
 
-_ocomps := TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_ccomps:=u,_ccomps)}, _acomps,250,20,_oDlg2,,;
+    _ocomps := TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_ccomps:=u,_ccomps)}, _acomps,250,20,_oDlg2,,;
 							{|| AOMS109CH(_acomps[_ocomps:nat])},,,,.T.,,,,,,,,,'') //40
-nLinha+=38
+    nLinha+=38
 
-@ nLinha,_nCol Say OemToAnsi("Selecione o produto de destino:")
-nLinha+=12
+    @ nLinha,_nCol Say OemToAnsi("Selecione o produto de destino:")
+    nLinha+=12
 
-_ocompd := TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_ccompd:=u,_ccompd)}, _acompd,250,20,_oDlg2,,,,,,.T.,,,,,,,,,'') //40
-nLinha+=38
+    _ocompd := TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_ccompd:=u,_ccompd)}, _acompd,250,20,_oDlg2,,,,,,.T.,,,,,,,,,'') //40
+    nLinha+=38
 
-AOMS109CH(_acomps[1])
+    AOMS109CH(_acomps[1])
 
-@ nLinha,_nCol    Button "Altera" SIZE 41,15 ACTION ( fwmsgrun(, { |oproc| AOMS109EX5(oproc) }, "Aguarde...","Alterando pedidos...") ,TRBF->(Dbgotop()), iif(_lsai,_oDlg2:End(),_lsai:= .T.)) Pixel 
-@ nLinha,_nCol+57 Button "Cancela"     SIZE 41,15 ACTION ( TRBF->(Dbgotop()),_oDlg2:End() ) Pixel 
+    @ nLinha,_nCol    Button "Altera" SIZE 41,15 ACTION ( fwmsgrun(, { |oproc| AOMS109EX5(oproc) }, "Aguarde...","Alterando pedidos...") ,TRBF->(Dbgotop()), iif(_lsai,_oDlg2:End(),_lsai:= .T.)) Pixel 
+    @ nLinha,_nCol+57 Button "Cancela"     SIZE 41,15 ACTION ( TRBF->(Dbgotop()),_oDlg2:End() ) Pixel 
 
 ACTIVATE MSDIALOG _oDlg2 
 
-
-RETURN
+Return Nil
 
 /*
 ===============================================================================================================================
@@ -3005,7 +2833,8 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109EX5(oproc)
-//Local _lWsTms := U_ITGETMV( 'IT_WEBSTMS' , .F.) // Indica se rotina de integração WebService é TMS Multi-Embarcador ou RDC.
+Local _aLstPedV := {}
+Local _nI 
 
 Private lMsErroAuto	:= .F.                        
 
@@ -3018,63 +2847,19 @@ If substr(_acomps[_ocomps:nat],1,11) == substr(_acompd[_ocompd:nat],1,11) .or. e
 	
 Endif
 
+//==================================================
+// Retorna Array com filial, Nr. PV e recno do PV. 
+//==================================================
+_aLstPedV  := RetSelecPV() 
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
-
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-	//================================================================================
-	// Somente pedidos selecionados pelo usuario
-	//================================================================================
-	If IsMark( "TRBF_OK" , cMarkado )
-		    
-	    //================================================================================
-	    // A filial dos pedidos eh sempre a mesma
-	    //================================================================================
-		_cFilPed	:= TRBF_FILIA
-		_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-	EndIf
-		
-  	TRBF->( DBSkip() )
-
-EndDo
-
-//Se não tem registros já retorna
-If 	empty(_cNumPed)
-
-	u_itmsg("Nenhum registro selecionado","Atenção",,1)
-	TRBF->(Dbgotop())
-	Return
-	
-Endif
-	
-//================================================================================
-// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-//================================================================================
-If Select("QRYCABEC") <> 0
-   QRYCABEC->( DBCloseArea() )
+//==================================
+// Se não tem registros já retorna
+//==================================
+If Empty(_aLstPedV)	// empty(_cNumPed)
+   U_Itmsg("Nenhum registro selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
 EndIf
-	
-//================================================================================
-// Query para selecao dos dados do cabecalho do pedido de venda
-//================================================================================
-_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-_cQuery += " WHERE	D_E_L_E_T_ = ' '
-// Filtro para selecao dos dados do pedido de venda
-_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
-
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-QRYCABEC->( DBGoTop() )
 	
 //================================================================================
 // Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
@@ -3084,111 +2869,80 @@ _alista := {}
 SC5->(DBSETORDER(1))
 SA1->(DBSETORDER(1))
 SC9->(DBSETORDER(1))
-	
-DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
-		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
-		
-		_aAreaCabec := QRYCABEC->( GetArea() )
 
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       ((( SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ));
-	        .OR. !( SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM))))
+For _nI := 1 To Len(_aLstPedV )	
+	
+	SC5->(DbGoto(_aLstPedV[_nI,3]))
+
+	_cNumPed := SC5->C5_NUM         
+	_npv++
+		
+	//Atualiza régua
+	oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	ProcessMessages()
+		
+	//=======================================================================================================
+	// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+	// filtrado os dados
+	//========================================================================================================
+	If EMPTY(SC5->C5_NOTA) .AND. ((( SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) )).OR. !( SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)))) // ( SC5->(DBSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. 
+	   // Grava se o pedido tem liberação de estoque		
+	   If SC9->C9_FILIAL == SC5->C5_FILIAL .AND. SC9->C9_PEDIDO == SC5->C5_NUM
+		  _ltemlib := .T.
+	   Else
+		  _ltemlib := .F.
+	   Endif
 			
-			//Grava se o pedido tem liberação de estoque		
-			If SC9->C9_FILIAL == SC5->C5_FILIAL .AND. SC9->C9_PEDIDO == SC5->C5_NUM
-			
-				_ltemlib := .T.
-				
-			Else
-			
-				_ltemlib := .F.
-				
-			Endif
-			
-		    oproc:cCaption := ("Alterando produto para PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		    ProcessMessages()
+	   oproc:cCaption := ("Alterando produto para PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	   ProcessMessages()
             
-  	      	 lMsErroAuto := .F.
-             AOMS109EA()//ALTERA PRODUTO DO PEDIDO DE VENDAS
+  	   lMsErroAuto := .F.
+       AOMS109EA()//ALTERA PRODUTO DO PEDIDO DE VENDAS
 						
-			If !lMsErroAuto 
+	   If !lMsErroAuto 
 						
-				//Se tinha liberação de estoque refaz a liberação
-				If _ltemlib
-				
-				   oproc:cCaption := ("Liberando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-				   ProcessMessages()
-            
-				   _cmsglibpv := AOMS109LP(oproc)//faz liberação de estoque para o item de pedido de vendas
+		  //Se tinha liberação de estoque refaz a liberação
+		  If _ltemlib
+		     oproc:cCaption := ("Liberando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+		     ProcessMessages()
+             _cmsglibpv := AOMS109LP(oproc)//faz liberação de estoque para o item de pedido de vendas
 				   
-				   If !empty(_cmsglibpv) 
+		     If !empty(_cmsglibpv) 
 		
-				   		_cErro:="Erro ao liberar o PV: "
-				   		_cErro+=_cmsglibpv
-				   		AADD(_alista,{_cNumPed,_cErro})
-				   		
-				   Endif
+		   		_cErro:="Erro ao liberar o PV: "
+		   		_cErro+=_cmsglibpv
+		   		AADD(_alista,{_cNumPed,_cErro})
+		     Endif
+		  Endif
 				
-				Endif
-				
-				IF SC5->C5_I_ENVRD = 'S'
-
-                    oproc:cCaption := ("Enviando Status TMS do PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-				    
-
-					ProcessMessages()
-					U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
-					
-				ELSE
-					SC5->( MSUnlock() )
-				ENDIF
-
-			EndIf
+		  IF SC5->C5_I_ENVRD = 'S'
+             oproc:cCaption := ("Enviando Status TMS do PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+  			 ProcessMessages()
+		     U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
+		  ELSE
+		     SC5->( MSUnlock() )
+		  ENDIF
+       EndIf
+  	Else
+        //Registra problema com pedido
+		If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		   AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		ELSEIF !EMPTY(SC5->C5_NOTA) 
+           AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+		ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+           AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+     	Endif
+     EndIf
 		
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-						
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
+	 SC5->( DBSkip() )
+Next 
 
 If len(_alista) > 0
 	U_ITListBox( "Pedidos com alteração de produto" , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
 	
-QRYCABEC->( DBCloseArea() )
-
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
-
 	
 Return
 
@@ -3219,8 +2973,8 @@ If SB1->(DbSeek(xFilial("SB1")+_cprod))
    _cListaProd := SB1->B1_I_PRDSM
 EndIf
 
-If Select("QRYCABEC2") <> 0
-   QRYCABEC2->( DBCloseArea() )
+If Select("SC52") <> 0
+   SC52->( DBCloseArea() )
 EndIf
 
 _cQuery := " SELECT B1_COD,B1_DESC,B1_CODBAR "
@@ -3235,7 +2989,9 @@ Else
 EndIf
 _cQuery += " ORDER BY B1.B1_COD "
 
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC2" , .F. , .T. )
+MPSysOpenQuery( _cQuery , "QRYCABEC2")
+
+DBSelectArea("QRYCABEC2")
 	
 QRYCABEC2->( DBGoTop() )
 
@@ -3431,144 +3187,87 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109CT(oproc)
-
 Local _lbloqi := .F.
+Local _aLstPedV := {}
+Local _nI 
+
 
 Private lMsErroAuto	:= .F.
 Private _alista3 := {}    
 Private _alistak := {}                    
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
+//=====================================================================
+// Retorna Array com filil, nr PV e Recno Pv selecionados pelo usuário.
+//=====================================================================
+_aLstPedV  := RetSelecPV() 
 
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-	//================================================================================
-	// Somente pedidos selecionados pelo usuario
-	//================================================================================
-	If IsMark( "TRBF_OK" , cMarkado ) .AND. TRBF->QTDBLOQEST > 0
-		    
-	    //================================================================================
-	    // A filial dos pedidos eh sempre a mesma
-	    //================================================================================
-		_cFilPed	:= TRBF_FILIA
-		_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-	EndIf
-		
-  	TRBF->( DBSkip() )
-
-EndDo
-
-//Se não tem registros já retorna
-If 	empty(_cNumPed)
-
-	u_itmsg("Nenhum registro com bloqueio de estoque selecionado","Atenção","Selecione ao menos um registro com legenda azul de bloqueio de estoque",1)
-	TRBF->(Dbgotop())
-	Return
-	
+//==================================
+// Se não tem registros já retorna
+//==================================
+If Empty(_aLstPedV)	 // empty(_cNumPed)
+   u_itmsg("Nenhum registro com bloqueio de estoque selecionado","Atenção","Selecione ao menos um registro com legenda azul de bloqueio de estoque",1)
+   TRBF->(Dbgotop())
+   Return
 Endif
-	
-//================================================================================
-// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-//================================================================================
-If Select("QRYCABEC") <> 0
-   QRYCABEC->( DBCloseArea() )
-EndIf
-	
-//================================================================================
-// Query para selecao dos dados do cabecalho do pedido de venda
-//================================================================================
-_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP,C5_CLIENTE,C5_LOJACLI,C5_I_NOME,C5_I_BLOG"
-_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-_cQuery += " WHERE	D_E_L_E_T_ = ' '
-// Filtro para selecao dos dados do pedido de venda
-_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
 
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-QRYCABEC->( DBGoTop() )
-	
 //================================================================================
 // Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
 //================================================================================
-	
 _npv := 0
 _alista := {}
 SC5->(DBSETORDER(1))
 SA1->(DBSETORDER(1))
 SC9->(DBSETORDER(1))
 	
-DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
-		
-		//Atualiza régua
-		oproc:cCaption := ("Analisando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
-		
-		If SC9->(Dbseek(QRYCABEC->C5_FILIAL+QRYCABEC->C5_NUM))
-		
-			_lbloqi := .F.
-			
-			Do while SC9->C9_FILIAL == QRYCABEC->C5_FILIAL .AND. SC9->C9_PEDIDO == QRYCABEC->C5_NUM
-			
-				If !empty(SC9->C9_BLEST) .AND.  alltrim(SC9->C9_PRODUTO) == substr(_acomps[_ocomps:nat],1,11)
-				
-					//Valida bloqueio logístico
-					If QRYCABEC->C5_I_BLOG == "S"
-					
-						//Verifica permissão de ajuste de bloqueio logístico
-						ZZL->(Dbsetorder(3))
-						If !(ZZL->(Dbseek(xFilial("ZZL") + RetCodUsr()))) .OR. ZZL->ZZL_PVLOG != "S"
+For _nI := 1 To Len(_aLstPedV )	
 
-							aadd(_alistaK,{QRYCABEC->C5_NUM,;
-								  QRYCABEC->C5_CLIENTE+"/"+QRYCABEC->C5_LOJACLI+" - " + SUBSTR(QRYCABEC->C5_I_NOME,1,45),;
+    SC5->(DbGoto(_aLstPedV[_nI,3]))
+
+	_cNumPed := SC5->C5_NUM         
+	_npv++
+		
+	//Atualiza régua
+	oproc:cCaption := ("Analisando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	ProcessMessages()
+		
+	If SC9->(Dbseek(SC5->C5_FILIAL+SC5->C5_NUM))
+	   _lbloqi := .F.
+			
+	   Do while SC9->C9_FILIAL == SC5->C5_FILIAL .AND. SC9->C9_PEDIDO == SC5->C5_NUM
+		  If !empty(SC9->C9_BLEST) .AND.  alltrim(SC9->C9_PRODUTO) == substr(_acomps[_ocomps:nat],1,11)
+		     //Valida bloqueio logístico
+			 If SC5->C5_I_BLOG == "S"
+			 	//Verifica permissão de ajuste de bloqueio logístico
+				ZZL->(Dbsetorder(3))
+				If !(ZZL->(Dbseek(xFilial("ZZL") + RetCodUsr()))) .OR. ZZL->ZZL_PVLOG != "S"
+                   aadd(_alistaK,{SC5->C5_NUM,;
+					     		  SC5->C5_CLIENTE+"/"+SC5->C5_LOJACLI+" - " + SUBSTR(SC5->C5_I_NOME,1,45),;
 								  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB,"Em Planej. Logístico" })
-			
-						Else
-    
-							aadd(_alistaK,{QRYCABEC->C5_NUM,;
-								  QRYCABEC->C5_CLIENTE+"/"+QRYCABEC->C5_LOJACLI+" - " + SUBSTR(QRYCABEC->C5_I_NOME,1,45),;
+				Else
+      			   aadd(_alistaK,{SC5->C5_NUM,;
+								  SC5->C5_CLIENTE+"/"+SC5->C5_LOJACLI+" - " + SUBSTR(SC5->C5_I_NOME,1,45),;
 								  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB,"Ok para corte" })
 		
-							aadd(_alista3,{QRYCABEC->C5_NUM,;
-								  QRYCABEC->C5_CLIENTE+"/"+QRYCABEC->C5_LOJACLI+" - " + SUBSTR(QRYCABEC->C5_I_NOME,1,45),;
+				   aadd(_alista3,{SC5->C5_NUM,;
+								  SC5->C5_CLIENTE+"/"+SC5->C5_LOJACLI+" - " + SUBSTR(SC5->C5_I_NOME,1,45),;
 								  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB })
 
-						Endif
-					
-					Else
-		
-						aadd(_alistaK,{QRYCABEC->C5_NUM,;
-								  QRYCABEC->C5_CLIENTE+"/"+QRYCABEC->C5_LOJACLI+" - " + SUBSTR(QRYCABEC->C5_I_NOME,1,45),;
-								  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB,"Ok para corte" })
-		
-						aadd(_alista3,{QRYCABEC->C5_NUM,;
-								  QRYCABEC->C5_CLIENTE+"/"+QRYCABEC->C5_LOJACLI+" - " + SUBSTR(QRYCABEC->C5_I_NOME,1,45),;
-								  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB })
-
-					Endif
-					
 				Endif
-				
-				SC9->(Dbskip())
-				
-			Enddo
+			 Else
+			    aadd(_alistaK,{SC5->C5_NUM,;
+							  SC5->C5_CLIENTE+"/"+SC5->C5_LOJACLI+" - " + SUBSTR(SC5->C5_I_NOME,1,45),;
+							  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB,"Ok para corte" })
 		
-		Endif			
-		
-		QRYCABEC->( Dbskip() )
-
-Enddo
-
+				aadd(_alista3,{SC5->C5_NUM,;
+							  SC5->C5_CLIENTE+"/"+SC5->C5_LOJACLI+" - " + SUBSTR(SC5->C5_I_NOME,1,45),;
+							  alltrim(SC9->C9_PRODUTO) + " - " + SUBSTR(POSICIONE("SB1",1,XFILIAL("SB1")+alltrim(SC9->C9_PRODUTO),"B1_DESC"),1,45),SC9->C9_QTDLIB })
+			 Endif
+		  Endif
+				
+		  SC9->(Dbskip())
+	   Enddo
+	EndIf 
+Next
 If len(_alista3) == 0
 
 	u_itmsg("Não foram localizados produtos válidos com bloqueio de estoque para corte","Atenção","Atualize a tela para buscar status atual dos pedidos",1)
@@ -3605,61 +3304,27 @@ Retorno-----------: Nenhum
 */
 Static Function AOMS109EX8(_alista,oproc)
 
-Local _cErro := space(200)  , _nnj
+Local _cErro := space(200)  //, _nnj
 Local _ntot := 0
-//Local _lWsTms := U_ITGETMV( 'IT_WEBSTMS' , .F.) // Indica se rotina de integração WebService é TMS Multi-Embarcador ou RDC.
+Local _aLstPedV := {}
+Local _nI 
 
 Private _alista2 := {}
 Private _lexclui := .T.
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
+//=================================================================
+// Retorna um array com filia, Nr.PV e Recno dos PVs selecionados.
+//=================================================================
+_aLstPedV  := RetSelecPV() 
 
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-For _nnj := 1 to len(_alista)
-	
-    //================================================================================
-    // A filial dos pedidos eh sempre a mesma
-    //================================================================================
-	_cFilPed	:= xfilial("SC5")
-	_cNumPed	+= "'"+ _alista[_nnj][1] +"',"
-	_ntot++
-
-Next
-
-//Se não tem registros já retorna
-If 	empty(_cNumPed)
-
-	u_itmsg("Nenhum registro selecionado","Atenção",,1)
-	TRBF->(Dbgotop())
-	Return
-	
+//=================================
+// Se não tem registros já retorna
+//=================================
+If Empty(_aLstPedV)	 // empty(_cNumPed)
+   u_itmsg("Nenhum registro selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
 Endif
-	
-//================================================================================
-// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-//================================================================================
-If Select("QRYCABEC") <> 0
-   QRYCABEC->( DBCloseArea() )
-EndIf
-	
-//================================================================================
-// Query para selecao dos dados do cabecalho do pedido de venda
-//================================================================================
-_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-_cQuery += " WHERE	D_E_L_E_T_ = ' '
-// Filtro para selecao dos dados do pedido de venda
-_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
-
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-QRYCABEC->( DBGoTop() )
 	
 //================================================================================
 // Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
@@ -3670,116 +3335,83 @@ nQtdTit := len(_alista)
 SC5->(DBSETORDER(1))
 SA1->(DBSETORDER(1))
 SC9->(DBSETORDER(1))
-	
-DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
-		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
-		
-		_aAreaCabec := QRYCABEC->( GetArea() )
 
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       ((( SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ));
-	        .OR. !( SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM))))
-			
-			//Grava se o pedido tem liberação de estoque		
-			If SC9->C9_FILIAL == SC5->C5_FILIAL .AND. SC9->C9_PEDIDO == SC5->C5_NUM
-			
-				_ltemlib := .T.
-				
-			Else
-			
-				_ltemlib := .F.
-				
-			Endif
-			
-		    oproc:cCaption := ("Cortando produtos para PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(_ntot,6) +"]")
-		    ProcessMessages()
-            
-  	      	 lMsErroAuto := .F.
-             AOMS109E2(_alista)//CORTA PRODUTO DO PEDIDO DE VENDAS
-						
-			If lMsErroAuto 
+For _nI := 1 To Len(_aLstPedV )	
+
+    SC5->(DbGoto(_aLstPedV[_nI,3]))
+
+    _cNumPed := SC5->C5_NUM         
+	_npv++
 		
-	            _cErro:="Erro ao cortar produto do PV: "
-	            _cErro+="["+MostraErro(Upper(GetSrvProfString("STARTPATH","")),"Mata410.LOG")+"]"
-				AADD(_alista2,{QRYCABEC->C5_NUM,_cErro})
-						
-			Else  
-				
-				//Se tinha liberação de estoque refaz a liberação
-				If _ltemlib .and. !_lexclui //Só libera se não excluiu o pedido todo
-				
-				   oproc:cCaption := ("Liberando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-				   ProcessMessages()
+	//Atualiza régua
+	oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	ProcessMessages()
+		
+	_aAreaCabec := SC5->( GetArea() )
+
+	//=======================================================================================================
+	// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+	// filtrado os dados
+	//========================================================================================================
+	If EMPTY(SC5->C5_NOTA)  .AND.((( SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) )).OR. !( SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM))))
+	   //Grava se o pedido tem liberação de estoque		
+	   If SC9->C9_FILIAL == SC5->C5_FILIAL .AND. SC9->C9_PEDIDO == SC5->C5_NUM
+		  _ltemlib := .T.
+	   Else
+		  _ltemlib := .F.
+	   Endif
+			
+	   oproc:cCaption := ("Cortando produtos para PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(_ntot,6) +"]")
+	   ProcessMessages()
             
-				   _cmsglibpv := AOMS109LP(oproc)//faz liberação de estoque para o item de pedido de vendas
+  	   lMsErroAuto := .F.
+       AOMS109E2(_alista)//CORTA PRODUTO DO PEDIDO DE VENDAS
+						
+	   If lMsErroAuto 
+		  _cErro := "Erro ao cortar produto do PV: "
+	      _cErro += "["+MostraErro(Upper(GetSrvProfString("STARTPATH","")),"Mata410.LOG")+"]"
+		  AADD(_alista2,{SC5->C5_NUM,_cErro})
+ 	   Else  
+		  //Se tinha liberação de estoque refaz a liberação
+		  If _ltemlib .and. !_lexclui //Só libera se não excluiu o pedido todo
+		     oproc:cCaption := ("Liberando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+			 ProcessMessages()
+             _cmsglibpv := AOMS109LP(oproc)//faz liberação de estoque para o item de pedido de vendas
 				   
-				   If !empty(_cmsglibpv) 
-		
-				   		_cErro:="Erro ao liberar o PV: "
-				   		_cErro+=_cmsglibpv
-				   		AADD(_alista2,{QRYCABEC->C5_NUM,_cErro})
-				   		
-				   Endif
-				
-				Endif
-				
-				IF SC5->C5_I_ENVRD = 'S'
-
-                   oproc:cCaption := ("Enviando Status TMS do PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+			 If !empty(_cmsglibpv) 
+		   		_cErro:="Erro ao liberar o PV: "
+		   		_cErro+=_cmsglibpv
+		   		AADD(_alista2,{SC5->C5_NUM,_cErro})
+			 Endif
+		  Endif
+		  
+		  IF SC5->C5_I_ENVRD = 'S'
+             oproc:cCaption := ("Enviando Status TMS do PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
  
-				   ProcessMessages()
-				   U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
-					
-				ELSE
-					SC5->( MSUnlock() )
-				ENDIF
-
-			EndIf
-		
-		Else
-		
-			_npv++
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-						
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() ) 
-	    
-EndDo
+             ProcessMessages()
+			 U_ENVSITPV()//lret := startjob("U_ ENVSITPV",getenvserver(),.F.,,.F.)   //Envia interface de alteração de situação do pedido atual
+          ELSE
+			 SC5->( MSUnlock() )
+		  ENDIF
+	   EndIf
+	Else
+	   _npv++
+    	//Registra problema com pedido
+		If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		   AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		ELSEIF !EMPTY(SC5->C5_NOTA) 
+		   AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+		ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+ 		   AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+	    Endif
+	 EndIf
+   Next 
 
 If len(_alista2) > 0
 	U_ITListBox( "Pedidos com corte de produto" , {"Numero","Situacao"} , _alista2 , .T. , 1 )
 Else
-	u_itmsg("Nenhuma alteração realizada","Atenção",,1)
+	U_Itmsg("Nenhuma alteração realizada","Atenção",,1)
 Endif
-	
-QRYCABEC->( DBCloseArea() )
 
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
@@ -4271,7 +3903,8 @@ _cQry += "  AND C9_PEDIDO = '" + _cPedido + "' "
 _cQry += "  AND (C9_BLEST <> ' ' OR C9_BLCRED <> ' ') "
 _cQry += "  AND SC9.D_E_L_E_T_ = ' ' "
 
-dbUseArea( .T. , "TOPCONN" , TcGenQry(,, _cQry ) , "TRBARM" , .T., .F. )
+//dbUseArea( .T. , "TOPCONN" , TcGenQry(,, _cQry ) , "TRBARM" , .T., .F. )
+MPSysOpenQuery( _cQry , "TRBARM")
 
 dbSelectArea("TRBARM")
 TRBARM->(dbGoTop())
@@ -4353,6 +3986,9 @@ Static Function AOMS109CI(oproc)
 Local _oDlg2 		:= nil
 Local nLinha:=10
 Local _nCol:=15
+Local _aLstPedV := {}
+Local _nI 
+Local _nJ
 
 Private _ccomps		:= ""
 Private _ccompd		:= ""
@@ -4362,72 +3998,47 @@ Private _Acompd       := {}
 Private _ocompd       := nil
 Private _lsai         := .T.
 
-//Carrega produtos dos pedidos selecionados
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
 
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-	//================================================================================
-	// Somente pedidos selecionados pelo usuario
-	//================================================================================
-	If IsMark( "TRBF_OK" , cMarkado ) .AND. TRBF->QTDBLOQEST > 0
-		    
-		_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-	EndIf
-		
-  	TRBF->( DBSkip() )
-
-EndDo
-
-//Se não tem registros já retorna
-If 	empty(_cNumPed)
-
-	u_itmsg("Nenhum registro válido selecionado","Atenção","Somente registros com bloqueio de estoque (legenda azul) são válidos para corte de produtos",1)
-	TRBF->(Dbgotop())
-	Return
-	
+//=======================================
+// Se não tem registros já retorna
+//=======================================
+If Empty(_aLstPedV) // Empty(_cNumPed)
+   U_itmsg("Nenhum registro válido selecionado","Atenção","Somente registros com bloqueio de estoque (legenda azul) são válidos para corte de produtos",1)
+   TRBF->(Dbgotop())
+   Return
 Endif
-	
-//================================================================================
-// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-//================================================================================
-If Select("QRYCABEC") <> 0
-   QRYCABEC->( DBCloseArea() )
-EndIf
-	
-//================================================================================
-// Query para selecao dos dados do cabecalho do pedido de venda
-//================================================================================
-_cQuery := " SELECT DISTINCT C9_PRODUTO AS C6_PRODUTO,(SELECT C6_DESCRI FROM "+ RetSqlName('SC6') +" C6  WHERE C6.D_E_L_E_T_ = ' ' AND C6.C6_FILIAL=C9.C9_FILIAL "
-_cQuery += " AND C6.C6_NUM = C9.C9_PEDIDO AND C6.C6_ITEM = C9.C9_ITEM) AS C6_DESCRI
-_cQuery += " FROM  "+ RetSqlName('SC9') +' C9 '
-_cQuery += " WHERE	C9.D_E_L_E_T_ = ' '
-// Filtro para selecao dos dados do pedido de venda
-_cQuery += " AND C9.C9_FILIAL = '"+ xfilial("SC9") +"' "
-_cQuery += " AND C9.C9_PEDIDO IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-_cQuery += " AND C9_BLEST > '  ' "
-_cQuery += " ORDER BY C9_PRODUTO "
 
-DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-QRYCABEC->( DBGoTop() )
 
-		
-DO While QRYCABEC->( !Eof() )
+//============================================================
+// Faz o estorno de liberação por grupos de pedidos de vendas.
+//============================================================	
+SC9->(DbSetOrder(1)) // C9_FILIAL+C9_PEDIDO+C9_ITEM+C9_SEQUEN+C9_PRODUTO+C9_BLEST+C9_BLCRED
 
-	AADD(_ACOMPS,QRYCABEC->C6_PRODUTO + " - " + QRYCABEC->C6_DESCRI )
-	QRYCABEC->( DBSkip() )
-	
-Enddo
+_cNumPed := ""
+
+For _nI := 1 To Len(_aLstPedV)
+    _cNumPed += _aLstPedV[_nI,2] +"; "
+
+    SC9->(MsSeek(_aLstPedV[_nI,1]+_aLstPedV[_nI,2]))
+	Do While ! SC9->(Eof()) .And. SC9->C9_FILIAL + SC9->C9_PEDIDO == _aLstPedV[_nI,1] + _aLstPedV[_nI,2]
+       If ! Empty(SC9->C9_BLEST)
+	      _nJ := Ascan(_ACOMPS,{|x| Substr(x,1,15) == SC9->C9_PRODUTO})
+	      If _nJ == 0
+             Aadd(_ACOMPS,SC9->C9_PRODUTO + " - " + POSICIONE("SB1",1,xFilial("SB1")+SC9->C9_PRODUTO,"B1_DESC"))
+	      EndIf 
+	   EndIf 
+	   
+       SC9->(DbSkip())
+	EndDo 
+    
+Next 
 
 If Len(_ACOMPS) = 0
-   u_itmsg("Nenhum registro encontrado para o(s) pedido(s): "+_cNumPed,"Atenção",,1)
+   u_itmsg("Nenhum registro encontrado para o(s) pedido(s): " + _cNumPed ,"Atenção",,1)
    Return
 Endif
 
@@ -4440,18 +4051,18 @@ _cQuery += " AND X5_TABELA  = 'Z1' AND TRIM(X5_CHAVE) <> '98' AND TRIM(X5_CHAVE)
 _cQuery += " ORDER BY X5_CHAVE "
 
 If Select("TMPCF") > 0 
-	("TMPCF")->( DBCloseArea() )
+   ("TMPCF")->( DBCloseArea() )
 EndIf
 
-DBUseArea( .T. , "TOPCONN" , TCGenQry( ,, _cQuery ) , 'TMPCF' , .F. , .T. )
+MPSysOpenQuery( _cQuery , 'TMPCF')
+
+DBSelectArea('TMPCF')
 
 _amotivs := {}
 
-While TMPCF->( !Eof() )
-                               
-	aAdd( _amotivs , AllTrim( TMPCF->CHAVE ) + " - " + AllTrim( TMPCF->DESCRI ) )
-
-TMPCF->( DBSkip() )
+Do While TMPCF->( !Eof() )
+   aAdd( _amotivs , AllTrim( TMPCF->CHAVE ) + " - " + AllTrim( TMPCF->DESCRI ) )
+   TMPCF->( DBSkip() )
 EndDo
 
 ("TMPCF")->( DBCloseArea() )
@@ -4459,31 +4070,30 @@ EndDo
 public _cmotivs := _AMOTIVS[1]
 
 DEFINE MSDIALOG _oDlg2 TITLE ("Corte de produto em PVs") From 0,0 To 325, 650 OF oMainWnd PIXEL
-                                                                       
-@ nLinha,_nCol Say OemToAnsi("Selecione o produto para corte:")
-nLinha+=12
+                                                                      
+   @ nLinha,_nCol Say OemToAnsi("Selecione o produto para corte:")
+   nLinha+=12
 
-_ocomps := TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_ccomps:=u,_ccomps)}, _acomps,250,20,_oDlg2,,;
+   _ocomps := TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_ccomps:=u,_ccomps)}, _acomps,250,20,_oDlg2,,;
 							{|| AOMS109CH(_acomps[_ocomps:nat],2)},,,,.T.,,,,,,,,,'') //40
 							
-nLinha+=38
+   nLinha+=38
 
-@ nLinha,_nCol Say OemToAnsi("Selecione o motivo para corte:")
-nLinha+=12
+   @ nLinha,_nCol Say OemToAnsi("Selecione o motivo para corte:")
+   nLinha+=12
 
-TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_cmotivs:=u,_cmotivs)}, _amotivs,250,20,_oDlg2,,,,,,.T.,,,,,,,,,'') //40
+   TComboBox():New(nLinha,_nCol,{|u|if(PCount()>0,_cmotivs:=u,_cmotivs)}, _amotivs,250,20,_oDlg2,,,,,,.T.,,,,,,,,,'') //40
 
-nLinha+=38
+   nLinha+=38
 
-AOMS109CH(_acomps[1],2)
+   AOMS109CH(_acomps[1],2)
 
-@ nLinha,_nCol    Button "Corta" SIZE 41,15 ACTION ( fwmsgrun(, { |oproc| AOMS109CT(oproc) }, "Aguarde...","Cortando pedidos...") ,TRBF->(Dbgotop()), iif(_lsai,_oDlg2:End(),_lsai:= .T.)) Pixel 
-@ nLinha,_nCol+57 Button "Cancela"     SIZE 41,15 ACTION ( TRBF->(Dbgotop()),_oDlg2:End() ) Pixel 
+   @ nLinha,_nCol    Button "Corta" SIZE 41,15 ACTION ( fwmsgrun(, { |oproc| AOMS109CT(oproc) }, "Aguarde...","Cortando pedidos...") ,TRBF->(Dbgotop()), iif(_lsai,_oDlg2:End(),_lsai:= .T.)) Pixel 
+   @ nLinha,_nCol+57 Button "Cancela"     SIZE 41,15 ACTION ( TRBF->(Dbgotop()),_oDlg2:End() ) Pixel 
 
 ACTIVATE MSDIALOG _oDlg2 
 
-
-RETURN
+RETURN Nil 
 
 
 /*
@@ -4500,156 +4110,92 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109DR(oproc)
-//Local _lWsTms := U_ITGETMV( 'IT_WEBSTMS' , .F.) // Indica se rotina de integração WebService é TMS Multi-Embarcador ou RDC.
 Local _cTextoMsg := ""
+Local _aLstPedV := {}
+Local _nI 
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
+
+//====================================================
+// Se não tem pedido selecionado já sai da rotina
+//====================================================
+If Empty(_aLstPedV) // empty(_cNumPed)
+   u_itmsg("Nenhum pedido selecionado.","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
+Endif
 	
 //================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
+// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
 //================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
+Begin Transaction
 	
-		//================================================================================
-		// Somente pedidos selecionados pelo usuario
-		//================================================================================
-		If IsMark( "TRBF_OK" , cMarkado )
-		    
-		    //================================================================================
-		    // A filial dos pedidos eh sempre a mesma
-		    //================================================================================
-			_cFilPed	:= TRBF_FILIA
-			_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-		EndIf
-		
-     	TRBF->( DBSkip() )
-	EndDo
-	
-	//Se não tem pedido selecionado já sai da rotina
-	If empty(_cNumPed)
-	
-		u_itmsg("Nenhum pedido selecionado","Atenção",,1)
-		TRBF->(Dbgotop())
-		Return
-		
-	Endif
-	
-	//================================================================================
-	// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-	//================================================================================
-	If Select("QRYCABEC") <> 0
-	   QRYCABEC->( DBCloseArea() )
-	EndIf
-	
-	//================================================================================
-	// Query para selecao dos dados do cabecalho do pedido de venda
-	//================================================================================
-	_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-	_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-	_cQuery += " WHERE	D_E_L_E_T_ = ' '
-	// Filtro para selecao dos dados do pedido de venda
-	_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-	_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-	_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
+   _npv := 0
+   _alista := {}
+   SC5->(DBSETORDER(1))
+   SA1->(DBSETORDER(1))
+   SC9->(DBSETORDER(1))
+   For _nI := 1 To Len(_aLstPedV)
+	   
+	   SC5->(DbGoTo(_aLstPedV[_nI,3]))
 
-
-    DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-	QRYCABEC->( DBGoTop() )
-	
-	//================================================================================
-	// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
-	//================================================================================
-	Begin Transaction
-	
-	_npv := 0
-	_alista := {}
-	SC5->(DBSETORDER(1))
-	SA1->(DBSETORDER(1))
-	SC9->(DBSETORDER(1))
-	
-	DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
+	   _cNumPed := SC5->C5_NUM         
+	   _npv++
 		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
-		
-		_aAreaCabec := QRYCABEC->( GetArea() )
+	   //Atualiza régua
+	   oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	   ProcessMessages()
 
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       (!SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) )
-
-            oproc:cCaption := ("Devolvendo para o TMS Multi-Embarcador o PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+       //=======================================================================================================
+       // Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+       // filtrado os dados
+       //========================================================================================================
+       If EMPTY(SC5->C5_NOTA) .AND. (!SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) ) // ( SC5->(DBSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. 
+          oproc:cCaption := ("Devolvendo para o TMS Multi-Embarcador o PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
 			 
-		    ProcessMessages()
+  	      ProcessMessages()
             
-            //================================================================================
-            // Realiza a devolução do pedido de vendas selecionados e 
-            // atualiza tabelas de muro.
-            //================================================================================
+          //================================================================================
+          // Realiza a devolução do pedido de vendas selecionados e 
+          // atualiza tabelas de muro.
+          //================================================================================
    
-            Reclock("SC5",.F.)
-            SC5->C5_I_ENVRD := "N"
-            SC5->C5_I_DTRET := Stod("") // Data de retorno do pedido de vendas do RDC para o Protheus
-            SC5->C5_I_HRRET := ""       // Hora de retorno do pedidod e vendas do RDC para o Protheus
-            SC5->(MsUnlock())
+          Reclock("SC5",.F.)
+          SC5->C5_I_ENVRD := "N"
+          SC5->C5_I_DTRET := Stod("") // Data de retorno do pedido de vendas do RDC para o Protheus
+          SC5->C5_I_HRRET := ""       // Hora de retorno do pedidod e vendas do RDC para o Protheus
+          SC5->(MsUnlock())
    
-            fwmsgrun(,{|oproc| U_AOMS084P(,oproc)},'Aguarde processamento...','Integrando dados devolução do PV: '+QRYCABEC->C5_NUM+' ['+ StrZero(_npv,6) +'] de ['+ StrZero(nQtdTit,6) +']')
+          fwmsgrun(,{|oproc| U_AOMS084P(,oproc)},'Aguarde processamento...','Integrando dados devolução do PV: '+SC5->C5_NUM+' ['+ StrZero(_npv,6) +'] de ['+ StrZero(nQtdTit,6) +']')
                         
 
-            _cmsglibpv :=  "Devolvido para o TMS" 
+          _cmsglibpv :=  "Devolvido para o TMS" 
 			 
 			
-			If !empty(_cmsglibpv)
-						
-				AADD(_alista,{_cNumPed,_cmsglibpv})
-				
-			Endif
-						
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-						
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
+		  If !empty(_cmsglibpv)
+		     AADD(_alista,{_cNumPed,_cmsglibpv})
+          Endif
+       Else
+  		  //Registra problema com pedido
+		  If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		     AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		  ELSEIF !EMPTY(SC5->C5_NOTA) 
+		     AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+		  ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+             AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+		  Endif
+	   EndIf
+   Next
 
 End Transaction
 
 If len(_alista) > 0
-
    _cTextoMsg := "Pedidos devolvidos para o TMS" 
    U_ITListBox( _cTextoMsg , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
-	
-QRYCABEC->( DBCloseArea() )
 
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
@@ -4670,6 +4216,8 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109BO(oproc)
+Local _aLstPedV := {}
+Local _nI 
 
 //Verifica permissão de ajuste de bloqueio logístico
 ZZL->(Dbsetorder(3))
@@ -4680,138 +4228,75 @@ If !(ZZL->(Dbseek(xFilial("ZZL") + RetCodUsr()))) .OR. ZZL->ZZL_PVLOG != "S"
 
 Endif
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
-	
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-		//================================================================================
-		// Somente pedidos selecionados pelo usuario
-		//================================================================================
-		If IsMark( "TRBF_OK" , cMarkado )
-		    
-		    //================================================================================
-		    // A filial dos pedidos eh sempre a mesma
-		    //================================================================================
-			_cFilPed	:= TRBF_FILIA
-			_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-		EndIf
-		
-     	TRBF->( DBSkip() )
-	EndDo
-	
-	//Se não tem pedido selecionado já sai da rotina
-	If empty(_cNumPed)
-	
-		u_itmsg("Nenhum pedido selecionado","Atenção",,1)
-		TRBF->(Dbgotop())
-		Return
-		
-	Endif
-	
-	//================================================================================
-	// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-	//================================================================================
-	If Select("QRYCABEC") <> 0
-	   QRYCABEC->( DBCloseArea() )
-	EndIf
-	
-	//================================================================================
-	// Query para selecao dos dados do cabecalho do pedido de venda
-	//================================================================================
-	_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-	_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-	_cQuery += " WHERE	D_E_L_E_T_ = ' '
-	// Filtro para selecao dos dados do pedido de venda
-	_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-	_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-	_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
 
+//===================================================
+// Se não tem pedido selecionado já sai da rotina
+//===================================================
+If Empty(_aLstPedV) // empty(_cNumPed)
+   U_Itmsg("Nenhum pedido selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
+EndIf
 
-    DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
+Begin Transaction
 	
-	QRYCABEC->( DBGoTop() )
-	
-	//================================================================================
-	// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
-	//================================================================================
-	Begin Transaction
-	
-	_npv := 0
-	_alista := {}
-	SC5->(DBSETORDER(1))
-	SA1->(DBSETORDER(1))
-	SC9->(DBSETORDER(1))
-	
-	DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
+   _npv := 0
+   _alista := {}
+   SC5->(DBSETORDER(1))
+   SA1->(DBSETORDER(1))
+   SC9->(DBSETORDER(1))
+	   
+   For _nI := 1 To Len(_aLstPedV)
+	   
+       SC5->(DbGoto(_aLstPedV[_nI,3]))	
+
+	  _cNumPed := SC5->C5_NUM         
+	  _npv++
 		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
+	  //Atualiza régua
+	  oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	  ProcessMessages()
 		
-		_aAreaCabec := QRYCABEC->( GetArea() )
+	  _aAreaCabec := SC5->( GetArea() )
 
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       (!SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) )
-					
-
-		    oproc:cCaption := ("Definindo PV em Planejamento Logístico: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		    ProcessMessages()
+	  //=======================================================================================================
+	  // Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+	  // filtrado os dados
+	  //========================================================================================================
+	  If EMPTY(SC5->C5_NOTA) .AND. (!SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL))) // ( SC5->(DBSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. 
+	     oproc:cCaption := ("Definindo PV em Planejamento Logístico: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	     ProcessMessages()
             
-            U_MOMS042P("S") //Rotina de marcação de bloqueio logístico
+         U_MOMS042P("S") //Rotina de marcação de bloqueio logístico
 			
-			AADD(_alista,{_cNumPed,"Bloqueio aplicado com SUCESSO"})
-						
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-						
-			Endif
-			 
-		EndIf
-		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
-
+      	 AADD(_alista,{_cNumPed,"Bloqueio aplicado com SUCESSO"})
+	  Else
+		 //Registra problema com pedido
+		 If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+			AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		 ELSEIF !EMPTY(SC5->C5_NOTA) 
+			AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+  		 ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+  			AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+		 Endif
+	  EndIf
+   Next			
 End Transaction
 
 If len(_alista) > 0
 	U_ITListBox( "Aplicado Planejamento Logístico nos Pedidos " , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
 	
-QRYCABEC->( DBCloseArea() )
+SC5->( DBCloseArea() )
 
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
 
 Return()
-
 
 /*
 ===============================================================================================================================
@@ -4827,7 +4312,8 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 Static Function AOMS109DO(oproc)
-
+Local _aLstPedV := {}
+Local _nI 
 
 //Verifica permissão de ajuste de bloqueio logístico
 ZZL->(Dbsetorder(3))
@@ -4838,132 +4324,70 @@ If !(ZZL->(Dbseek(xFilial("ZZL") + RetCodUsr()))) .OR. ZZL->ZZL_PVLOG != "S"
 
 Endif
 
-DBSelectArea("TRBF")
-TRBF->( DBGoTop() )
-	
-//================================================================================
-// Armazena todos os pedidos selecionados pelo usuario
-//================================================================================
-_cNumPed := ""
-While TRBF->(!EOF())
-	
-		//================================================================================
-		// Somente pedidos selecionados pelo usuario
-		//================================================================================
-		If IsMark( "TRBF_OK" , cMarkado )
-		    
-		    //================================================================================
-		    // A filial dos pedidos eh sempre a mesma
-		    //================================================================================
-			_cFilPed	:= TRBF_FILIA
-			_cNumPed	+= "'"+ TRBF_NUM +"',"
-		
-		EndIf
-		
-     	TRBF->( DBSkip() )
-	EndDo
-	
-	//Se não tem pedido selecionado já sai da rotina
-	If empty(_cNumPed)
-	
-		u_itmsg("Nenhum pedido selecionado","Atenção",,1)
-		TRBF->(Dbgotop())
-		Return
-		
-	Endif
-	
-	//================================================================================
-	// Verifica se ja existe um arquivo com mesmo nome, se sim deleta
-	//================================================================================
-	If Select("QRYCABEC") <> 0
-	   QRYCABEC->( DBCloseArea() )
-	EndIf
-	
-	//================================================================================
-	// Query para selecao dos dados do cabecalho do pedido de venda
-	//================================================================================
-	_cQuery := " SELECT  C5_FILIAL , C5_NUM, C5_I_CEP CEP"
-	_cQuery += " FROM  "+ RetSqlName('SC5') +' C5 '
-	_cQuery += " WHERE	D_E_L_E_T_ = ' '
-	// Filtro para selecao dos dados do pedido de venda
-	_cQuery += " AND C5_FILIAL = '"+ _cFilPed +"' "
-	_cQuery += " AND C5_NUM IN (" + SubStr(_cNumPed,1,Len(_cNumPed) - 1) + ") "
-	_cQuery += " ORDER BY CEP,C5_CLIENTE,C5_LOJACLI "
+//=====================================================================
+// Retorna um Array com grupos de produtos selecionados pelo usuário.
+//=====================================================================
+_aLstPedV := RetSelecPV() 
 
+//==================================================
+// Se não tem pedido selecionado já sai da rotina
+//==================================================
+If Empty(_aLstPedV) // empty(_cNumPed)
+   U_Itmsg("Nenhum pedido selecionado","Atenção",,1)
+   TRBF->(Dbgotop())
+   Return
+EndIf
 
-    DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , "QRYCABEC" , .F. , .T. )
-	
-	QRYCABEC->( DBGoTop() )
-	
-	//================================================================================
-	// Percorre os pedidos selecionados e monta o cabecalho e itens do pedido de venda
-	//================================================================================
-	Begin Transaction
-	
-	_npv := 0
-	_alista := {}
-	SC5->(DBSETORDER(1))
-	SA1->(DBSETORDER(1))
-	SC9->(DBSETORDER(1))
-	
-	DO While QRYCABEC->( !Eof() )
-	
-		_cNumPed := QRYCABEC->C5_NUM         
-		_npv++
+Begin Transaction
+   _npv := 0
+   _alista := {}
+   SC5->(DBSETORDER(1))
+   SA1->(DBSETORDER(1))
+   SC9->(DBSETORDER(1))
+   
+   For _nI := 1 To Len(_aLstPedV)	
+
+	   SC5->(DbGoTo(_aLstPedV[_nI,3]))   
+		  
+	   _cNumPed := SC5->C5_NUM         
+		 
+	   _npv++
+	   //Atualiza régua
+	   oproc:cCaption := ("Processando PV: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+	   ProcessMessages()
 		
-		//Atualiza régua
-		oproc:cCaption := ("Processando PV: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		ProcessMessages()
-		
-		_aAreaCabec := QRYCABEC->( GetArea() )
+	   _aAreaCabec := SC5->( GetArea() )
 
-		//=======================================================================================================
-		// Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
-		// filtrado os dados
-		//========================================================================================================
-		If ( SC5->(DBSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. EMPTY(SC5->C5_NOTA) ) .AND.;
-	       (!SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) )
-					
-
-		    oproc:cCaption := ("Retirando Pedido do Planejamento Logístico: "+QRYCABEC->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
-		    ProcessMessages()
+	   //=======================================================================================================
+	   // Caso outro usuario exclua, fature ou carregue o Pedido de Venda posteriormente ao usuario ter 
+	   // filtrado os dados
+	   //========================================================================================================
+	   If EMPTY(SC5->C5_NOTA) .AND. (!SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .OR. (EMPTY(SC9->C9_CARGA) .AND. EMPTY(SC9->C9_NFISCAL) ) )
+	      oproc:cCaption := ("Retirando Pedido do Planejamento Logístico: "+SC5->C5_NUM+" ["+ StrZero(_npv,6) +"] de ["+ StrZero(nQtdTit,6) +"]")
+		  ProcessMessages()
             
-            U_MOMS042P("N") //Rotina de marcação de bloqueio logístico
+          U_MOMS042P("N") //Rotina de marcação de bloqueio logístico
 			
-			AADD(_alista,{_cNumPed,"Bloqueio retirado com SUCESSO"})
-						
-		Else
-			
-			//Registra problema com pedido
-			If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
-			
-				AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
-			
-			ELSEIF !EMPTY(SC5->C5_NOTA) 
-			
-				AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
-			
-  			ELSEIF SC9->(DbSeek(QRYCABEC->C5_FILIAL + QRYCABEC->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
-
-  				AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
-						
-			Endif
-			 
-		EndIf
+		  AADD(_alista,{_cNumPed,"Bloqueio retirado com SUCESSO"})
+	   Else
+		  // Registra problema com pedido
+		  If !SC5->( DBSeek( xFilial("SC5") + _cNumPed ) )
+		     AADD(_alista,{_cNumPed, "Pedido foi EXCLUIDO antes do processamento"})
+		  ELSEIF !EMPTY(SC5->C5_NOTA) 
+			 AADD(_alista,{_cNumPed, "Pedido foi FATURADO antes do processamento"})
+		  ELSEIF SC9->(DbSeek(SC5->C5_FILIAL + SC5->C5_NUM)) .AND. (!EMPTY(SC9->C9_CARGA) .OR. !EMPTY(SC9->C9_NFISCAL) )
+  			 AADD(_alista,{_cNumPed, "Pedido CARREGADO antes do processamento"})
+		  EndIf
+	   EndIf
 		
-		RestArea(_aAreaCabec)
-		
-	    QRYCABEC->( DBSkip() )
-	    
-EndDo
+	   RestArea(_aAreaCabec)
+   Next
 
 End Transaction
 
 If len(_alista) > 0
 	U_ITListBox( "Pedido Retirado do Planejamento Logístico" , {"Numero","Situacao"} , _alista , .T. , 1 )
 Endif
-	
-QRYCABEC->( DBCloseArea() )
 
 //Atualiza tela
 fwmsgrun( , {|oproc| AOMS109ARQ(oproc) }, "Aguarde!" , 'Carregando dados...' )
@@ -5880,3 +5304,138 @@ Begin Sequence
 End Sequence
 
 Return _lRet
+
+/*
+===============================================================================================================================
+Programa--------: AOMS109Y()
+Autor-----------: Julio de Paula Paz
+Data da Criacao-: 24/07/2025
+===============================================================================================================================
+Descrição-------: Rotina Webservice de solicitação de retorno dos Pedidos de Vendas Enviados para o TMS Multiembarcados ou
+                  RDC para o Protheus.
+===============================================================================================================================
+Parametros------: oProc = Objeto Regua de Processos.
+===============================================================================================================================
+Retorno---------: Nenhum 
+===============================================================================================================================
+*/
+User Function AOMS109Y(oProc)
+Local _lRet   := .F.
+Local _aDados := {}
+Local _aCabec := {"Filial","Numero PV","Cliente","Loja","Nome","Status"}
+Local _lTemDados := .F.
+Local _cTitulo := "Resultado da Solicitação de Retorno de Pedidos de Vendas do TMS para o Protheus"
+
+Begin Sequence 
+
+   TRBF->(DbGoTop())
+
+   Do While ! TRBF->(Eof())
+      If ! Empty(TRBF->TRBF_OK)
+ 
+         _lTemDados := .T.
+
+         SC5->(DbGoto(TRBF->TRBF_REGC5)) 
+         
+		 If ValType(oproc) == "O"
+            oproc:cCaption := ("Processando Pedido de Vendas: "+SC5->C5_NUM+". ")
+		    ProcessMessages()
+		 EndIf
+
+         If SC5->C5_I_ENVRD <> "S"
+			Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Este pedido não se encontra integrado ao sistema TMS !"})
+         Else
+            If ! U_IT_TMS(SC5->C5_I_LOCEM) 
+               Fwmsgrun(,{|oproc| _lRet := U_AOMS094E(oproc)},'Aguarde processamento...','Integrando dados solicitação de retorno de PV do TMS para o Protheus...')
+            Else
+               Fwmsgrun(,{|oproc| _lRet := U_AOMS140E(oproc)},'Aguarde processamento...','Integrando dados solicitação de retorno de PV do TMS para o Protheus...')
+            EndIf
+
+            If _lRet 
+               Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Solicitação de retorno do PV realizada com Sucesso."})
+		    Else 
+		       Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Não foi possível realizar o retorno do PV para o Protheus."})
+		    EndIf 
+         EndIf 
+      EndIf 
+
+	  TRBF->(DbSkip())
+   EndDo 
+   
+   If _lTemDados
+      U_ITListBox( _cTitulo , _aCabec , _aDados  ) 
+   Else 
+      U_ItMsg("Nenhum registro selecionado para solicitação de retorno do Pedido de Vendas do TMS para o Protheus.","Atenção",,1)
+   EndIf 
+   
+   TRBF->(DbGoTop())
+
+End Sequence 
+
+Return Nil 
+
+/*
+===============================================================================================================================
+Programa--------: AjustaX1()
+Autor-----------: Julio de Paula Paz
+Data da Criacao-: 28/07/2025
+===============================================================================================================================
+Descrição-------: Ajusta dicinário de perguntas SX1. 
+===============================================================================================================================
+Parametros------: _cPerg = Nome do grupo de perguntas SX1 a ser ajustado.
+===============================================================================================================================
+Retorno---------: Nenhum 
+===============================================================================================================================
+*/
+Static Function AjustaX1(_cPerg)
+
+_aHelpPor := {}
+Aadd( _aHelpPor, 'Informe status de envio do PV para o TMS: ')
+Aadd( _aHelpPor, 'Sim: Enviados para o TMS')
+Aadd( _aHelpPor, 'Não: Não enviados para o TMS' )
+Aadd( _aHelpPor, 'Ambos: Todos os Pedidos enviados e não enviados para o TMS' )
+U_ItPutx1(_cPerg,"32","Ped.Vendas Enviados para o TMS ?"," "," ","mv_chm","C",1,0,0,"C","","","","","MV_PAR32","Sim","","","2","Não","","","Ambos","","","","","","","","",_aHelpPor,_aHelpPor,_aHelpPor)
+
+Return Nil 
+
+/*
+===============================================================================================================================
+Programa--------: RetSelecPV()
+Autor-----------: Julio de Paula Paz
+Data da Criacao-: 28/07/2025
+===============================================================================================================================
+Descrição-------: Ajusta dicinário de perguntas SX1. 
+===============================================================================================================================
+Parametros------: _cPerg = Nome do grupo de perguntas SX1 a ser ajustado.
+===============================================================================================================================
+Retorno---------: Nenhum 
+===============================================================================================================================
+*/
+Static Function RetSelecPV()
+Local _aListaPV := {}            
+
+Begin Sequence 
+   
+   TRBF->( DBGoTop() )
+
+   //================================================================================
+   // Armazena todos os pedidos selecionados pelo usuario
+   //================================================================================
+   
+   Do While TRBF->(!EOF())
+	
+	  //================================================================================
+	  // Somente pedidos selecionados pelo usuario
+	  //================================================================================
+	  If TRBF->(IsMark( "TRBF_OK" , cMarkado ))
+         Aadd(_aListaPV,{TRBF->TRBF_FILIA, TRBF->TRBF_NUM, TRBF->TRBF_REGC5})
+	  EndIf
+		
+  	  TRBF->( DBSkip() )
+   EndDo
+
+   TRBF->( DBGoTop() )
+
+End Sequence 
+
+Return _aListaPV

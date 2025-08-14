@@ -49,7 +49,7 @@ Vanderlei   - Alex Wallauer - 16/05/25 - 23/07/25 - 50687   - Ajuste no calculo 
 Vanderlei   - Alex Wallauer - 24/07/25 - 24/07/25 - 49894   - Correção de Error.log: Update error - lock required - File: DAI010 
 Vanderlei   - Alex Wallauer - 24/07/25 - 24/07/25 - 49894   - Correção de Error.log: variable does not exist _NVLRTOTFRET on MSGSAIDA(M460FIM.PRW) 24/07/2025 11:56:28 line : 1657
 Vanderlei   - Alex Wallauer - 24/07/25 - 24/07/25 - 49894   - Correção de Error.log: variable does not exist _NVLRPEDAGIO on VALDADOS(M460FIM.PRW) 24/07/2025 16:56:57 line : 5021
-Vanderlei   - Alex Wallauer - 25/07/25 - 25/07/25 - 49894   - Correção de Error.log: variable does not exist _COPPED on MSGSAIDA(M460FIM.PRW) 24/07/2025 19:36:53 line : 1712
+Vanderlei   - Alex Wallauer - 08/08/25 - 11/08/25 - 50687   - Correção da logica das data de previsão de entrega, quando tem operador logístico.
 ===============================================================================================================================================================================================
 */
 
@@ -3121,7 +3121,7 @@ Static Function GrvTransiTime(_lGrava)
 	EndIf
 
 	DAI->(Dbsetorder(3))
-	If EmptY(SF2->F2_I_OPER) .OR. !Empty(SF2->F2_I_REDP)//DAI->(Dbseek(SF2->F2_FILIAL+SF2->F2_DOC+SF2->F2_SERIE))//SE TEM CARGA
+	If !EmptY(SF2->F2_I_OPER) .OR. !Empty(SF2->F2_I_REDP)//DAI->(Dbseek(SF2->F2_FILIAL+SF2->F2_DOC+SF2->F2_SERIE))//SE TEM CARGA
 
 		IF !EMPTY(SF2->F2_I_OPER)
 			cCodOL :=SF2->F2_I_OPER//DAI->DAI_I_OPLO
@@ -3560,6 +3560,7 @@ Retorno-----------: Nenhum
 USER FUNCTION TestesNF()// U_TestesNF
 	Local _aParRet :={}
 	Local _aParAux :={} , nI
+
 	PRIVATE _AITALAC_F3:={}
 	_BSelectSF2:={|| "SELECT DISTINCT F2_FILIAL, F2_DOC, F2_SERIE, F2_CLIENTE, F2_LOJA, F2_EMISSAO FROM "+RETSQLNAME("SF2")+" SF2 WHERE"+;
 		" F2_FILIAL  IN "+FormatIn(ALLTRIM(MV_PAR01),";")+" AND "+;

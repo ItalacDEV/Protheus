@@ -13,6 +13,7 @@ Analista    - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteraçã
 ==============================================================================================================================================================
 Andre       - Alex Wallauer - 04/04/25 - 04/04/25 - 50389   - Novo filtro para considerar centro de custo no calculo das horas extras.
 Andre       - Alex Wallauer - 29/04/25 - 29/04/25 - 50525   - Alteracao do diretorio temporario para GetTempPath().
+Andre       - Alex Wallauer - 31/07/25 -          - 51226   - Ajuste dos filtros para gravação dos dados de custos gerenciais.
 ==============================================================================================================================================================
 */
 
@@ -190,12 +191,12 @@ _aSalvaCusMGCMS:={}
 // Ultimo parâmetro indica que e a primeira etapa de leitura da ZL6
 PRIVATE _lMostraSoro:=.F.
 
-If MV_PAR07 = 2//Atualiza dados
-   MV_PAR01:=" "
-   MV_PAR02:=" "
-   MV_PAR03:=" "
-   MV_PAR04:=" "
-ELSEIf MV_PAR07 = 3//Gera Excel
+//If MV_PAR07 = 2//Atualiza dados
+   //MV_PAR01:=" "
+   //MV_PAR02:=" "
+   //MV_PAR03:=" "
+   //MV_PAR04:=" "
+If MV_PAR07 = 3//Gera Excel
    If cFilAnt = "10"
       _lMostraSoro := U_ITMSG("Custo operacional por planta?",'Atenção!', ,3,2,2)//ALERT
    ENDIF  
@@ -8457,7 +8458,7 @@ If ZE0->( Dbseek( _cfiltro ) )
  	("ZE0")->(MsUnlock())
 	 	
 Else
-	 	
+
 	//não achou registro cria um novo
  	RecLock("ZE0",.T.)    
 		
@@ -8477,7 +8478,7 @@ Else
 	ZE0->ZE0_VDOLAR :=  _nvalor / (_ntotlei * _nTotdol)
 	 	
  	("ZE0")->(MsUnlock())
-	 	
+
 Endif
 
 Return

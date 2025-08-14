@@ -13,6 +13,8 @@ Josué Danich      | 20/02/2019 | Chamado 28160. Inclusão de observação na libera
  Alex Wallauer    | 14/12/2021 | Chamado 38612. Ajustes do retorno de varivel dos htms . 
 ------------------------------------------------------------------------------------------------------------------------------
  Igor Melgaço     | 12/03/2024 | Chamado 45575. Ajuste para conversão de texto do Assunto do email em padrao UTF8.
+------------------------------------------------------------------------------------------------------------------------------
+Lucas Borges      | 01/08/2025 | Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ===============================================================================================================================
 */
 
@@ -608,7 +610,7 @@ _oProcess:cTo := _cMailApr
 //===============================
 // Informamos o assunto do email.  
 //===============================
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 _cMailID	:= _oProcess:fProcessId
 _cTaskID	:= _oProcess:fTaskID
@@ -682,7 +684,7 @@ IF lEnviaEmailSolic
    //===============================
    // Informamos o assunto do email.  
    //===============================
-   _oProcess:cSubject	:= U_ITEncode(_cAssunto)
+   _oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
    _cMailID	:= _oProcess:fProcessId
    _cTaskID	:= _oProcess:fTaskID
@@ -858,7 +860,7 @@ ENDIF
 //===============================
 // Informamos o assunto do email.  
 //===============================
-oProc:cSubject	:= U_ITEncode(_cAssunto)
+oProc:cSubject	:= FWHttpEncode(_cAssunto)
 
 //===============================================
 // Informamos o arquivo a ser atachado no e-mail.

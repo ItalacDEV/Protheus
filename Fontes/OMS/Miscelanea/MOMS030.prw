@@ -45,6 +45,8 @@ Josué Danich      |20/02/2019  | Chamado 28160. Inclusão de observação na libera
  Igor Melgaço     | 12/03/2024 | Chamado 45575. Ajuste para conversão de texto do Assunto do email em padrao UTF8.
 -------------------------------------------------------------------------------------------------------------------------------
 Lucas Borges      | 23/07/2025 | Chamado 51340. Ajustar função para validação de ambiente de teste
+-------------------------------------------------------------------------------------------------------------------------------
+Lucas Borges      | 01/08/2025 | Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ================================================================================================================================
 */ 
 
@@ -1288,7 +1290,7 @@ User Function MOMS030P(_cBlqCre, _lCliBlq, _cGetSol)
 		//===============================
 		// Informamos o assunto do email.
 		//===============================
-		_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+		_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 		_cMailID	:= _oProcess:fProcessId
 		_cTaskID	:= _oProcess:fTaskID
@@ -1371,7 +1373,7 @@ User Function MOMS030P(_cBlqCre, _lCliBlq, _cGetSol)
 		//===============================
 		// Informamos o assunto do email.
 		//===============================
-		_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+		_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 		_cMailID	:= _oProcess:fProcessId
 		_cTaskID	:= _oProcess:fTaskID
@@ -1717,7 +1719,7 @@ User Function MOMS30ML(_cFilial, _cNumPV, _cOpcao, _cObs, _cCodApr, _cCodSol, _c
 //===============================
 // Informamos o assunto do email.  
 //===============================
-	oProc:cSubject	:= U_ITEncode(_cAssunto)
+	oProc:cSubject	:= FWHttpEncode(_cAssunto)
 
 //===============================================
 // Informamos o arquivo a ser atachado no e-mail.
@@ -2381,7 +2383,7 @@ User Function MOMS030O(_cGetSol)
 			// Assunto da mensagem
 			_cAssunto := "Sol.Lib de Preço Protheus " + SC5->C5_FILIAL + " Cliente " + SA1->A1_NOME + " Ped.: " + SUBSTR(SC5->C5_NUM,1,6)
 
-			_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+			_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 			_cMailID	:= _oProcess:fProcessId
 			_cTaskID	:= _oProcess:fTaskID
@@ -2459,7 +2461,7 @@ User Function MOMS030O(_cGetSol)
 		//===============================
 		// Informamos o assunto do email.
 		//===============================
-		_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+		_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 		_cMailID	:= _oProcess:fProcessId
 		_cTaskID	:= _oProcess:fTaskID
@@ -3087,7 +3089,7 @@ User Function MOMS030K(_cGetSol)
 			//===============================
 			// Informamos o assunto do email.
 			//===============================
-			_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+			_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 			_cMailID	:= _oProcess:fProcessId
 			_cTaskID	:= _oProcess:fTaskID
@@ -3172,7 +3174,7 @@ User Function MOMS030K(_cGetSol)
 		//===============================
 		// Informamos o assunto do email.
 		//===============================
-		_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+		_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 		_cMailID	:= _oProcess:fProcessId
 		_cTaskID	:= _oProcess:fTaskID

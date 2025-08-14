@@ -24,9 +24,12 @@ Jerry    - Julio Paz     - 20/03/25 - 20/03/25 -  49611  - Alterar a rotina de i
 Vanderlei- Alex Wallauer - 20/03/25 - 24/03/25 -  50197  - Novo tratamento para cortes e desmembramentos de pedidos - BLOQUEAR: M->C5_I_BLSLD = "S"
 Vanderlei- Alex Wallauer - 26/03/25 - 28/03/25 -  49611  - Ajuste na validaçao da data da ocorrencia para não permitir data maior que a data atual para diferente de tipo = "F".
 Vanderlei- Alex Wallauer - 07/05/25 - 08/05/25 -  50639  - Correção no calculo da data de previsão de entrega no cliente que era alterada indevidamente na ocorrência integrada do RDC.
-Vanderlei- Alex Wallauer - 25/03/24 - 24/07/25 -  49894  - Acerto das somatorias dos campos de peso bruto: C6_I_PTBRU / C5_I_PESBR / C5_PBRUTO / DAI_PESO / DAK_PESO.
-Vanderlei- Alex Wallauer - 25/03/24 - 24/07/25 -  51508  - Gravação do C5_DESCONT NA FUNÇÃO U_ALTERAP.
-Vanderlei- Alex Wallauer - 25/03/24 - 24/07/25 -  49894  - Acerto das somatorias dos campos de peso bruto: C6_I_PTBRU / C5_I_PESBR / C5_PBRUTO / DAI_PESO / DAK_PESO para carga sem Palete
+Vanderlei- Alex Wallauer - 24/05/25 - 24/07/25 -  49894  - Acerto das somatorias dos campos de peso bruto: C6_I_PTBRU / C5_I_PESBR / C5_PBRUTO / DAI_PESO / DAK_PESO.
+Vanderlei- Alex Wallauer - 24/07/25 - 24/07/25 -  51508  - Gravação do C5_DESCONT NA FUNÇÃO U_ALTERAP.
+Vanderlei- Alex Wallauer - 24/07/25 - 24/07/25 -  49894  - Acerto das somatorias dos campos de peso bruto: C6_I_PTBRU / C5_I_PESBR / C5_PBRUTO / DAI_PESO / DAK_PESO para carga sem Palete
+Vanderlei- Alex Wallauer - 25/07/25 - 29/07/25 -  49894  - Acerto da busca dos valores do pedagio e uso da nova função U_ITAcertaPeso() para acertar o peso bruto da carga.
+Vanderlei- Alex Wallauer - 30/07/24 - 30/07/25 -  49894  - Criação da gravação de log de calculos do peso bruto da carga.
+Vanderlei- Alex Wallauer - 31/07/24 - 31/07/25 -  49894  - Ajustes na gravação do log de calculos do peso bruto da carga. 
 ==================================================================================================================================================================================================================
 */
 
@@ -421,7 +424,7 @@ WSMETHOD U_LIBERAP WSRECEIVE U_LIBERP WSSEND U_STATUS WSSERVICE U_AOMS074
 		SC6->(Dbgotop())
 		SC6->(Dbseek(SC5->C5_FILIAL+SC5->C5_NUM))
 
-		Do while SC6->C6_NUM == SC5->C5_NUM .AND. SC5->C5_FILIAL == SC6->C6_FILIAL
+		Do while !SC6->(EOF()) .AND. SC6->C6_NUM == SC5->C5_NUM .AND. SC5->C5_FILIAL == SC6->C6_FILIAL
 
 
 			If !SC6->(MsRLock(SC6->(RECNO())))
@@ -579,7 +582,7 @@ WSMETHOD U_LIBERAP WSRECEIVE U_LIBERP WSSEND U_STATUS WSSERVICE U_AOMS074
 	ZGB->(Dbsetorder(1))
 	If _cSituacao == "E" .AND. ZGB->(Dbseek("  "+SC5->C5_NUM)) //Se for encerramento da solicitação encerra todas as solicitações pendentes do PV
 
-		Do while ZGB->ZGB_NUM == SC5->C5_NUM
+		Do while !ZGB->(EOF()) .AND. ZGB->ZGB_NUM == SC5->C5_NUM
 
 			If ZGB->ZGB_SITUAC == "P"
 
@@ -637,7 +640,7 @@ WSMETHOD U_LIBERAP WSRECEIVE U_LIBERP WSSEND U_STATUS WSSERVICE U_AOMS074
 		SC6->(Dbsetorder(1))
 		If SC6->(Dbseek(_cFilial+U_LIBERP:PEDIDO))
 
-			Do while SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
+			Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
 
 				SC6->(Msunlock())
 				SC6->(Msunlockall())
@@ -1306,6 +1309,7 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 	Local _aPedXml, _cPedXml, _aCargasAtu,_cMsgRDC
 	Local _cCodCarga, _lPedOk, _cPedGerador , _nnh
     Local _cIT_NAGEND := ALLTRIM(SuperGetMV("IT_NAGEND",.F., "P;R;N"))//P=Aguardando Agenda; R=Reagendar;  N=Reagendar com Multa
+    Local _nTotPedagio:= 0 As Numeric
 
 	Private _lWebservice
 	Private _cMsgEfetiva
@@ -1605,7 +1609,7 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 				EndIf
 			EndIf
 
-			Break
+			Break// UMA SAIDA AQUI **********************************************
 		EndIf
 
 		//==================================================================================
@@ -1660,7 +1664,37 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 			_cMsg += " O valor de frete informado para esta carga, supera o limite máximo definido no parâmetro IT_MAXFRETE. "
 		EndIf
 
-		If U_CARGA:PEDAGIO > _nValMaxPedagio
+        _cFilRDC    := U_CARGA:CODFIL
+        _cCargaRDC  := U_CARGA:CODIGO
+        _nTotPedagio:= 0
+
+        IF VAL(_cFilRDC) > 0 .AND. VAL(_cCargaRDC) > 0
+        
+           IF _nTotPedagio = 0
+        
+              _cAlias := GetNextAlias()
+              _cquery :="SELECT NVL(A037C.VRPEDA,0) VLPEDAG "
+              _cquery +="      FROM RDCITL.AFA037 A037, "
+              _cquery +="           RDCITL.AFA037_CARGA A037C "
+              _cquery +="     WHERE A037.CODFIL  = "+ALLTRIM(_cFilRDC)
+              _cquery +="       AND A037.NUMERO  = "+ALLTRIM(_cCargaRDC)
+              _cquery +="       AND A037C.NRLOTE IS NOT NULL "
+              _cquery +="       AND A037C.CODFIL = A037.FILORI "
+              _cquery +="       AND A037C.NUMERO = A037.VIAORI "
+              _cquery +=" ORDER BY A037.NUMERO "
+        
+              MPSysOpenQuery( _cQuery , _cAlias)
+        
+              (_cAlias)->( DBGOTOP() )
+              IF (_cAlias)->(!EOF())
+                 _nTotPedagio:=(_cAlias)->VLPEDAG
+              ENDIF
+              (_cAlias)->( DBCloseArea() )
+        
+           ENDIF
+        ENDIF
+
+		If _nTotPedagio > _nValMaxPedagio
 			_cMsg += " O valor de pedágio informado para esta carga, supera o limite máximo definido no parâmetro IT_MAXPEDAG. "
 		EndIf
 
@@ -2214,7 +2248,7 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 
 					SC6->(Dbsetorder(1))
 					If SC6->(DbSeek(_cFilial+PadR(U_CARGA:ITENS[_nI]:PEDIDO,_nTamPedido," ")))
-						Do while SC6->C6_FILIAL + SC6->C6_NUM == cFilial+PadR(U_CARGA:ITENS[_nI]:PEDIDO,_nTamPedido," ")
+						Do while !SC6->(EOF()) .AND.  SC6->C6_FILIAL + SC6->C6_NUM == cFilial+PadR(U_CARGA:ITENS[_nI]:PEDIDO,_nTamPedido," ")
 							ntotped += SC6->C6_VALOR
 							SC6->( Dbskip())
 						Enddo
@@ -2469,6 +2503,7 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 				DAK->(Reclock("DAK",.F.))
 				_cCodigo := DAK->DAK_COD
 			EndIf
+			_nRegAtu := DAK->(Recno())
 
 			If AllTrim(U_CARGA:PRECARGA) == "N" // Não é uma précarga.
 				DAK->DAK_I_PREC := "1" // Para que seja possível efetivar a carga sem précarga, é necessário iniciar a carga como précarga e depois de rodar a rotina de efetivação da carga, definimos DAK->DAK_I_PREC := "2" para dizer que é uma Carga.
@@ -2489,7 +2524,8 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 			DAK->DAK_I_TPFR := If(Len(AllTrim(U_CARGA:CNPJTRA))< 14,"1","2")  // 1="Autonomo";2="PJ-Transportadora" (escolhe se cpf no transportador é 1, se é cgc no transportador é 2)
 			DAK->DAK_IDENT  := ""               // sempre vazio
 			DAK->DAK_TRANSP := _cCodTransp // SA2->A2_COD      // SA2->A2_COD que tenha a2_cgc  igual a cnpj de transportadora do xml
-			DAK->DAK_I_VRPE := U_CARGA:PEDAGIO
+			//DAK->DAK_I_VRPE := U_CARGA:PEDAGIO não vem na TAG 
+			DAK->DAK_I_VRPE := _nTotPedagio
 
 			_cMailUsrCarga := Posicione("ZZL",5,xfilial("ZZL")+AllTrim(Str(U_CARGA:USUCAD,_nTamCodUser)),"ZZL_EMAIL") // E-mail do usuário que criou a carga utilizado na rotina de envio de e-mail da carga.
 			If Empty(_cMailUsrCarga)
@@ -2506,7 +2542,6 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 			//===================================================================================
 			// Gravação dos Itens da Carga.
 			//===================================================================================
-			_nTotPeso     := 0
 			_nCapacVolum  := 0
 			_aQtdClientes := {}
 			_lTemPallet   := .F.
@@ -2565,33 +2600,6 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 					DAI->(DbSeek(_cFilial+PadR(U_CARGA:ITENS[_nI]:PEDIDO,_nTamPedido," ")))
 					DAI->(RecLock("DAI",.F.))
 				EndIf
-
-                _nPesoBrut:=0// #DAI_PESO
-                SC6->( DbSeek( DAI->DAI_FILIAL + DAI->DAI_PEDIDO ) )
-                DO While SC6->( !EOF() ) .AND. SC6->C6_FILIAL+SC6->C6_NUM == DAI->DAI_FILIAL+DAI->DAI_PEDIDO
-          
-                   //==================================================================================
-                   // SEMPRE ACERTA O PESO BRUTO DE ACORDO COM O DO CADASTRO DO SB1 PQ ENTRE O PEDIDO E A CARGA PODE TER HAVIDO ALTERACAO
-                   //==================================================================================
-                   IF POSICIONE( "SB1" , 1 , xFilial("SB1") + SC6->C6_PRODUTO , "B1_I_PCCX" )  > 0  .AND.  SC6->C6_I_PTBRU > 0 //EXCETO SE FOR PESO VARIADO
-                      _nPesoItem := SC6->C6_I_PTBRU
-                   Else
-                      _nPesoItem := SB1->B1_PESBRU * SC6->C6_QTDVEN //Peso do Item
-                      SC6->(RecLock("SC6",.F.))
-                      SC6->C6_I_PTBRU:=_nPesoItem 
-                      SC6->(MsUnlock())
-                   EndIf
-                   _nPesoBrut += _nPesoItem
-                   SC6->( DBSkip() )
-                ENDDO
-          
-                SC5->(RecLock("SC5",.F.))
-                SC5->C5_I_PESBR:= _nPesoBrut
-                SC5->C5_PBRUTO := _nPesoBrut
-                SC5->(MsUnlock())
-
-				DAI->DAI_PESO   :=  SC5->C5_I_PESBR // c5_pesol ou c5_pesob de acordo com parâmetro DAK_PESO
-                _nTotPeso+=DAI->DAI_PESO // #DAI_PESO
 
 				//==========================================================================================
 				// Grava dados do transportador de redespacho
@@ -2679,7 +2687,6 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 
 				EndIf
 
-
 				DAI->DAI_I_TIPC := AllTrim(U_CARGA:ITENS[_nI]:TPCARG) // 1 = "Paletizada" / 2 = "Batida"
 				DAI->DAI_I_QTPA := U_CARGA:ITENS[_nI]:QTDPALLET// quantidade de pallets indicada no xml
 				IF DAI->DAI_I_TIPC  $ TP_GERA_PALET .AND. DAI->DAI_I_QTPA # 0
@@ -2706,7 +2713,7 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 				If SC9->(Dbseek(DAI->DAI_FILIAL+DAI->DAI_PEDIDO))
 
 
-					Do while DAI->DAI_FILIAL == SC9->C9_FILIAL .AND. DAI->DAI_PEDIDO == SC9->C9_PEDIDO
+					Do while !DAI->(EOF()) .AND. DAI->DAI_FILIAL == SC9->C9_FILIAL .AND. DAI->DAI_PEDIDO == SC9->C9_PEDIDO
 
 						If Reclock("SC9",.F.)
 
@@ -2741,7 +2748,6 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 			//===================================================================================
 			// Continuação capa Gravação dos Capa da Carga.
 			//===================================================================================
-            DAK->DAK_PESO   := _nTotPeso//Somatoria do #DAI_PESO
 			DAK->DAK_CAPVOL := _nCapacVolum       // soma de dai_capvol
 			DAK->DAK_PTOENT := Len(_aQtdClientes) // contagem de clientes diferentes, dai_client+cai_loja
             DAK->DAK_I_TMS  := "R" // Indica que a carga foi criada pelo sistema RDC 
@@ -2788,9 +2794,6 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 					Endif
 
 				ELSE
-				    DAK->(DbGoto(_nRegAtu))    
-					U_CargaRatVlrs(DAK->DAK_COD)//FUNÇÃO DO OM200FIM.PRW para refazer o Reteio do FRETE 1o PERCURSO e PEDAGIO no DAI / FRETE 2o PERCURSO NÃO é RATEIO É SOMATORIA DOS ITENS DA CARGA (PEDIDOS)
-					
 					_lEnviaEmail := .T.
 					IF ZFU->(FIELDPOS("ZFU_ENMAIL")) = 0
 						U_OM200Email(.F.,Nil,.T.,.T.,.T.)//_lEstorno,_aCargas,_lEnviaDireto,_lScheduller,_lMarcaEnvio
@@ -2808,9 +2811,6 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 				EndIf
 
 			Else
-
-			    DAK->(DbGoto(_nRegAtu))
-			    U_CargaRatVlrs(DAK->DAK_COD)//FUNÇÃO DO OM200FIM.PRW para refazer o Reteio do FRETE 1o PERCURSO e PEDAGIO no DAI / FRETE 2o PERCURSO NÃO é RATEIO É SOMATORIA DOS ITENS DA CARGA (PEDIDOS)
 
 				//Envia ordem de carga da pré carga
 				_lEnviaEmail := .T.
@@ -2852,44 +2852,77 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 
 			EndIf
 
-			//===========================================================================
-			// Atualiza tabela SC5.
-			//===========================================================================
-			If Empty(_cMsg) // Integração com sucesso.
+            //===========================================================================
+            // Atualiza tabela SC5 , PESOS E RATEIOS
+            //===========================================================================
+            _lGralogPeso:=SuperGetMV("IT_GVLOGPE",.F., .T.) // Verifica se é necessário gravar log de alteração de carga
+            If Empty(_cMsg) // Integração com sucesso.
+               _nTamPedido := TAMSX3("C5_NUM")[1]
+               For _nI := 1 To Len(U_CARGA:ITENS)
+                    _cPedido := PadR(U_CARGA:ITENS[_nI]:PEDIDO,_nTamPedido," ")
+                    SC5->(Dbsetorder(1))
+                    If (SC5->(DbSeek(_cFilial + _cPedido))) // Posiciona no numero de pedido da SC5
+                       _ddataant := SC5->C5_I_DTENT
+                       _aLogSC5 := U_ITIniLog( 'SC5')
+                       SC5->(RecLock("SC5",.F.))
+                       SC5->C5_I_OBCOP := U_CARGA:ITENS[_nI]:OBSCPA  // Observação da condição de pagamento
+                       SC5->C5_I_OBPED := U_CARGA:ITENS[_nI]:OBSPVE  // Observação do Pedido de Vendas
+                       SC5->C5_MENNOTA := U_CARGA:ITENS[_nI]:OBSNFE  // Observação da Nota Fiscal
+                       SC5->C5_I_DTENT := CTOD(U_CARGA:ITENS[_nI]:DTPREV) // Data de Previsão de Entrega
+                       SC5->C5_FECENT  := CTOD(U_CARGA:ITENS[_nI]:DTPREV) // Data de Previsão de Entrega
+                       SC5->(MsUnlock())
+                       //Grava monitor de pedido de vendas
+                       If SC5->C5_I_DTENT != _ddataant
+                          _cJUSCOD := "007"//Alterado Data de Entrega
+                          _cCOMENT := "Data de entrega modificada de " + dtoc(_ddataant) + " para " + dtoc(SC5->C5_I_DTENT) + "  via inclusão de carga RDC."
+                          _cENCERR := ""
+                          __cUserID := _cCodUsuario
+                          U_GrvMonitor(,,_cJUSCOD,_cCOMENT,_cENCERR,_ddataant,SC5->C5_I_DTENT,_ddataant)
+                       Endif
+                       //Grava log de alteração de tabela
+                       U_ITGrvLog( _aLogSC5 , "SC5" , 1 , SC5->( C5_FILIAL + C5_NUM ) ,"A" , _cCodUsuario , date() , time() )
+                       _cmotivs := "  " //Zera variável pública de motivo de corte para não repetir uso por engano
+                    EndIf
+               Next
+               // Atualiza tabela PESOS E RATEIOS
+               DAK->(DbGoto(_nRegAtu))    
+               _cTexto:="*DADOS DA CARGA INTEGRADA: "+DAK->DAK_FILIAL+"-"+DAK->DAK_COD+CRLF
+               _cDados:=""
+               DAI->(DbSetOrder(1)) // DAI_FILIAL+DAI_COD
+               If DAI->(MsSeek(DAK->DAK_FILIAL+DAK->DAK_COD))
+                  _cTexto+="ACHOU CARGA (DAK): '"+DAK->DAK_FILIAL+"'-'"+DAK->DAK_COD+"'"+CRLF
+                  _cTexto+="ACHOU CARGA (DAI): '"+DAI->DAI_FILIAL+"'-'"+DAI->DAI_COD+"'"+CRLF
+				  _cTexto+="DAI->DAI_FILIAL+ALLTRIM(DAI->DAI_COD) == DAK->DAK_FILIAL+ALLTRIM(DAK->DAK_COD): '"+IF(DAI->DAI_FILIAL+ALLTRIM(DAI->DAI_COD) == DAK->DAK_FILIAL+ALLTRIM(DAK->DAK_COD)," == "," <> ") 
+                  _nTotPeso:=0
+                  Do while DAI->(!EOF()) .AND. DAI->DAI_FILIAL+ALLTRIM(DAI->DAI_COD) == DAK->DAK_FILIAL+ALLTRIM(DAK->DAK_COD)
+                     _nPesoBrut:=U_ITAcertaPeso(DAI->DAI_FILIAL + DAI->DAI_PEDIDO)//FUNÇÃO DO OM200FIM.PRW para refazer o peso bruto dos itens do pedido
+                     _cTexto+="**ACERTOS U_ITACERTAPESO : "+DAI->DAI_FILIAL+"-"+DAI->DAI_PEDIDO+CRLF+_cDados
+                     _cTexto+="*DAI antes.: DAI_PESO: " + Str(DAI->DAI_PESO,19,5) +CRLF
+                     DAI->(RecLock("DAI",.F.))
+                     DAI->DAI_PESO:=_nPesoBrut
+                     DAI->(MsUnLock())
+                     _cTexto+="*DAI depois: DAI_PESO: " + Str(DAI->DAI_PESO,19,5) +CRLF
+                     _nTotPeso+=DAI->DAI_PESO
+                     DAI->(DBSKIP())
+                  Enddo 
+                  _cTexto+="***DAK antes.: DAK_PESO: " + Str(DAK->DAK_PESO,19,5) +CRLF
+                  DAK->(RecLock("DAK",.F.))
+                  DAK->DAK_PESO:=_nTotPeso
+                  DAK->(MsUnLock())
+                  _cTexto+="***DAK depois: DAK_PESO: " + Str(DAK->DAK_PESO,19,5) +CRLF
+                  U_CargaRatVlrs(DAK->DAK_COD)//FUNÇÃO DO OM200FIM.PRW para refazer o Reteio do FRETE 1o PERCURSO e PEDAGIO no DAI / FRETE 2o PERCURSO NÃO é RATEIO É SOMATORIA DOS ITENS DA CARGA (PEDIDOS)
+               EndIf
+            Else
+                DAK->(DbGoto(_nRegAtu))    
+                _cTexto:="DADOS DA CARGA INTEGRADA: "+DAK->DAK_FILIAL+"-"+DAK->DAK_COD+CRLF
+                _cTexto+="_cMsg: "+_cMsg
+            EndIf//If Empty(_cMsg) // Integração com sucesso.
 
-				_nTamPedido := TAMSX3("C5_NUM")[1]
-
-				For _nI := 1 To Len(U_CARGA:ITENS)
-					_cPedido := PadR(U_CARGA:ITENS[_nI]:PEDIDO,_nTamPedido," ")
-					SC5->(Dbsetorder(1))
-					If (SC5->(DbSeek(_cFilial + _cPedido))) // Posiciona no numero de pedido da SC5
-						_ddataant := SC5->C5_I_DTENT
-						_aLogSC5 := U_ITIniLog( 'SC5')
-						SC5->(RecLock("SC5",.F.))
-						SC5->C5_I_OBCOP := U_CARGA:ITENS[_nI]:OBSCPA  // Observação da condição de pagamento
-						SC5->C5_I_OBPED := U_CARGA:ITENS[_nI]:OBSPVE  // Observação do Pedido de Vendas
-						SC5->C5_MENNOTA := U_CARGA:ITENS[_nI]:OBSNFE  // Observação da Nota Fiscal
-						SC5->C5_I_DTENT := CTOD(U_CARGA:ITENS[_nI]:DTPREV) // Data de Previsão de Entrega
-						SC5->C5_FECENT  := CTOD(U_CARGA:ITENS[_nI]:DTPREV) // Data de Previsão de Entrega
-						SC5->(MsUnlock())
-
-						//Grava monitor de pedido de vendas
-						If SC5->C5_I_DTENT != _ddataant
-							_cJUSCOD := "007"//Alterado Data de Entrega
-							_cCOMENT := "Data de entrega modificada de " + dtoc(_ddataant) + " para " + dtoc(SC5->C5_I_DTENT) + "  via inclusão de carga RDC."
-							_cENCERR := ""
-							__cUserID := _cCodUsuario
-							U_GrvMonitor(,,_cJUSCOD,_cCOMENT,_cENCERR,_ddataant,SC5->C5_I_DTENT,_ddataant)
-
-						Endif
-                        
-						//Grava log de alteração de tabela
-						U_ITGrvLog( _aLogSC5 , "SC5" , 1 , SC5->( C5_FILIAL + C5_NUM ) ,"A" , _cCodUsuario , date() , time() )
-						_cmotivs := "  " //Zera variável pública de motivo de corte para não repetir uso por engano
-
-					EndIf
-				Next
-			EndIf
+            IF _lGralogPeso
+               _cdir:="/temp/aoms074/"
+               _cFileNome:=_cdir+"aos074_carga_v1_"+DAK->DAK_FILIAL+"_"+DAK->DAK_COD+"_"+DTOS(DATE())+"_"+STRTRAN(TIME(),":","_")+".txt"
+               MemoWrite(_cFileNome,_cTexto)
+            Endif
 
 		End Transaction
 
@@ -3060,7 +3093,7 @@ WSMETHOD U_INCLUIC WSRECEIVE U_CARGA WSSEND U_STATUS WSSERVICE U_AOMS074
 			SC6->(Dbsetorder(1))
 			If SC6->(Dbseek(_cFilial+U_CARGA:ITENS[_nI]:PEDIDO))
 
-				Do while SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
+				Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
 
 					SC6->(Msunlock())
 					SC6->(Msunlockall())
@@ -3226,11 +3259,11 @@ WSMETHOD U_ESTORNC WSRECEIVE U_ESTORN WSSEND U_STATUS WSSERVICE U_AOMS074
 
 			If DAI->(Dbseek(_cfilial+_cCodigo))
 
-				Do while _cfilial == DAI->DAI_FILIAL .AND. _cCodigo == DAI->DAI_COD
+				Do while !DAI->(EOF()) .AND. _cfilial == DAI->DAI_FILIAL .AND. _cCodigo == DAI->DAI_COD
 
 					If SC6->(Dbseek(DAI->DAI_FILIAL+DAI->DAI_PEDIDO))
 
-						Do while _ltravou .and. SC6->C6_FILIAL == DAI->DAI_FILIAL .AND. SC6->C6_NUM == DAI->DAI_PEDIDO
+						Do while !SC6->(EOF()) .AND. _ltravou .and. SC6->C6_FILIAL == DAI->DAI_FILIAL .AND. SC6->C6_NUM == DAI->DAI_PEDIDO
 
 							_ni := ascan(_aprods,{|AUX| AUX[1] == SC6->C6_PRODUTO .AND. AUX[2] == SC6->C6_LOCAL })
 
@@ -3391,7 +3424,7 @@ WSMETHOD U_LIBERAC WSRECEIVE U_LIBERA WSSEND U_STATUS WSSERVICE U_AOMS074
 		SA2->(Dbsetorder(3))
 		If SA2->(Dbseek(xfilial("SA2")+alltrim(U_LIBERA:CNPJTRA)))
 
-			Do while ALLTRIM(SA2->A2_CGC) == ALLTRIM(U_LIBERA:CNPJTRA)
+			Do while !SA2->(EOF()) .AND. ALLTRIM(SA2->A2_CGC) == ALLTRIM(U_LIBERA:CNPJTRA)
 
 				If substr(alltrim(SA2->A2_COD),1,1) == "T" .AND. SA2->A2_MSBLQL <> '1'
 
@@ -3961,7 +3994,7 @@ WSMETHOD U_ALTERAP WSRECEIVE U_ALTERA WSSEND U_STATUS WSSERVICE U_AOMS074
 				SC6->(Dbseek(SC5->C5_FILIAL+SC5->C5_NUM))
 				_cchep := alltrim(GetMV("IT_CCHEP"))
 
-				Do while SC6->C6_NUM == SC5->C5_NUM .AND. SC5->C5_FILIAL == SC6->C6_FILIAL
+				Do while !SC6->(EOF()) .AND. SC6->C6_NUM == SC5->C5_NUM .AND. SC5->C5_FILIAL == SC6->C6_FILIAL
 
 					_nTotPV += SC6->C6_VALOR
 
@@ -4138,7 +4171,7 @@ WSMETHOD U_ALTERAP WSRECEIVE U_ALTERA WSSEND U_STATUS WSSERVICE U_AOMS074
 						SC6->(Dbsetorder(1))
 						SC6->(Dbseek(SC5->C5_FILIAL+SC5->C5_NUM))
 
-						Do while SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
+						Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
 
 							If alltrim(SC6->C6_PRODUTO) == SubStr(U_ALTERA:ITENS[_nI]:CODIGO,1,11)
 
@@ -4792,7 +4825,7 @@ WSMETHOD U_ALTERAP WSRECEIVE U_ALTERA WSSEND U_STATUS WSSERVICE U_AOMS074
 		SC6->(Dbsetorder(1))
 		If SC6->(Dbseek(_cfilial+AllTrim(U_ALTERA:PEDIDO)))
 
-			Do while SC6->C6_FILIAL == _cfilial .and. ALLTRIM(SC6->C6_NUM) == AllTrim(U_ALTERA:PEDIDO)
+			Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL == _cfilial .and. ALLTRIM(SC6->C6_NUM) == AllTrim(U_ALTERA:PEDIDO)
 
 				SC9->(Dbsetorder(1))
 				If !( SC9->(Dbseek(SC6->C6_FILIAL+SC6->C6_NUM+SC6->C6_ITEM) ) )
@@ -4832,7 +4865,7 @@ WSMETHOD U_ALTERAP WSRECEIVE U_ALTERA WSSEND U_STATUS WSSERVICE U_AOMS074
 		ZFQ->(Dbsetorder(3))
 		If ZFQ->(Dbseek(SC5->C5_FILIAL+SC5->C5_NUM))
 
-			Do while ZFQ->ZFQ_FILIAL == SC5->C5_FILIAL .AND. ZFQ->ZFQ_PEDIDO == SC5->C5_NUM
+			Do while !ZFQ->(EOF()) .AND. ZFQ->ZFQ_FILIAL == SC5->C5_FILIAL .AND. ZFQ->ZFQ_PEDIDO == SC5->C5_NUM
 
 				ZFQ->(MSUNLOCKALL())
 				ZFQ->(Msunlock())
@@ -4846,7 +4879,7 @@ WSMETHOD U_ALTERAP WSRECEIVE U_ALTERA WSSEND U_STATUS WSSERVICE U_AOMS074
 		ZFR->(Dbsetorder(3))
 		If ZFR->(Dbseek(SC5->C5_FILIAL+SC5->C5_NUM))
 
-			Do while ZFR->ZFR_FILIAL == SC5->C5_FILIAL .AND. ZFR->ZFR_NUMPED == SC5->C5_NUM
+			Do while !ZFR->(EOF()) .AND. ZFR->ZFR_FILIAL == SC5->C5_FILIAL .AND. ZFR->ZFR_NUMPED == SC5->C5_NUM
 
 				ZFR->(MSUNLOCKALL())
 				ZFR->(Msunlock())
@@ -4869,7 +4902,7 @@ WSMETHOD U_ALTERAP WSRECEIVE U_ALTERA WSSEND U_STATUS WSSERVICE U_AOMS074
 		SC6->(Dbsetorder(1))
 		If SC6->(Dbseek(_cFilial+PadR(U_ALTERA:PEDIDO,_nTamPedido," ")))
 
-			Do while SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
+			Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL == SC5->C5_FILIAL .AND. SC6->C6_NUM == SC5->C5_NUM
 
 				SC6->(Msunlock())
 				SC6->(Msunlockall())
@@ -5606,7 +5639,7 @@ Static Function AOMS074S( cNumPed , cFilAux, Altera )
 		Else
 
 			_cchep := alltrim(GetMV("IT_CCHEP"))
-			Do While SC6->C6_FILIAL == cFilAux .AND. SC6->C6_NUM == cNumPed
+			Do While !SC6->(EOF()) .AND. SC6->C6_FILIAL == cFilAux .AND. SC6->C6_NUM == cNumPed
 
 
 				_nTotPV += SC6->C6_VALOR
@@ -5908,7 +5941,7 @@ Static Function AOMS074J
 	SC6->(Dbsetorder(1))
 	If SC6->(DbSeek(SC5->C5_FILIAL+SC5->C5_NUM))
 
-		Do while SC6->C6_FILIAL + SC6->C6_NUM == SC5->C5_FILIAL+SC5->C5_NUM
+		Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL + SC6->C6_NUM == SC5->C5_FILIAL+SC5->C5_NUM
 
 			If !SC6->(MsRLock(SC6->(RECNO())))
 
@@ -6124,7 +6157,7 @@ Static Function AOMS074J
 	If SC6->(DbSeek(SC5->C5_FILIAL+SC5->C5_NUM))
 
 
-		Do while SC6->C6_FILIAL + SC6->C6_NUM == SC5->C5_FILIAL+SC5->C5_NUM
+		Do while !SC6->(EOF()) .AND. SC6->C6_FILIAL + SC6->C6_NUM == SC5->C5_FILIAL+SC5->C5_NUM
 
 			SC6->(MSUNLOCKALL())
 
@@ -6255,11 +6288,11 @@ Static function AOMS074D()
 
 	If DAI->(Dbseek(DAK->DAK_FILIAL+DAK->DAK_COD))
 
-		Do while DAK->DAK_FILIAL == DAI->DAI_FILIAL .AND. DAK->DAK_COD == DAI->DAI_COD
+		Do while !DAK->(EOF()) .AND. DAK->DAK_FILIAL == DAI->DAI_FILIAL .AND. DAK->DAK_COD == DAI->DAI_COD
 
 			If SC9->(Dbseek(DAI->DAI_FILIAL+DAI->DAI_PEDIDO))
 
-				Do while SC9->C9_FILIAL == DAI->DAI_FILIAL .AND. SC9->C9_PEDIDO == DAI->DAI_PEDIDO
+				Do while !SC9->(EOF()) .AND. SC9->C9_FILIAL == DAI->DAI_FILIAL .AND. SC9->C9_PEDIDO == DAI->DAI_PEDIDO
 
 					If !Empty(SC9->C9_NFISCAL)
 

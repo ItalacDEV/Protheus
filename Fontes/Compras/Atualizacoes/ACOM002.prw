@@ -13,6 +13,9 @@ Lucas Borges  | 17/03/2025 | Chamado 50218. Inclído filtro correto dos CFOPs con
 #INCLUDE "PROTHEUS.CH"
 #INCLUDE "FWMVCDEF.CH"
 
+
+
+
 /*
 ===============================================================================================================================
 Programa--------: ACOM002
@@ -361,5 +364,10 @@ While !(_cAlias)->(EOF())
 	(_cAlias)->(dbSkip())
 EndDo
 (_cAlias)->(DBCloseArea())
+
+
+
+
+
 
 Return

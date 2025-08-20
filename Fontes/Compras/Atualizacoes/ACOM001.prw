@@ -13,7 +13,7 @@ Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada estática no nome das 
 #INCLUDE "FWMBROWSE.CH"
 #INCLUDE "FWMVCDEF.CH"
 #INCLUDE "PROTHEUS.CH"
-
+ 
 #define	MB_OK				0
 
 /*

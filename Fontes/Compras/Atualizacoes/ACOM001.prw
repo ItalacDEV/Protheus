@@ -176,6 +176,20 @@ Descrição---------: Rotina para validação dos campos SX3
 Parametros--------: Nenhum
 Retorno-----------: _lRet -> .T. - Continua processo / .F. - não permite continuação do processo
 ===============================================================================================================================
+
+sdasdasdasd alsdalsdkalkjsd lajsld ajlsdjkasdasd
+asdasdja 
+sdasd
+asdasda
+sd a
+sd
+asdasda jsda
+jsdiajsdpiajsd 
+asda
+sdapsjd asidasd 
+
+
+
 */
 User Function ACOM001VLD()
 Local _aArea		:= GetArea()

@@ -4,10 +4,9 @@
 ===============================================================================================================================
    Autor      |   Data   |                              Motivo                                                          
 -------------------------------------------------------------------------------------------------------------------------------
-Alex Wallauer |06/12/2023| Chamado 45405. Tratamento para gerar arquivo (novo layout) para a ODONTOPREV.
-Alex Wallauer |15/12/2023| Chamado 45868. Fernando - Retirar a obrigatoriedade do campo RG.
 Lucas Borges  |09/10/2024| Chamado 48465. Retirada manipulação do SX1
 Lucas Borges  |23/07/2025| Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges  |01/08/2025| Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode
 ===============================================================================================================================
 */
 
@@ -2052,7 +2051,7 @@ Do Case
 		If nTam == 0
 			xValor := AllTrim( xValor )
 		EndIf
-		cRet := AllTrim( EnCodeUtf8( NoAcento( SubStr( xValor , 1 , nTam ) ) ) )
+		cRet := AllTrim( FWHttpEncode( NoAcento( SubStr( xValor , 1 , nTam ) ) ) )
 EndCase
 
 Return(cRet)

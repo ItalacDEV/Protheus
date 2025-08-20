@@ -11,11 +11,12 @@
  Julio Paz     | 16/09/2020 | Chamado 34159.  Correções nas formações de nomes dos campos para a tabela temporária TRBPED.
  Alex Wallauer | 01/06/2022 | Chamado 40254.  Inclusão para as opções de menu, para Check List Carregamento.
 ================================================================================================================================================================================================================================================
- Analista        - Programador      - Inicio    - Envio    - Chamado - Motivo da Alteração
+ Analista        - Programador    - Inicio    - Envio    - Chamado - Motivo da Alteração
 ================================================================================================================================================================================================================================================
- Vanderlei Alves  - Igor Melgaço     - 26/12/24 - 10/06/25 - 49427   - Inclusão do metodo de alteração de carga.
- Vanderlei Alves  - Julio Paz        - 14/03/25 - 10/06/25 - 50188   - Desenvolvimento de Rotina de Integração Webservice Protheus x TMS Multiembarcador Para Replicar Cargas Criadas no Protheus para o TMS Multiembarcador [OMS]
- Alex Wallauer    - Alex Wallauer    - 31/03/25 - 10/06/25 - 49966   - CORREÇÃO DE ERROR.LOG: Alias already in use: TRBPED on FWOPENTEMP(CRIATRAB.PRG) 01/04/2025 19:02:17 line : 271
+ Vanderlei Alves  - Igor Melgaço  - 26/12/24 - 10/06/25 - 49427   - Inclusão do metodo de alteração de carga.
+ Vanderlei Alves  - Julio Paz     - 14/03/25 - 10/06/25 - 50188   - Desenvolvimento de Rotina de Integração Webservice Protheus x TMS Multiembarcador Para Replicar Cargas Criadas no Protheus para o TMS Multiembarcador [OMS]
+ Alex Wallauer    - Alex Wallauer - 31/03/25 - 10/06/25 - 49966   - CORREÇÃO DE ERROR.LOG: Alias already in use: TRBPED on FWOPENTEMP(CRIATRAB.PRG) 01/04/2025 19:02:17 line : 271
+ Vanderlei Alves  - Alex Wallauer - 25/07/25 - 37/07/25 - 49894   - Retirado o botão "Ajuste Peso" pq não acerta o rateio do frete e pedágio no DAI.
 ================================================================================================================================================================================================================================================
 */
 
@@ -48,9 +49,8 @@ User Function OM200MNU()
 //================================================================================
 aRotina := {{ OemtoAnsi( "Pesquisar" )                                 , 'PesqBrw'             , 0 , 1 , 0 , .F. },;
             { OemtoAnsi( "Montagem Carga" )                            , 'U_OM20MNUM'          , 0 , 3 , 0 , NIL },;
-            { OemtoAnsi( "Visualizar" )                                , 'U_OM20MNUV'          , 0 , 2 , 0 , NIL },;
-            { OemtoAnsi( "Liberacao" )                                 , 'Os200Liber'          , 0 , 0 , 0 , NIL },;
-            { OemtoAnsi( "Ajuste Peso" )                               , 'U_OM20MNUA'          , 0 , 6 , 0 , NIL },;
+            { OemtoAnsi( "Visualizar" )                                , 'U_OM20MNUV'          , 0 , 2 , 0 , NIL },;//foi Retirado esse botão pq não acerta o rateio do frete e pedagio
+            { OemtoAnsi( "Liberacao" )                                 , 'Os200Liber'          , 0 , 0 , 0 , NIL },;//{"Ajuste Peso",'U_OM20MNUA',0,6,0,},;
             { OemtoAnsi( "Estorno Carga" )                             , 'U_OM20MNUE'          , 0 , 3 , 0 , NIL },;
             { OemtoAnsi( "Efetiva Pre-Carga" )                         , 'U_OM20MNUP'          , 0 , 2 , 0 , NIL },;
             { OemtoAnsi( "Reenvio WF Carga")                           , 'U_OM200Email(.F.)'   , 0 , 3 , 0 , NIL },;
@@ -792,7 +792,7 @@ Return _lRet
 
 /*
 ===============================================================================================================================
-Programa----------: OM20MNUADADOS()
+Programa----------: OM20MNUAGRAVA()
 Autor-------------: Julio de Paula Paz
 Data da Criacao---: 15/10/2018
 ===============================================================================================================================

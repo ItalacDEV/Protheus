@@ -6,6 +6,7 @@
 -------------------------------------------------------------------------------------------------------------------------------
 Lucas Borges  |07/05/2025| Chamado 50617. Corrigir chamada estática no nome das tabelas do sistema
 Lucas Borges  |23/07/2025| Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges  |01/08/2025| Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ===============================================================================================================================
 Analista       - Programador     - Inicio   - Envio    - Chamado - Motivo da Alteração
 ==============================================================================================================================================================
@@ -301,7 +302,7 @@ _oProcess:cTo := (cEmail)
 //===============================
 // Informamos o assunto do email.  
 //===============================
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 _cMailID	:= _oProcess:fProcessId
 _cTaskID	:= _oProcess:fTaskID
@@ -492,7 +493,7 @@ _oProcess:cTo := _cMVMEST19E
 //===============================
 // Informamos o assunto do email.  
 //===============================
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 //=======================================================
 // Iniciamos a tarefa e enviamos o email ao destinatário.
@@ -788,7 +789,7 @@ _oProcess:cTo := _cEmail
 // Informamos o assunto do email.  
 //===============================
 _cAssunto := "Retorno WF da Solicitação de armazem Filial " + _cFilName + " / SA Número: " + ALLTRIM(_cNUMSA) + " - " + _cAviso
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 //=======================================================
 // Iniciamos a tarefa e enviamos o email ao destinatário.
@@ -990,7 +991,7 @@ FOR _nAprv := 1 TO LEN(_aRegs)
 	_oProcess:cTo := (cEmail)
 
 	// Informamos o assunto do email.  
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	// Iniciamos a tarefa e enviamos o email ao destinatário.
 	_oProcess:Start()

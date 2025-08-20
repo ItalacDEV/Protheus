@@ -2,10 +2,11 @@
 ===============================================================================================================================
                ULTIMAS ATUALIZAÇÕES EFETUADAS - CONSULTAR LOG DO VERSIONADOR PARA HISTORICO COMPLETO
 ===============================================================================================================================
- Autor            |    Data     |                              Motivo                      										 
--------------------------------------------------------------------------------------------------------------------------------
-                  |             | 
-===============================================================================================================================
+ Analista     - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
+======================================================================================================================================================================================================
+ Jerry        - Alex WALLAUER - 21/01/25 - 05/08/25 - 37652   - Ajuste para poder chamar do U_FORMULA() pelo usuario no cadastro de clientes.
+ Jerry        - Alex WALLAUER - 16/04/25 - 05/08/25 - 37652   - Ajuste para poder chamar pelo usuario / privilegios no cadastro de clientes.
+=======================================================================================================================================================================================================
 */
 
 //====================================================================================================
@@ -29,21 +30,23 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 User Function AOMS131()
-Local aArea   := GetArea()
-Local _bCond, _cCond
-Local _aRotBack := AClone(aRotina)
+Local aArea   := GetArea() As Array
+Local _bCond  As Block
+Local _cCond  As Character
+//Local _aRotBack As Array
+
+IF !FWIsInCallStack("MATA030")
+   RETURN MATA030()//CADASTRO DE CLIENTES QUANDO CHAMADA DO U_FORMULA()
+ENDIF
+
+//_aRotBack := AClone(aRotina)
+Private aRotina:= MenuDef() 
 
 Private _cTitulo 
 Private _oBrowse 
 
 Begin Sequence 
    DbSelectArea("ZBB")
-
-   aRotina := {}
-   aAdd(aRotina,{ "Pesquisar"    ,"AxPesqui"                , 0, 1})
-   aAdd(aRotina,{ "Visualizar"   ,"AxVisual"                , 0, 2})
-   aAdd(aRotina,{ "Incluir"      ,"U_AOMS131I()"            , 0, 3})
-   aAdd(aRotina,{ "Excluir"      ,"U_AOMS131E()"            , 0, 5})
 
    _bCond := { || SA1->A1_COD = ZBB_CLIENT .And. SA1->A1_LOJA = ZBB_LOJA }
    _cCond := "SA1->A1_COD = ZBB_CLIENT .And. SA1->A1_LOJA = ZBB_LOJA"
@@ -66,7 +69,7 @@ Begin Sequence
 
 End Sequence 
 
-aRotina := AClone(_aRotBack)
+//aRotina := AClone(_aRotBack)
 
 DbSelectArea("SA1")
 
@@ -89,15 +92,14 @@ Retorno-----------: Nenhum
 ===============================================================================================================================
 */
 User Function AOMS131P()
-Local _cRet := SA1->A1_COD
+ Local _cRet := SA1->A1_COD
 
-Begin Sequence 
-   
-   M->ZBB_CLIENT := SA1->A1_COD
-   M->ZBB_LOJA   := SA1->A1_LOJA
-   M->ZBB_NOMCLI := SA1->A1_NOME
-
-End Sequence 
+ M->ZBB_CLIENT := SA1->A1_COD
+ M->ZBB_LOJA   := SA1->A1_LOJA
+ M->ZBB_NOMCLI := SA1->A1_NOME
+ IF DUT->(MsSeek(xFilial("DUT")+M->ZBB_TPVEIC))
+    M->ZBB_PALETE := DUT->DUT_QTUNIH
+ Endif
 
 Return _cRet 
 
@@ -189,3 +191,27 @@ Begin Sequence
 End Sequence 
 
 Return _lRet 
+
+/*
+===============================================================================================================================
+Programa----------: MenuDef
+Autor-------------: Alex Wallauer
+Data da Criacao---: 16/04/2025
+===============================================================================================================================
+Descrição---------: Rotina para criação do menu da tela principal
+===============================================================================================================================
+Parametros--------: Nenhum
+===============================================================================================================================
+Retorno-----------: _aRotina - Array com as opções de menu
+===============================================================================================================================
+*/
+Static Function MenuDef()
+ Local aRotina2 := {}
+ //If FWIsInCallStack("CFGA530") // Colocar esse IF menu do primeiro Browse (CRM980MDEF.PRW (MVC) e MA030ROT.PRW) com todas as linhas abaixo 
+ //   para conceder acesso ao Fonte MATA030 através de privilegios do configurador 
+ aAdd(aRotina2,{ "Pesquisar"    ,"AxPesqui"                , 0, 1})
+ aAdd(aRotina2,{ "Visualizar"   ,"AxVisual"                , 0, 2})
+ aAdd(aRotina2,{ "Incluir"      ,"U_AOMS131I()"            , 0, 3})
+ aAdd(aRotina2,{ "Excluir"      ,"U_AOMS131E()"            , 0, 5})
+
+Return( aRotina2 )

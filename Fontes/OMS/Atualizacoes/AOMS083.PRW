@@ -10,6 +10,7 @@
  Julio Paz       | 11/09/2020 | Chamado 34126 - Correções conversão Saldos p/outra unidade,quando fator conv B1_CONV estiver zero.
  Julio Paz       | 09/09/2022 | Chamado 41046 - Alterar função utilizada para chamada via Scheduller para não consumir liçenças. 
  Igor Melgaco    | 12/01/2024 | Chamado 46028 - Integração via TMS metodo rest SalvarEstoqueProdutoArmazem
+ Lucas Borges    | 01/08/2025 | Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode
 ============================================================================================================================================================
 Analista         - Programador     - Inicio     - Envio    - Chamado - Motivo da Alteração
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -616,10 +617,10 @@ Begin Sequence
             If !Empty(Alltrim(ZFJ->ZFJ_FILTMS))
                
                _cBodyJson := '{'
-               _cBodyJson += '"codigoFilial": "'+EncodeUTF8(AllTrim(ZFJ->ZFJ_FILTMS))+'",'
-               _cBodyJson += '"codigoProduto": "'+EncodeUTF8(AllTrim(Subs(ZFJ->ZFJ_COD,1,11)))+'",'
-               _cBodyJson += '"codigoFilialArmazem": "'+EncodeUTF8(Alltrim(ZFJ->ZFJ_CODARM))+'",'
-               _cBodyJson += '"quantidadeProduto": '+EncodeUTF8(Alltrim(Str(ZFJ->ZFJ_QATU,13)))
+               _cBodyJson += '"codigoFilial": "'+FWHttpEncode(AllTrim(ZFJ->ZFJ_FILTMS))+'",'
+               _cBodyJson += '"codigoProduto": "'+FWHttpEncode(AllTrim(Subs(ZFJ->ZFJ_COD,1,11)))+'",'
+               _cBodyJson += '"codigoFilialArmazem": "'+FWHttpEncode(Alltrim(ZFJ->ZFJ_CODARM))+'",'
+               _cBodyJson += '"quantidadeProduto": '+FWHttpEncode(Alltrim(Str(ZFJ->ZFJ_QATU,13)))
                _cBodyJson += '}'
 
                _aHeader :={}

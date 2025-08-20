@@ -4,9 +4,9 @@
 ===============================================================================================================================
    Autor      |   Data   |                              Motivo                                                          
 -------------------------------------------------------------------------------------------------------------------------------
-Lucas Borges  |11/02/2025| Chamado 49877. Removido tratamento sobre a versão do Mix
 Lucas Borges  |01/07/2025| Chamado 50617. Revisões diversas visando padronizar os fontes
 Lucas Borges  |23/07/2025| Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges  |01/08/2025| Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode
 ===============================================================================================================================
 */
 
@@ -2611,7 +2611,7 @@ If !Empty(_cTO) //Envio de e-mail só ocorre se existirem destinatários
 	_oMessage:cCC		:= Lower(_cCC)
 	_oMessage:cBCC		:= Lower(_cBCC)
 	_oMessage:cReplyTo	:= Lower(_cReplyTo)
-	_oMessage:cSubject	:= EncodeUTF8(_cAssunto,"cp1252")
+	_oMessage:cSubject	:= FWHttpEncode(_cAssunto)
 	_oMessage:cBody		:= _cMensagem
 	_oMessage:MsgBodyType( "text/html" )
 

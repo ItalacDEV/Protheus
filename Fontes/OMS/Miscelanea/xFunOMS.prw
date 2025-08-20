@@ -28,17 +28,18 @@ Analista    - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteraçã
 Vanderlei   - Alex Wallauer - 14/08/24 - 18/09/24 - 48138   - Tratamento do Local de Embarque (ZG5_LOCEMB) no cadastro de Transit Time.
 Jerry       - Alex Wallauer - 03/02/25 - 03/02/25 - 49795   - Chamar os índices customizados da tabela SC5 com DBOrderNickName().
 Jerry       - Alex Wallauer - 27/11/24 - 20/03/25 - 37652   - Novo parametro "_lValSC5" na função OMSVLDENT() para validar de qq tabela só passando os parametros.
-Jerry       - Alex Wallauer - 06/01/25 - 20/03/25 - 44092   - Novo Tratamento para Tabela de Preços no Pedido de Vendas. Função U_ITTABPRC().
+Jerry       - Alex Wallauer - 06/01/25 - 20/03/25 - 44092   - Novo Tratamento para Tabela de Preços no Pedido de Vendas. Função U_ITTABPRC ().
 Jerry       - Julio Paz     - 11/03/25 - 20/03/25 - 48837   - Inclusão de validação para clientes com condição de pagamento especial. Ajustes na função que retorna a condição de pagamento.
 Jerry       - Alex Wallauer - 24/03/25 - 24/03/25 - 48837   - Inclusão de validação para clientes com condição de pagamento especial. Ajustes na função que retorna a condição de pagamento.
 Jerry       - Alex Wallauer - 27/03/25 - 01/04/25 - 50330   - Ajustes na função que retorna a condição de pagamento.
-Jerry       - Alex Wallauer - 13/05/25 - 10/06/25 - 44092   - Troca do campo ZGQ_UF pelo ZGQ_UFPEDV e exclusao do ZGQ_UF. Função U_ITTABPRC().
+Jerry       - Alex Wallauer - 13/05/25 - 10/06/25 - 44092   - Troca do campo ZGQ_UF pelo ZGQ_UFPEDV e exclusao do ZGQ_UF. Função U_ITTABPRC ().
 Andre       - Alex Wallauer - 27/05/25 - 10/06/25 - 50460   - Criação da função da ITConv(cProd,nQuant,nUM_Ori,nUM_Dest).
 Vanderlei   - Alex Wallauer - 06/06/25 - 10/06/25 - 45229   - Retirada do parâmetro p/determinar se a integração WebS. será TMS Multiembarcador ou RDC para chamar a U_IT_TMS(_cLocEmb).
 Vanderlei   - Alex Wallauer - 06/06/25 - 10/06/25 - 45229   - Criacao da função U_IT_TMS(_cLocEmb) p/determinar se a integração WebS.será TMS Multiembarcador ou RDC.
 Vanderlei   - Alex Wallauer - 09/06/25 - 10/06/25 - 45229   - Tratamento para validar FWIsInCallStack("U_AOMS085B") junto com FWISINCALLSTACK("U_ALTERAP").
 Andre       - Igor Melgaço  - 11/06/25 - 11/07/25 - 50716   - Ajustes para busca de preço do produto na tabela Z09, para pedidos de transferência entre filiais
 Andre       - Alex Wallauer - 25/06/25 - 11/07/25 - 50460   - Correção da função da ITConv(cProd,nQuant,nUM_Ori,nUM_Dest) na 3a UM.
+Jerry       - Alex Wallauer - 05/08/25 -          - 44092   - Novas regras de pesquisa na Função BuscaTabPreco ().
 ==============================================================================================================================================================================================
 */
  
@@ -508,6 +509,7 @@ User Function BLQPRC(_cProd     As Char   ,;
  Local _lRegraNova    := .F.         As Logical
  Local _nFatComercial := 1           As Numeric
 
+
  IF TYPE("M->C5_I_EST") = "C"
     Default _cProd 	   := aCols[n][Ascan( aHeader , { |x| Alltrim(x[2]) == "C6_PRODUTO"	} )]
     Default _nPrcVen   := M->C6_PRCVEN
@@ -520,14 +522,14 @@ User Function BLQPRC(_cProd     As Char   ,;
     Default _nPrcVen   := SZW->ZW_PRCVEN
     Default _cTab      := SZW->ZW_TABELA
     Default _cUFPedV   := SA1->A1_EST
-    Default _cTpVenda  := SZW->ZW_TPVENDA//F-> Carga Fechada / V-> Carga Varejo
+    Default _cTpVenda  := SZW->ZW_TPVENDA// F-> Carga Fechada / V-> Carga Varejo
     Default _cFil 	   := SZW->ZW_FILIAL
  ELSE
     Default _cProd 	   := SC6->C6_PRODUTO
     Default _nPrcVen   := SC6->C6_PRCVEN
     Default _cTab      := SC5->C5_I_TAB
     Default _cUFPedV   := SC5->C5_I_EST
-    Default _cTpVenda  := SC5->C5_I_TPVEN //F-> Carga Fechada / V-> Carga Varejo
+    Default _cTpVenda  := SC5->C5_I_TPVEN // F-> Carga Fechada / V-> Carga Varejo
     Default _cFil 	   := xFilial("SC5")
  ENDIF	
  Default _lShow     := .F.
@@ -612,7 +614,7 @@ User Function BLQPRC(_cProd     As Char   ,;
             EndIf
 
             _cUFFat:= Posicione("ZZM",1,xFilial("ZZM")+_cFilFat,"ZZM_EST")
-            If AllTrim(_cUFFat) == AllTrim(_cUFPedV)  // UF Fat = UF CLIENTE
+            If AllTrim(_cUFFat) == AllTrim(_cUFPedV) // UF Fat = UF CLIENTE
                _nFatComercial := 1
             Else// UF Fat <> UF CLIENTE
                _cRegraFatC:=""
@@ -5921,7 +5923,7 @@ User function ITTabPrc(_cFilCarreg As Char,;
  Local _cRegra As Char
  Local _cFilori As Char
  Local _nI As Numeric
- Local _cRegra1 := "" As Char
+ Local _cRegra1 := " " As Char
  Local _cRegra2 As Char
  Local _cRegra3 As Char
  Local _cRegra4 As Char
@@ -5973,8 +5975,8 @@ User function ITTabPrc(_cFilCarreg As Char,;
  _cOperRemessa   := RIGHT(_cOperTriangular,2)
  _lRegraNova     := SuperGetMV("IT_AMBTEST",.F.,.T.)
  _lRegraNova     := SuperGetMV("MV_ITMDREG",, _lRegraNova ) //O PARAMETRO DEVE SER CRIADO LOGICO
- _lRegraNova     := _lRegraNova .AND. ZGQ->(FIELDPOS("ZGQ_LOCEMB")) > 0 .AND. ZGQ->(FIELDPOS("ZGQ_SEGCLI")) 
- _cTabDireta     := "" //Origem do Cliente ou da Operação
+ _lRegraNova     := _lRegraNova .AND. ZGQ->(FIELDPOS("ZGQ_LOCEMB")) > 0 .AND. ZGQ->(FIELDPOS("ZGQ_SEGCLI")) > 0
+ _cTabDireta     := "   " //Origem do Cliente ou da Operação
  _nRecno         := 0
  _cRegra         := "Não Encontrou Tabela"
  _cfilori        := cfilant
@@ -6042,7 +6044,7 @@ User function ITTabPrc(_cFilCarreg As Char,;
  _cTabDireta := Posicione("ZB4",1,xFilial("ZB4")+_cTipoOper,"ZB4_TABPRC")
  
  If Empty(_cTabDireta) .OR. !(DA0->(Dbseek(xfilial("DA0")+_cTabDireta))) .OR. DA0->DA0_ATIVO = '2' .OR. DA0->DA0_DATDE > DATE() .OR. DA0->DA0_DATATE < DATE()//Tabela inativa
-    _cTabDireta:= ""
+    _cTabDireta:= "   "
  Else
     _cRegra1   := "Regra por Operação " + _cTipoOper
  EndIf
@@ -6107,7 +6109,13 @@ User function ITTabPrc(_cFilCarreg As Char,;
  
     Enddo
  
- 
+    IF EMPTY(_cTabDireta)
+       //      //   1   2   3   4   5     6
+       _aret  := {"   ",0,"   ",0,"   ","   "}
+       cfilant:= _cfilori
+       Return _aRet
+    EndIf
+
  EndIF
 
  //**************************
@@ -6133,7 +6141,7 @@ User function ITTabPrc(_cFilCarreg As Char,;
 
     _aCposBusca:={_cFilFatura,_cLocalEmb,_cCliente,_cLojaCli,_cSegCli,_cRede,_cGeren,_cUF,_cCoord,_cSuper,_cVend}
 
-    BuscaTabPreco(_aCposBusca,@_cRegra1, @_nRecno, @_cGrupoP, @_cUFPedV)//QUARTA BUSCA
+    _ctab:=BuscaTabPreco(_aCposBusca,@_cRegra, @_nRecno, @_cGrupoP, @_cUFPedV)//QUARTA BUSCA
 
     //***** REGRA ANTERIOR DE BUSCA DO ZGQ ******************************************************************************************************//
  ElseIf ( ( U_ItGetMv("IT_TABPRG",.F.)) .And. Empty(Alltrim(_cTabDireta)) )  // Carrega tabela de regras se o parametro de regras estiver ativo
@@ -6465,39 +6473,47 @@ Static Function BuscaTabPreco(_aCposBusca As Array, _cRegra As Char, _nRecno  As
  LOCAL _cCoorde   := _aCposBusca[09]              As Char
  LOCAL _cSuperv   := _aCposBusca[10]              As Char
  LOCAL _cVended   := _aCposBusca[11]              As Char
- LOCAL _cTabDireta:= "" As Char
+ LOCAL _cTabDireta:= "   " As Char
  
  // 01 - Código do Cliente  + Código da Loja do Cliente 
- //             ,ZGQ_CLIENT  +ZGQ_LOJA  +ZGQ_SEGCLI  +ZGQ_REDE  +ZGQ_GEREN  +ZGQ_UFPEDV  +ZGQ_COORDE +ZGQ_SUPERV  + ZGQ_VENDED
- AADD(_aOrdBusca, _cClient   + _cLoja   + _cB_SegCli + _cB_Rede + _cB_Geren + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// ORDEM 01
- AADD(_aRegras, "Regra por Cliente e Loja do Cliente " + _cClient + "/" + _cLoja)
+ // INDICE:     ,ZGQ_CLIENT  +ZGQ_LOJA  +ZGQ_SEGCLI  +ZGQ_REDE  +ZGQ_GEREN  +ZGQ_UFPEDV  +ZGQ_COORDE +ZGQ_SUPERV  + ZGQ_VENDED
+ AADD(_aOrdBusca, _cClient   + _cLoja   + _cB_SegCli + _cB_Rede + _cB_Geren + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 01
+ AADD(_aRegras, "Regra por Cliente + Loja: " + _cClient + " + " + _cLoja)
  
- // 02 - Código da Rede do Cliente  (A1_GRPVEN) + Gerente do vendedor (A3_GEREN)
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cRede   + _cGeren   + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// ORDEM 02
- AADD(_aRegras, "Regra por Rede do Cliente " + _cRede)
+ // 02 - Código da Rede do Cliente (A1_GRPVEN) + Gerente do vendedor (A3_GEREN) + Estado do Cliente (A1_EST)
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cRede + _cGeren + _cUF   +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 02
+ AADD(_aRegras, "Regra por Gerente + Rede +  Estado: " +_cRede+" + " +_cGeren+" + "+ _cUF)
  
- // 03 - Estado do Cliente (A1_EST)
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cB_Geren + _cUF   +_cB_Coorde + _cB_Superv + _cB_Vended )// ORDEM 03
- AADD(_aRegras, "Regra por Estado do Cliente " + _cUF)
+ // 03 - Código da Rede do Cliente (A1_GRPVEN) + Gerente do vendedor (A3_GEREN)
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cRede   + _cGeren   + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 03
+ AADD(_aRegras, "Regra por Gerente + Rede: " + _cRede+" + " +_cGeren)
+  
+ // 04 - Estado do Cliente (A1_EST) 
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cB_Geren + _cUF   +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 04
+ AADD(_aRegras, "Regra por Estado do Cliente: " + _cUF)
  
- // 04 - Estado do Cliente (A1_EST) + Segmento do cliente (A1_I_GRCLI)
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cSegCli   + _cB_Rede + _cB_Geren + _cUF   +_cB_Coorde + _cB_Superv + _cB_Vended )// ORDEM 04
- AADD(_aRegras, "Regra por Segmento do Cliente " + _cSegCli)
- 
- // 05 - Gerente do vendedor (A3_GEREN) + Coordenador do vendedor (A3_SUPER) + Supervisor do vendedor (A3_I_SUPE) + Código do Vendedor 
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cCoorde   + _cSuperv   + _cVended   )// ORDEM 05
- AADD(_aRegras, "Regra por Vendedor " + _cVended)
+ // 05 - Segmento do cliente (A1_I_GRCLI) + Estado do Cliente (A1_EST)
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cSegCli + _cB_Rede + _cB_Geren + _cUF   +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 05
+ AADD(_aRegras, "Regra por Segmento + Estado: " + _cSegCli+" + "+ _cUF)
  
  // 06 - Gerente do vendedor (A3_GEREN) + Coordenador do vendedor (A3_SUPER) + Supervisor do vendedor (A3_I_SUPE) 
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cCoorde   + _cSuperv   + _cB_Vended )// ORDEM 06
- AADD(_aRegras, "Regra por Supervisor do Vendedor " + _cSuperv)
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cSegCli + _cB_Rede + _cB_Geren   + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 06
+ AADD(_aRegras, "Regra por Segmento: " + _cSegCli)
  
- // 07 - Gerente do vendedor (A3_GEREN) + Coordenador do vendedor (A3_SUPER) 
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cCoorde   + _cB_Superv + _cB_Vended )// ORDEM 07
- AADD(_aRegras, "Regra por Coordenador do Vendedor " + _cCoorde)
+ // 07 - Gerente do vendedor (A3_GEREN) + Coordenador do vendedor (A3_SUPER) + Supervisor do vendedor (A3_I_SUPE) + Código do Vendedor 
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cCoorde + _cSuperv + _cVended)// REGRA 07
+ AADD(_aRegras, "Regra por Gerente + Coordenador + Supervisor + Vendedor: " + _cGeren+" + "  +_cCoorde+" + "   + _cSuperv+" + " + _cVended)
  
- // 08 - Gerente do vendedor (A3_GEREN)
- AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// ORDEM 08
+ // 08 - Gerente do vendedor (A3_GEREN) + Coordenador do vendedor (A3_SUPER) + Supervisor do vendedor (A3_I_SUPE) + Código do Vendedor 
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cCoorde + _cSuperv + _cB_Vended)// REGRA 08
+ AADD(_aRegras, "Regra por Gerente + Coordenador + Supervisor: " + _cGeren+" + "  +_cCoorde+" + "+ _cSuperv)
+ 
+ // 09 - Gerente do vendedor (A3_GEREN) + Coordenador do vendedor (A3_SUPER) 
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren   + _cB_UF +_cCoorde   + _cB_Superv + _cB_Vended )// REGRA 09
+ AADD(_aRegras, "Regra por Gerente + Coordenador: " + _cGeren+" + "  +_cCoorde)
+
+ // 10 - Gerente do vendedor (A3_GEREN)
+ AADD(_aOrdBusca, _cB_Client + _cB_Loja + _cB_SegCli + _cB_Rede + _cGeren + _cB_UF +_cB_Coorde + _cB_Superv + _cB_Vended )// REGRA 10
  AADD(_aRegras,	"Regra por Gerente do Vendedor " + _cGeren)
  
  ZGQ->(DBSETORDER(4))//ZGQ_FILIAL+ZGQ_FILFAT+ZGQ_LOCEMB+ZGQ_CLIENT+ZGQ_LOJA+ZGQ_SEGCLI+ZGQ_REDE+ZGQ_GEREN+ZGQ_UFPEDV+ZGQ_COORDE+ZGQ_SUPERV+ZGQ_VENDED

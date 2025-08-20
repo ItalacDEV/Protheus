@@ -4,9 +4,9 @@
 ===============================================================================================================================
    Autor      |   Data   |                              Motivo                                                          
 -------------------------------------------------------------------------------------------------------------------------------
-Lucas Borges  |08/08/2024| Chamado 48156. Incluído item XMLs corrompidos na fila do TOTVS Colaboração
 Lucas Borges  |16/04/2025| Chamado 50480. Incluída validação para documentos recusados
 Lucas Borges  |29/05/2025| Chamado 50833. Incluído evento 610110
+Lucas Borges  |30/07/2025| Chamado 51396. Removido changequery indevido
 ===============================================================================================================================
 */
 
@@ -24,11 +24,11 @@ Retorno-----------: Nenhum
 */
 User Function MFIS005
 
-Local _aArea 		:= FWGetArea() as Array
-Local _oSelf		:= nil as Object
-Local _cPerg		:= "MFIS005" as String
-Local _cTitulo		:= "Workflow Inconsistências Fiscais" as Strig
-Local _cTexto		:= "Rotina para avaliar possíveis inconsistências na escrituração de documentos fiscais, bem como nos Livros Fiscais." as String
+Local _aArea 		:= FWGetArea() As Array
+Local _oSelf		:= Nil As Object
+Local _cPerg		:= "MFIS005" As Character
+Local _cTitulo		:= "Workflow Inconsistências Fiscais" As Character
+Local _cTexto		:= "Rotina para avaliar possíveis inconsistências na escrituração de documentos fiscais, bem como nos Livros Fiscais." As Character
 
 //============================================
 //Cria interface principal
@@ -62,13 +62,13 @@ Retorno-----------: Nenhum
 */
 Static Function MFIS005P(_oSelf as Object)
 
-Local _aSelFil		:= {} as Array
-Local _aTitulos 	:= {} as Array
-Local _aDocs		:= {} as Array
-Local _aCabec		:= {} as Array
-Local _nX			:= 0 as Numeric
+Local _aSelFil		:= {} As Array
+Local _aTitulos 	:= {} As Array
+Local _aDocs		:= {} As Array
+Local _aCabec		:= {} As Array
+Local _nX			:= 0 As Numeric
 Local _cArqLog		:= SuperGetMV("MV_RELT",.F.,"\spool\") + "wfstsnf_"+ DtoS(Date()) +"_"+ StrTran(Time(),":","") + ".htm" As Character//Nome do arquivo anexo a ser enviado ao usuario
-Local _oArquivo		:= Nil as Object
+Local _oArquivo		:= Nil As Object
 
 _oArquivo:= FWFileWriter():New(_cArqLog)
 
@@ -435,7 +435,7 @@ ElseIf _nX == 19
 	EndIf
 	_cQuery+= "AND (FT_FORMUL = 'S' OR (FT_FORMUL = ' ' AND FT_CFOP > '5000')) "
 	_cQuery+= "AND FT_EMISSAO BETWEEN '"+ DTOS(MV_PAR01) +"' AND '"+ DTOS(MV_PAR02) +"'"
-	TCSqlExec(ChangeQuery(_cQuery))
+	TCSqlExec(_cQuery)
 
 	/*_cQuery:= "UPDATE "+RETSQLNAME('SE5')+" SET E5_TPDESC = 'I' "
 	_cQuery+= "WHERE D_E_L_E_T_ = ' ' "
@@ -1121,8 +1121,8 @@ Return
 //-----------------------------------------------------------------*/
 Static Function Scheddef()
 
-Local aParam := {} as array
-Local aOrd := {} as array
+Local aParam	:= {} As Array
+Local aOrd		:= {} As Array
 
 Aadd(aParam, "P"        ) // 01 - Tipo R para relatorio P para processo
 Aadd(aParam, "MFIS005"  ) // 02 - Pergunte do relatorio, caso nao use passar ParamDef

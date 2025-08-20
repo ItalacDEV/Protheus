@@ -37,6 +37,7 @@ Igor Melgaço  | 12/03/2024 | Chamado 45575. Ajuste para conversão de texto do As
 Alex Wallauer | 24/06/2024 | Chamado 47634. Ajuste dinâmico das linhas no array _aTransferecias do MSExecAuto() do MATA261().
 Lucas Borges  | 24/09/2024 | Chamado 48465. Removendo warning de compilação.
 Lucas Borges  | 23/07/2025 | Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges  | 01/08/2025 | Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ===============================================================================================================================
 
 ==================================================================================================================================================================================================================
@@ -1810,7 +1811,7 @@ If !(_cAliasSCR)->(Eof())
 			//===============================
 			// Informamos o assunto do email.  
 			//===============================
-			_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+			_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 			//===============================================
 			// Informamos o arquivo a ser atachado no e-mail.
@@ -2141,7 +2142,7 @@ While !TRBSCR->(Eof())
 	//===============================
 	// Informamos o assunto do email.  
 	//===============================
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	If _lCriaAmb
 	   _cMailID	:= _oProcess:fProcessId
@@ -3226,7 +3227,7 @@ If !(_cAliasSC7)->(Eof())
 
 	_cAssunto := "5-Retorno WF do PC Filial " + _cFilial + " Número: " + SUBSTR(_cNumPc,1,6) + " - " + cBloq
 
-	_oProcess:cSubject := U_ITEncode(_cAssunto)
+	_oProcess:cSubject := FWHttpEncode(_cAssunto)
 
     IF _cOrigem = "REENVIO"
        IF _lTodos
@@ -4264,7 +4265,7 @@ If !(_cAliasSC7)->(Eof())
 	//===============================
 	// Informamos o assunto do email.  
 	//===============================
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	//===============================================
 	// Informamos o arquivo a ser atachado no e-mail.
@@ -5286,7 +5287,7 @@ If !(_cAliasSC7)->(Eof())
 	   _cAssunto := "8-Retorno WF do PC Filial " + _cFilial + " Número: " + SUBSTR(_cNumPc,1,6) + " - " + Iif(_cConaPro == "L", "Aprovado - [" + cBloq + "]", "Reprovado - [" + cBloq + "]")
     ENDIF
     
-	_oProcess:cSubject := U_ITEncode(_cAssunto) 
+	_oProcess:cSubject := FWHttpEncode(_cAssunto) 
 
 	//=========================
 	//Dados dos questionamentos
@@ -6514,7 +6515,7 @@ If !(_cAliasSC7)->(Eof())
 	
 	_cAssunto := "Alteração do Pedido de Compra Filial " + _cFilial + " Número: " + SUBSTR(_cNumPc,1,6) 
 
-	_oProcess:cSubject := U_ITEncode(_cAssunto) 
+	_oProcess:cSubject := FWHttpEncode(_cAssunto) 
 
 	If _lTodos
 		_cEmail += ";" + Lower(AllTrim(UsrRetMail(RetCodUsr())))

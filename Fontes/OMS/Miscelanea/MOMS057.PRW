@@ -7,6 +7,7 @@
 Julio Paz     |02/02/2023| Chamado 42807 - Correções na exibição da hora de emissão do pedido do portal no Workflow. 
 Igor Melgaço  |12/03/2024| Chamado 45575 - Ajuste para conversão de texto do Assunto do email em padrao UTF8.
 Lucas Borges  |09/10/2024| Chamado 48465. Retirada da função de conout
+Lucas Borges  |01/08/2025| Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ===============================================================================================================================
 */
 
@@ -271,7 +272,7 @@ Begin Sequence
 	//===============================
 	// Informamos o assunto do email.  
 	//===============================
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	_cMailID	:= _oProcess:fProcessId
 	_cTaskID	:= _oProcess:fTaskID

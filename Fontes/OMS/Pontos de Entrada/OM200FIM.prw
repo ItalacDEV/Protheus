@@ -15,7 +15,10 @@ Alex Wallauer| 01/08/24 | Chamado 46599. Vanderlei. Nova validacao de Agrupament
 ================================================================================================================================================================================================================================================
 Jerry         - Julio Paz    - 22/01/24 - 26/02/25 - 49300   - Ajustar a Rotina de Geração de Pedidos de Pallets na Geração da Carga para Deixar o Tipo de Frete do Pedido de Pallet Igual ao Tipo de Frete do Pedido das Mercadorias.
 Vanderlei     - Alex Wallauer- 27/03/24 - 10/06/25 - 50188   - Gravacao do campo DAK->DAK_I_LEMB COM SC5->C5_I_LOCEM do 1o pedido da carga.
-Vanderlei     - Alex Wallauer- 25/03/24 -          - 49894   - Novos rateios de peso bruto por itens de NF, Campo novo DAI_I_FROL.
+Vanderlei     - Alex Wallauer- 25/03/24 - 23/07/25 - 49894   - Novos rateios de peso bruto por itens de NF, Campo novo DAI_I_FROL.
+Vanderlei     - Alex Wallauer- 25/07/24 - 29/07/25 - 49894   - Criada nova função U_ITAcertaPeso() para acertar o peso bruto da carga.
+Vanderlei     - Alex Wallauer- 30/07/24 - 30/07/25 - 49894   - Criação da gravação de log de calculos do peso bruto da carga.
+Vanderlei     - Alex Wallauer- 31/07/24 - 31/07/25 - 49894   - Ajustes na gravação do log de calculos do peso bruto da carga. 
 ================================================================================================================================================================================================================================================
 */
 //====================================================================================================
@@ -898,11 +901,9 @@ Static Function ValidaTela( _cTipo , _cAuto , _nValor , _cCond , _cTpCarga , _cD
  //================================================================================
  If Upper(_cTipo) == "AUTONOMO" .And. _lRet
 
-    DBSelectArea("SA2")
     SA2->( DBOrderNickName("IT_AUTONOM") )
     If !( SA2->( DBSeek( xFilial("SA2") + _cAuto ) ) )
 
-        DBSelectArea("SA2")
         SA2->( DBOrderNickName("IT_AUTAVUL") )
         If !( SA2->( DBSeek( xFilial("SA2") + _cAuto ) ) )
 
@@ -942,9 +943,7 @@ Static Function CalcFrete(lAcertaCarga As Logical)
  Local _cTipoFret:= "" As Char
  Local nSeqInc   := SuperGetMV("MV_OMSENTR",.F.,5) As numeric
  Local nInc      := 0 As numeric
- Local _cFilSB1  := xFilial("SB1") As Char
  Local _nTotPeso := 0 As numeric
- Local _nTotValor:= 0 As numeric
  
  Private _cRecibo	   := ""
  Private _nVlrIrrfPag:= 0
@@ -984,7 +983,6 @@ Static Function CalcFrete(lAcertaCarga As Logical)
         ConfirmSX8()
     EndIf
 
-    DBSelectArea("ZZ2")
     ZZ2->( RecLock("ZZ2" , .T. ) )
 
     ZZ2->ZZ2_FILIAL  := xFILIAL("ZZ2")
@@ -1009,7 +1007,7 @@ Static Function CalcFrete(lAcertaCarga As Logical)
  EndIf
 
  _nTotPeso :=0
- _nTotValor:=0
+ PRIVATE _nTotValor:=0//Somado dentro da função U_ITAcertaPeso ()
  _nFretOL2 :=0//variavel Statica
  SC5->( DBSetOrder(1) )
  SC6->( DBSetOrder(1) )
@@ -1021,39 +1019,18 @@ Static Function CalcFrete(lAcertaCarga As Logical)
  dbGotop()
  nSequencia:=0
  _cFilFatTrocaNF:=""
+_lGralogPeso:=SuperGetMV("IT_GVLOGPE",.F., .T.) // Verifica se é necessário gravar log de alteração de carga
+_cTexto:="DADOS DA CARGA: "+DAK->DAK_FILIAL+"-"+DAK->DAK_COD+CRLF
+_cDados:=""
+
  Do While !TRBPED->(Eof())
 
    If DAI->( DBSeek( xFILIAL("DAI")  + TRBPED->PED_PEDIDO + DAK->DAK_COD + DAK->DAK_SEQCAR  ) ) .AND.;
       SC5->( DbSeek( DAI->DAI_FILIAL + TRBPED->PED_PEDIDO ) )
-
-      _nPesoBrut:=0
-      SC6->( DbSeek( DAI->DAI_FILIAL + DAI->DAI_PEDIDO ) )
-      DO While SC6->( !EOF() ) .AND. SC6->C6_FILIAL+SC6->C6_NUM == DAI->DAI_FILIAL+DAI->DAI_PEDIDO
-
-         //==================================================================================
-         // SEMPRE ACERTA O PESO BRUTO DE ACORDO COM O DO CADASTRO DO SB1 PQ ENTRE O PEDIDO E A CARGA PODE TER HAVIDO ALTERACAO
-         //==================================================================================
-         IF POSICIONE( "SB1" , 1 , _cFilSB1 + SC6->C6_PRODUTO , "B1_I_PCCX" )  > 0  .AND.  SC6->C6_I_PTBRU > 0 //EXCETO SE FOR PESO VARIADO
-            _nPesoItem := SC6->C6_I_PTBRU
-         Else
-            _nPesoItem := SB1->B1_PESBRU * SC6->C6_QTDVEN //Peso do Item
-            SC6->(RecLock("SC6",.F.))
-            SC6->C6_I_PTBRU:=_nPesoItem 
-            SC6->(MsUnlock())
-         EndIf
-         _nPesoBrut += _nPesoItem
-
-         IF lAcertaCarga
-            _nTotValor += SC6->C6_VALOR
-         Endif
-         SC6->( DBSkip() )
-      ENDDO
-
-      SC5->(RecLock("SC5",.F.))
-      SC5->C5_I_PESBR:= _nPesoBrut
-      SC5->C5_PBRUTO := _nPesoBrut
-      SC5->(MsUnlock())
-
+      _cDados:=""//Grava dentro da função U_ITAcertaPeso()
+      _nPesoBrut:=U_ITAcertaPeso(DAI->DAI_FILIAL + DAI->DAI_PEDIDO)//Acerta o peso dos pedidos e soma o  _nTotValor
+      _cTexto+="**ACERTOS U_ITACERTAPESO : "+DAI->DAI_FILIAL+"-"+DAI->DAI_PEDIDO+CRLF+_cDados
+      _cTexto+="*DAI antes.: DAI_PESO: " + Str(DAI->DAI_PESO,19,5) +CRLF
 
       IF EMPTY(_cFilFatTrocaNF) .AND. SC5->C5_I_TRCNF = 'S' .AND. !EMPTY(SC5->C5_I_FILFT) .AND. !EMPTY(SC5->C5_I_FLFNC) .AND.;
                                            SC5->C5_I_FILFT # SC5->C5_I_FLFNC .AND. EMPTY(SC5->C5_I_PDPR+SC5->C5_I_PDFT)//Pedidos de Troca Nota
@@ -1072,8 +1049,11 @@ Static Function CalcFrete(lAcertaCarga As Logical)
       IF DAI->(FIELDPOS("DAI_I_FROL")) > 0 .and. (DAI->DAI_I_OPER = "1" .Or.  DAI->DAI_I_REDP = "1")
          DAI->DAI_I_FROL:=TRBPED->PED_I_FROL
       ENDIF
-      DAI->DAI_PESO  :=SC5->C5_I_PESBR//#Regrava por segurança
-      _nTotPeso+=DAI->DAI_PESO
+      
+      DAI->DAI_PESO:=_nPesoBrut //#Regrava por segurança U_ITAcertaPeso
+      _nTotPeso    +=DAI->DAI_PESO
+      _cTexto+="*DAI depois: DAI_PESO: " + Str(DAI->DAI_PESO,19,5) +CRLF
+      
       IF EMPTY(DAI->DAI_DTCHEG)//Para os Pedidos de Pallets que vem com esse campos vazios
          DAI->DAI_DTCHEG := DATE()
          DAI->DAI_TMSERV := '0000:00'
@@ -1153,7 +1133,6 @@ Static Function CalcFrete(lAcertaCarga As Logical)
  //================================================================================
  //| Armazena o tipo da carga                                                     |
  //================================================================================
- DBSelectArea("DAK")
  DAK->( DBSetOrder(1) ) //DAK_FILIAL+DAK_COD+DAK_SEQCAR
  If DAK->( DBSeek( xFILIAL("DAK") + cCarga ) )
 
@@ -1184,9 +1163,11 @@ Static Function CalcFrete(lAcertaCarga As Logical)
     DAK->DAK_I_PREC := _cPreCarga
     DAK->DAK_MOTORI := _cMotorDAK
     DAK->DAK_CAMINH := _cCaminDAK
-    DAK->DAK_PESO   := _nTotPeso //Sempre acerta pq   - #Regrava por segurança
+    _cTexto+="***DAK antes.: DAK_PESO: " + Str(DAK->DAK_PESO,19,5) +CRLF
+    DAK->DAK_PESO   := _nTotPeso // Somado dentro da função U_ITAcertaPeso ()
+    _cTexto+="***DAK depois: DAK_PESO: " + Str(DAK->DAK_PESO,19,5) +CRLF
     IF lAcertaCarga
-      DAK->DAK_VALOR := _nTotValor
+      DAK->DAK_VALOR := _nTotValor// Somado dentro da função U_ITAcertaPeso ()
     ENDIF
     IF DAK->(FIELDPOS( "DAK_I_TRNF" )) > 0
        IF !EMPTY(_cFilFatTrocaNF)
@@ -1202,6 +1183,12 @@ Static Function CalcFrete(lAcertaCarga As Logical)
     DAK->( MsUnlock() )
 
  EndIf
+
+ IF _lGralogPeso
+    _cdir:="/temp/aoms074/"
+    _cFileNome:=_cdir+"om200fim_carga_"+DAK->DAK_FILIAL+"_"+DAK->DAK_COD+"_"+DTOS(DATE())+"_"+STRTRAN(TIME(),":","_")+".txt"
+    MemoWrite(_cFileNome,_cTexto)
+ Endif
 
  If  (_cPreCarga # "1" .AND. (UPPER( ALLTRIM(_cTipo) ) == "AUTONOMO" .OR. UPPER( ALLTRIM(_cTipo) ) == "PJ-TRANSPORTADORA") .And. _nValor > 0) ;
      .Or. _nPedagio > 0
@@ -1263,7 +1250,6 @@ Static Function GravaFrete( _nDA_I_FRET As Numeric , _cCarga as char , _nPedagio
  //================================================================================
  //| Gravacao dao Valor total da Carga                                            |
  //================================================================================
- DBSelectArea("DAK")
  DAK->( DBSetOrder(1) ) //DAK_FILIAL+DAK_COD+DAK_SEQCAR
  If (lAChouDAK:=DAK->( DBSeek( xFilial("DAK") + _cCarga ) )) .AND. _nDA_I_FRET > 0
 
@@ -1301,7 +1287,6 @@ Static Function GravaFrete( _nDA_I_FRET As Numeric , _cCarga as char , _nPedagio
  //================================================================================
  // Grava Valor Rateado por item da Carga desconsiderando Produtos Unitizadores
  //================================================================================
- DBSelectArea("DAI")
  DAI->( DBSetOrder(1) ) //DAI_FILIAL+DAI_COD+DAI_SEQCAR+DAI_SEQUEN+DAI_PEDIDO
  If DAI->( DBSeek( xFILIAL("DAI") + _cCarga ) ) .AND. (_nDA_I_FRET > 0 .Or. _nPedagio > 0)
 
@@ -1424,8 +1409,6 @@ User Function CalPesCarg( _cCodigo As Char  , _nTipo As Numeric ) As Numeric
  _cQuery += " ) "//Fechamento DA SUB-QUERY
 
  MPSysOpenQuery( _cQuery , _oAliasPes)
-
- DBSelectArea(_oAliasPes)
 
  If (_oAliasPes)->(!Eof())
      _nPesoTot := (_oAliasPes)->PESTOTAL
@@ -3447,3 +3430,56 @@ User Function IT_EditCell(_xGetValor ,oBrowse As object ,cPict as char ,nCol as 
   EndIf
 
 Return( nLastKey <> 0 )
+
+
+/*
+===============================================================================================================================
+Programa--------: ITAcertaPeso
+Autor-----------: Alex Wallauer
+Data da Criacao-: 25/07/2015
+Descrição-------: Acerta o peso bruto do pedido e dos itens conforme o cadastro do SB1
+Parametros------: _cChavePV: Filial + Pedido de Venda
+Retorno---------: _nPesoBrut //Retorna o peso bruto total do pedido
+===============================================================================================================================*/
+User Function ITAcertaPeso(_cChavePV) As Numeric //_nPesoBrut:=U_ITAcertaPeso ( DAI->DAI_FILIAL + DAI->DAI_PEDIDO )
+ LOCAL _nPesoBrut:=0 As Numeric
+ LOCAL _nPesoItem:=0 As Numeric
+ Local _cFilSB1  := xFilial("SB1") As Char
+ _cDados:=""//inicializa antes da função tb
+ SC6->( DbSetOrder(1) )
+ SC5->( DbSetOrder(1) )
+ IF !SC6->( DbSeek( _cChavePV ) )
+    _cDados +=  "Pedido Nao Achou (SC6): " + AllTrim(_cChavePV)+CRLF
+ ENDIF
+ _nTotValor:=0
+ DO While SC6->( !EOF() ) .AND. SC6->C6_FILIAL+SC6->C6_NUM == _cChavePV
+    //================================================================================================================================
+    // SEMPRE ACERTA O PESO BRUTO DE ACORDO COM O DO CADASTRO DO SB1 PQ ENTRE O PEDIDO E A CARGA PODE TER HAVIDO ALTERACAO...
+    //================================================================================================================================
+    IF POSICIONE( "SB1" , 1 , _cFilSB1 + SC6->C6_PRODUTO , "B1_I_PCCX" )  > 0  .AND.  SC6->C6_I_PTBRU > 0 //...EXCETO SE FOR PESO VARIADO
+       _nPesoItem := SC6->C6_I_PTBRU
+       _cDados +=  "Prod Variado: " + AllTrim(SC6->C6_PRODUTO) + " - C6_I_PTBRU: " + Str(SC6->C6_I_PTBRU,19,5)+CRLF
+    Else
+       _nPesoItem := SB1->B1_PESBRU * SC6->C6_QTDVEN //Peso do Item
+       _cDados +=  "Prod antes..: " + AllTrim(SC6->C6_PRODUTO) + " - C6_I_PTBRU: " + Str(SC6->C6_I_PTBRU,19,5) +CRLF
+       SC6->(RecLock("SC6",.F.))
+       SC6->C6_I_PTBRU:=_nPesoItem 
+       SC6->(MsUnlock())
+       _cDados +=  "Prod depois.: " + AllTrim(SC6->C6_PRODUTO) + " - C6_I_PTBRU: " + Str(SC6->C6_I_PTBRU,19,5) +CRLF
+    EndIf
+    _nPesoBrut += _nPesoItem
+    _nTotValor += SC6->C6_VALOR
+    SC6->( DBSkip() )
+ ENDDO
+ IF SC5->( DbSeek( _cChavePV ) )
+    _cDados +=  "Pedido Achou (SC5) antes.: " + AllTrim(_cChavePV) + " - C5_I_PESBR: " + Str(SC5->C5_I_PESBR,19,5) + " - C5_PBRUTO: " + Str(SC5->C5_PBRUTO,19,5) +CRLF
+    SC5->(RecLock("SC5",.F.))
+    SC5->C5_I_PESBR:= _nPesoBrut
+    SC5->C5_PBRUTO := _nPesoBrut
+    SC5->(MsUnlock())
+    _cDados +=  "Pedido Achou (SC5) depois: " + AllTrim(_cChavePV) + " - C5_I_PESBR: " + Str(SC5->C5_I_PESBR,19,5) + " - C5_PBRUTO: " + Str(SC5->C5_PBRUTO,19,5)+CRLF
+ Else
+    _cDados +=  "Pedido Nao Achou (SC5): " + AllTrim(_cChavePV)+CRLF
+ EndIf
+
+RETURN _nPesoBrut //Retorna o peso bruto total do pedido

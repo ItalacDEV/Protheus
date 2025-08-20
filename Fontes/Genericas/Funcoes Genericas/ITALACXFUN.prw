@@ -8,6 +8,7 @@ Igor Melgaço  | 04/09/2024 | Chamado 48431. Jerry. Correção de error.log na funç
 Alex Wallauer | 09/09/2024 | Chamado 48431. Jerry. Correção função ITmsg() para não mostrar as mensagem somente se for MSExecAuto()
 Lucas Borges  | 22/04/2025 | Chamado 50505. Alterada a picture do CNPJ para contemplar campo alfanumérico
 Lucas Borges  | 23/07/2025 | Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges  | 01/08/2025 | Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode e removida função U_ITEncode
 ===============================================================================================================================
 Analista      - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
 ================================================================================================================================================================================================
@@ -25,6 +26,7 @@ Andre         - Alex Wallauer - 16/05/25 - 29/05/25 - 49966   - Correção da tela
 Lucas Borges  - Lucas Borges  - 29/05/25 - 29/05/25 - 50833   - Inclusão do código 610111 no F3
 Antonio Ramos - Igor Melgaço  - 24/02/25 - 09/06/25 - 42949   - Ajustes para consulta de limite de credito com operações 05 e 42.
 Vanderlei     - Alex Wallauer - 09/06/25 - 09/06/25 - 45229   - Tratamento para validar FWIsInCallStack("U_AOMS085B") junto com FWISINCALLSTACK("U_ALTERAP").
+Jerry         - Alex Wallauer - 17/07/25 - 05/08/25 - 37652   - Acerto da janela das mensagens da função ITMSG() para deixa a janela mais larga.
 ================================================================================================================================================================================================
 */ 
 
@@ -613,16 +615,6 @@ Default _cReplyTo   := ""
 // Inicializa o Log de Erro Vazio
 //====================================================================================================
 cLogErro := ""
-
-//====================================================================================================
-// Verifica o ambiente para validar se envia ou não o e-mail
-//====================================================================================================
-If SuperGetMV("IT_AMBTEST",.F.,.T.)
-	
-	cLogErro := "Rotina executada em Ambiente de Testes: ["+ GetEnvServer() +"]. Não será processado o envio de e-mail!"
-	Return()
-
-EndIF
 
 //====================================================================================================
 // Valida se o e-mail do destinatário foi preenchido
@@ -1516,6 +1508,7 @@ Local aRetOk	:= {}
 Local aLogErro	:= {}
 Local lEnvia	:= .T.
 Local nI
+Local lAmbTeste :=SuperGetMV("IT_AMBTEST",.F.,.T.)
 
 Default cServer	:= ""
 Default nPorta	:= 21
@@ -1551,7 +1544,7 @@ IF Empty(cPath) .Or. Empty(aArqEnv)
 	
 EndIF
 
-If SuperGetMV("IT_AMBTEST",.F.,.T.)
+If lAmbTeste
 	
 	IF !lViaJob
 	
@@ -7349,7 +7342,7 @@ Endif
 //Monta tela
 //=============================================================================
 
-oDlg = TDialog():New( _nlini,_ncini, _nlfim,_ncfim, _ctitu+" ["+DTOC(DATE())+"] ["+TIME()+"]",,,,, CLR_BLACK,CLR_WHITE ,,,.T.,,,,,, )
+oDlg = TDialog():New( _nlini,_ncini, _nlfim,(_ncfim+10), _ctitu+" ["+DTOC(DATE())+"] ["+TIME()+"]",,,,, CLR_BLACK,CLR_WHITE ,,,.T.,,,,,, )
 oDlg:SetCss(cEstilo0)  
     
  
@@ -10355,20 +10348,6 @@ RETURN xRet
 
 /*
 ===============================================================================================================================
-Programa----------: U_ITEncode ()
-Autor-------------: Igor Melgaço
-Data da Criacao---: 12/03/2024
-Descrição---------: Coneverte texto para padrão UF8
-Parametros--------: _cTexto
-Retorno-----------: _cTexto
-===============================================================================================================================
-*/
-User Function ITEncode(_cTexto)
-
-RETURN EncodeUTF8(_cTexto,"cp1252")
-
-/*
-===============================================================================================================================
 Programa----------: ITTLMAIL
 Autor-------------: Julio de Paula Paz
 Data da Criacao---: 25/03/2024
@@ -10483,7 +10462,17 @@ MV_PAR01 :=  Space(600)
 MV_PAR02 :=  Space(200)
 MV_PAR03 :=  2
 
-IF !SuperGetMV("IT_AMBTEST",.F.,.T.)
+IF SELECT("SX3") = 0//Para a função ParamBox() funcionar no Remote
+   cFilAnt  :="01"
+   CEMPANT  :="01"
+   CARQTAB  :=""
+   cUserName:=""
+   __CUSERID:=""
+ENDIF
+
+PRIVATE _lRemote:=IsBlind()
+
+IF _lRemote .AND. !SuperGetMV("IT_AMBTEST",.F.,.T.)
    _nDestinos:=GETF_RETDIRECTORY+GETF_LOCALHARD
 ELSE
    _nDestinos:=GETF_RETDIRECTORY+GETF_LOCALHARD+GETF_NETWORKDRIVE
@@ -10501,15 +10490,6 @@ aAdd( _aParAux , { 3 , "Deixe-me decidir Substituir para cada Arquivo", MV_PAR03
 For _nI := 1 To Len( _aParAux )
    aAdd( _aParRet , _aParAux[_nI][03] )
 Next _nI
-
-IF SELECT("SX3") = 0//Para a função ParamBox() funcionar no Remote
-   cFilAnt  :="01"
-   CEMPANT  :="01"
-   CARQTAB  :=""
-   cUserName:=""
-   __CUSERID:=""
-ENDIF
-PRIVATE _lRemote:=IsBlind()
 
 _lRet:=.T.
 _cTimeIni  := Time()

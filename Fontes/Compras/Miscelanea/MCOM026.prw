@@ -7,6 +7,7 @@ Analista       - Programador   - Inicio   - Envio    - Chamado - Motivo da Alter
 Andre Carvalho - Alex Wallauer - 05/03/25 - 28/03/25 - 49970   - Inclusao dos campo de % de ICMS e Valor do ICMS na tabela de preços.
 Andre Carvalho - Alex Wallauer - 17/03/25 - 28/03/25 - 49970   - Inclusao do campo Observacao da Tabela / AIA_I_OBS.
 Andre Carvalho - Alex Wallauer - 02/04/25 - 03/03/25 - 50355   - Colocado um email com copia baseado no parametro IT_IDCWFTP do SX6.
+Lucas Borges   - Lucas Borges  - 01/08/25 - 01/08/25 - 51453   - Substituir função U_ITEncode por FWHttpEncode
 ==============================================================================================================================================================
 */
 #INCLUDE "RWMAKE.CH"
@@ -278,7 +279,7 @@ Static Function MCOM026S(_cIDAproc As Character,_nReAIA As Numeric,_cPergPai As 
  _oProcess:cTo := Lower(cEmail)
   
  // Informamos o assunto do email.  
- _oProcess:cSubject	:= U_ITEncode(_cAssunto)
+ _oProcess:cSubject	:= FWHttpEncode(_cAssunto)
  
  U_ITWF1WF2Put("APRVTP",,"WFTP01","ENVIADO/AGUARDANDO APROVACAO" )//Grava WF2 a primeira vez se não existir  'N=Não Enviado;E=Enviado/Aguardando Aprovação;Q=Questionado;A=Aprovado;R-Rejeitado'
   //          cStatusCode, cDescription, cUserName, uShape
@@ -595,7 +596,7 @@ Static Function MCOM026A(_oProcess As Object,_cObsConc As Character,_nReAIA As N
  //===============================
  // Informamos o assunto do email.  
  //===============================
- _oProcess:cSubject	:= U_ITEncode(_cAssunto)
+ _oProcess:cSubject	:= FWHttpEncode(_cAssunto)
   
  //=======================================================
  // Iniciamos a tarefa e enviamos o email ao destinatário.
@@ -875,7 +876,7 @@ Static Function MCOM26Q(_oProcess As Object,_cObsConc As Character,_nReAIA As Nu
  //EndIf
  
  // Informamos o assunto do email.  
- _oProcess:cSubject	:= U_ITEncode(_cAssunto)
+ _oProcess:cSubject	:= FWHttpEncode(_cAssunto)
  
  U_ITWF1WF2Put("APRVTP",,"WFTP04","PERGUNTA DO QUESTIONAMENTO")//Grava WF2 a primeira vez se não existir  'N=Não Enviado;E=Enviado/Aguardando Aprovação;Q=Questionado;A=Aprovado;R-Rejeitado'
   //          cStatusCode, cDescription     , cUserName, uShape

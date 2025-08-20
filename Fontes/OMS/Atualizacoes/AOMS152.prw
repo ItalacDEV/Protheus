@@ -7,6 +7,7 @@ Analista         - Programador       - Inicio     - Envio    - Chamado - Motivo 
 Vanderlei Alves  - Julio Paz         - 14/03/25   - 10/06/25 - 50188   - Desenvolvimento de Rotina de Integração Webservice Protheus x TMS Multiembarcador Para Replicar Cargas Criadas no Protheus para o TMS Multiembarcador [OMS]
 Vanderlei Alves  - Julio Paz         - 14/03/25   - 10/06/25 - 45229   - Webservice de Integração Protheus x TMS Multiembarcador.
 Vanderlei Alves  - Julio Paz         - 12/06/25   - 13/06/25 - 45229   - Ajustes no novo webservice de integração Alteração na Situação Comercial do Pedido de Vendas.
+Lucas Borges     - Lucas Borges      - 01/08/25   - 01/08/25 - 51453   - Substituir função EncodeUtf8 por FWHttpEncode
 =================================================================================================================================================================================================
 */
 
@@ -1134,7 +1135,7 @@ Begin Sequence
 
                      _cXml := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
                      _cXml += '   <soapenv:Header>'
-                     _cXml += '      <Token xmlns="Token">'+Eval({|| EncodeUTF8(AllTrim(_cToken))})+'</Token>'
+                     _cXml += '      <Token xmlns="Token">'+Eval({|| FWHttpEncode(AllTrim(_cToken))})+'</Token>'
                      _cXml += '   </soapenv:Header>'
                      _cXml += '   <soapenv:Body>'
                      _cXml += '      <tem:EnviarArquivoXMLNFe>'

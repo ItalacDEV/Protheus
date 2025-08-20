@@ -7,7 +7,11 @@
 Jonathan      |13/03/2020| Chamado 32149. Correção dos valores nas colulas do relatório
 Jonathan      |09/06/2020| Chamado 33207. Correção nas validações do estoque atual quanto ao estoque minimo cadastrado
 Lucas Borges  |08/10/2024| Chamado 48465. Retirada manipulação do SX1
-===============================================================================================================================
+==================================================================================================================================================================================================================
+Analista       - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
+==================================================================================================================================================================================================================
+Andre Carvalho - Igor Melgaço  - 11/08/25 - 11/08/25 -  51725  - Ajustes para exibição correta do campo "Ultima Baixa" no relatório REST003
+==================================================================================================================================================================================================================
 */
 #INCLUDE "PROTHEUS.CH"
 
@@ -118,10 +122,8 @@ Local oBreak02
 
 Local aSizeQT	:= TamSX3("B2_QATU")
 Local aSizeVL	:= TamSX3("B2_VATU1")
-Local aSizeLZ   := TamSX3("NNR_DESCRI")
 Local cPictQT   := PesqPict("SB2","B2_QATU")
 Local cPictVL   := PesqPict("SB2","B2_VATU1")
-Local cPictLZ   := PesqPict("NNR","NNR_DESCRI")
 
 //================================================================
 // Variaveis Private                                            |
@@ -150,8 +152,8 @@ TRCell():New(oSection,'B2_LOCAL'	,'SB2',"Armazém",/*Picture*/,/*Tamanho*/,/*lPix
 TRCell():New(oSection,'DISPON'		,cAliasTRB,"Estoque"+CRLF+"disponivel",cPictQT						   ,aSizeQT[1],/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")
 TRCell():New(oSection,'VALOR'		,cAliasTRB,"Valor estoque",cPictVL,aSizeVL[1],/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")
 TRCell():New(oSection,'VALORR'		,cAliasTRB,"Valor empenhado",cPictVL,aSizeVL[1],/*lPixel*/,/*{|| code-block de impressao }*/,,,"RIGHT")
-TRCell():New(oSection,'DESCARM'		,cAliasTRB,"Desc Arm.",cPictLZ						    ,aSizeLZ[1],/*lPixel*/,/*{|| code-block de impressao }*/)
-TRCell():New(oSection,'ULTBAIX'		,cAliasTRB,"Ult Baixa",cPictLZ						    ,aSizeLZ[1],/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection,'DESCARM'		,cAliasTRB,"Desc Arm.","@!"						    ,15,/*lPixel*/,/*{|| code-block de impressao }*/)
+TRCell():New(oSection,'ULTBAIX'		,cAliasTRB,"Ult Baixa","@D"						    ,8,/*lPixel*/,/*{|| code-block de impressao }*/)
 TRCell():New(oSection,'BZ_I_LOCAL'  ,cAliasTRB,"Localizacao Almoxarifado ",PesqPict("SBZ","BZ_I_LOCAL"),LEN(SBZ->BZ_I_LOCAL),/*lPixel*/,/*{|| code-block de impressao }*/)
 TRCell():New(oSection,"STATUS"     ,"TRB","Status"         ,"@!",100)
 
@@ -413,7 +415,7 @@ Local aCampos 	:= {	{ "FILIAL"		,"C",FWSizeFilial(),00 },;
 						{ "VALOR "		,"N",aSizeVL[ 1 ]+1	, aSizeVL[ 2 ] },;
 						{ "DESCARM"	,"C",15	,00 },;
 						{ "DISPON"		,"N",aSizeQT[ 1 ]+1	, aSizeQT[ 2 ] },;
-						{ "ULTBAIX"		,"C",08	,00 },;
+						{ "ULTBAIX"		,"D",8	,00 },;
 						{ "BZ_I_LOCAL"	,"C",LEN(SBZ->BZ_I_LOCAL),00 };
 					 }
 
@@ -991,7 +993,7 @@ While !oReport:Cancel() .And. !Eof()
 		FIELD->DESCARM := NNR->NNR_DESCRI  
 	EndIf
 	If mv_par24 == 1
-		FIELD->ULTBAIX := DTOC(STOD((cAliasSB2)->ULTBAIX)) 
+		FIELD->ULTBAIX := STOD((cAliasSB2)->ULTBAIX) 
 	EndIf
 	
 	MsUnlock()

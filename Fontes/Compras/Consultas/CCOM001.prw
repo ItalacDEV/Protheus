@@ -9,7 +9,11 @@
 Lucas Borges  | 17/10/2019 | Removidos os Warning na compilação da release 12.1.25. Chamado 28346
 ------------------------------------------------------------------------------------------------------------------------------
 Jonathan      | 09/10/2020 | Remoção de bugs apontados pelo Totvs CodeAnalysis. Chamado: 34262
-===============================================================================================================================
+==================================================================================================================================================================================
+ Analista      - Programador  - Inicio   - Envio    - Chamado - Motivo da Alteração
+==================================================================================================================================================================================
+Jerry Santiago - Julio Paz    - 22/07/25 - 06/08/25 - 51464   - Correção de Error Log na Rotina Consulta Histórico de Alterações do Cadastro de Fornecedores.
+==================================================================================================================================================================================
 */
 
 //====================================================================================================
@@ -118,14 +122,14 @@ Retorno-----------: Nenhum
 */
 Static Function CCOM001HIS( cCodFor )
 
-Local oDlg			:= Nil
-Local oLbxTOP		:= Nil
-Local oLbxDET		:= Nil
+//Local oDlg			:= Nil
+//Local oLbxTOP		:= Nil
+//Local oLbxDET		:= Nil
 Local aPosObj   	:= {}
 Local aObjects  	:= {}
 Local aSize     	:= MsAdvSize()
-Local bMontaTOP		:= { || Processa({|lEnd| CCOM001LOG( @oLbxTOP , cCodFor ) }) }
-Local bMontaDET		:= { || CCOM001DET( @oLbxDET , oLbxTOP:aArray[oLbxTOP:nAt][05] , oLbxTOP:aArray[oLbxTOP:nAt][02] ) }
+//Local bMontaTOP		:= { || Processa({|lEnd| CCOM001LOG( @oLbxTOP , cCodFor ) }) }
+//Local bMontaDET		:= { || CCOM001DET( @oLbxDET , oLbxTOP:aArray[oLbxTOP:nAt][05] , oLbxTOP:aArray[oLbxTOP:nAt][02] ) }
 
 Local oBar			:= Nil
 Local aBtn 	    	:= Array(02)
@@ -141,10 +145,19 @@ Local aCabLbxDET	:= { "Data"				,; // 01
                          "Usuário"			,; // 03
                          "Nome Usr."		,; // 04
                          "Cont. Orig."		,; // 05
-                         "Cont. Alt."		 } // 06
+                         "Cont. Alt."		,; // 06
+						 "Campo Alterado"    } // 7
 
 Private	nDvPosAnt	:= 0
 Private	cCadastro	:= "["+ cCodFor +"] - " + TITULO
+
+Private oLbxTOP		:= Nil
+Private oLbxDET		:= Nil
+
+Private oDlg		:= Nil
+Private bMontaTOP	:= { || Processa({|lEnd| CCOM001LOG( @oLbxTOP , cCodFor ) }) }
+Private bMontaDET	:= { || CCOM001DET( oLbxDET , oLbxTOP:aArray[oLbxTOP:nAt][05] , oLbxTOP:aArray[oLbxTOP:nAt][02] ) }
+Private _cNomeCmp   := ""
 
 Default cCodFor		:= ""
 
@@ -234,10 +247,12 @@ DEFINE MSDIALOG oDlg TITLE cCadastro From aSize[7],00 to aSize[6],aSize[5] Of oM
 	//================================================================================
 	DEFINE BUTTONBAR oBar SIZE 25,25 3D OF oDlg
 	
-	DEFINE BUTTON aBtn[01] RESOURCE PmsBExcel()[1] OF oBar GROUP ACTION DlgToExcel({{"ARRAY","",oLbxPM7:AHeaders,oLbxPM7:aArray}})	TOOLTIP "Exportar para Planilha..."
+	//DEFINE BUTTON aBtn[01] RESOURCE PmsBExcel()[1] OF oBar GROUP ACTION DlgToExcel({{"ARRAY","",oLbxPM7:AHeaders,oLbxPM7:aArray}})	TOOLTIP "Exportar para Planilha..." 
+	DEFINE BUTTON aBtn[01] RESOURCE PmsBExcel()[1] OF oBar GROUP ACTION DlgToExcel({{"ARRAY","",oLbxDET:AHeaders,oLbxDET:aArray}})	TOOLTIP "Exportar para Planilha..." 
+
 	aBtn[01]:cTitle := ""
 	
-	DEFINE BUTTON aBtn[02] RESOURCE "FINAL" 		OF oBar GROUP ACTION oDlg:End() 													TOOLTIP "Sair da Tela..."
+	DEFINE BUTTON aBtn[02] RESOURCE "FINAL" 		OF oBar GROUP ACTION oDlg:End()  												TOOLTIP "Sair da Tela..."
 	aBtn[02]:cTitle := ""
 	
 	oDlg:lMaximized := .T.
@@ -363,6 +378,8 @@ Local _nTotReg	:= 0
 Local _nCont	:= 0
 Local _bUserN := {|x| UsrFullName(x)}
 
+_cNomeCmp := cCampo + "[" + GetSx3Cache(cCampo,"X3_DESCRIC") + "]"
+
 //================================================================================
 //| Consulta para buscar os detalhes das alterações dos campos                   |
 //================================================================================
@@ -388,7 +405,8 @@ _cQuery	:= ChangeQuery(_cQuery)
 
 DBUseArea( .T. , "TOPCONN" , TCGenQry(,,_cQuery) , _cAlias , .F. , .T. )
 
-TcSetField( _cAlias , "Z07.Z07_DATA" , "D" , 8 , 0 )
+//TcSetField( _cAlias , "Z07.Z07_DATA" , "D" , 8 , 0 )
+TcSetField( _cAlias , "DT_ALT" , "D" , 8 , 0 )
 
 DBSelectArea(_cAlias)
 (_cAlias)->(DBGoTop()) 
@@ -406,10 +424,11 @@ While (_cAlias)->(!Eof())
 
 		aAdd( _aLbxAux , {			(_cAlias)->DT_ALT		,; // 01
                          			(_cAlias)->HORA			,; // 02
-                         			(_cAlias)->CODUSU		,; // 03
+                         			Char(160)+(_cAlias)->CODUSU,; // 03
   AllTrim( Capital( Eval(_bUserN,	(_cAlias)->CODUSU ) ) )	,; // 04
 						AllTrim(	(_cAlias)->CONT_ORG )	,; // 05
-						AllTrim(	(_cAlias)->CONT_ALT )	}) // 06
+						AllTrim(	(_cAlias)->CONT_ALT )	,; // 06
+						_cNomeCmp})
 
 _nCont++
 IncProc("Montando estrutura "+StrZero(_nCont,6)+" de "+StrZero(_nTotReg,6)  )
@@ -429,7 +448,8 @@ If	Len(_aLbxAux) > 0 .And. ValType(oLbxAux) == "O"
 						_aLbxAux[oLbxAux:nAt][03]	,; // 03
 						_aLbxAux[oLbxAux:nAt][04]	,; // 04
 						_aLbxAux[oLbxAux:nAt][05]	,; // 05
-						_aLbxAux[oLbxAux:nAt][06]	}} // 06
+						_aLbxAux[oLbxAux:nAt][06]	,; // 06
+						_cNomeCmp}}                    // 07
 
 	oLbxAux:Refresh()
 

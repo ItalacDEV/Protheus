@@ -21,15 +21,15 @@ Alex Wallauer| 29/07/24 | Chamado 47700. Andre. Incluido o filtro por por código
 Lucas Borges | 23/07/25 | Chamado 51340. Ajustar função para validação de ambiente de teste
 ==============================================================================================================================================================
 Analista    - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
-==============================================================================================================================================================
+=====================================================================================================================================================================================================================
 Jerry       - Alex Wallauer - 08/10/24 - 23/10/24 - 48154   - Acrescentado contador de Linhas selecionadas e ajustes na validacao da Dt.Ent.PV.
 Jerry       - Igor Melgaço  - 25/02/24 - 20/03/25 - 39201   - Ajustes para contabilizar a quantidade de alterações efetuadas no pedido de vendas.
 Jerry       - Alex Wallauer - 24/03/24 - 24/03/25 - 39201   - Ajustes para contabilizar a quantidade de alterações efetuadas no pedido de vendas, correçaõ de error.log.
 Alex        - Alex Wallauer - 22/04/25 - 18/07/25 - 49966   - CORREÇÃO DE ERROR.LOG: variable does not exist _ODLGJ on {|| NOPC := 2, _ODLGJ:END()}(AOMS097.PRW) 25/03/2025 07:16:16 line : 2495
 Jerry       - Julio Paz     - 13/05/25 - 18/07/25 - 49758   - Realização de Ajustes nas Telas de Solicitação de Justificativa para Alteração de Tipo de Agendamento e Data de Entrega do Pedido de Vendas.
 Jerry       - Julio Paz     - 29/05/25 - 18/07/25 - 50129   - Ajustar a rotina para listar pedidos de vendas liberados.
-===============================================================================================================================================================
-
+Jerry       - Julio Paz     - 24/07/25 - 11/08/25 - 50344   - Ajustar a Rotina para Integrar a Solicitação de Retorno Reenvio de Pedido de Vendas do TMS. Criar um novo botão para isso.
+=====================================================================================================================================================================================================================
 */
 #INCLUDE "PROTHEUS.CH"
 #INCLUDE "RPTDEF.CH"
@@ -133,25 +133,25 @@ Begin Sequence
    _bAlteraTA:= {|| FWMSGRUN(,{|O| U_AOMS097A(O)          }) }
    _bAlteraMD:= {|| FWMSGRUN(,{|O| U_AOMS097M(_cMarcaSC5) }) }
    
-   Aadd( _aButtons , {"", {|| U_AOMS097Q()}   , "Pesquisar..."              , "Pesquisar"                 , {|| .T.}})// "Pesquisar" 
-   Aadd( _aButtons , {"", {|| U_AOMS097T("V")}, "Visualizar..."             , "Visualizar"                , {|| .T.}})// "Visualizar"
-   Aadd( _aButtons , {"", {|| U_AOMS097T("I")}, "Incluir..."                , "Incluir"                   , {|| .T.}})// "Incluir"
-   Aadd( _aButtons , {"", {|| U_AOMS097T("A")}, "Alterar..."                , "Alterar"                   , {|| .T.}})// "Alterar"
-   Aadd( _aButtons , {"", {|| U_AOMS097V("V")}, "Visualiza Pedido Vendas"   , "Visualiza Pedido Vendas"   , {|| .T.}})// "Visualiza Pedio Vendas"
-   Aadd( _aButtons , {"", {|| U_A097PLA()}    , "Notas..."                  , "Notas"                     , {|| .T.}})// "Notas"
-   Aadd( _aButtons , {"", _bAlteraDT          ,"Alterar Dt.Ent.PV..."       , "Alterar Dt.Ent.PV"         , {|| .T.}})// "Alt.Dt.Ent.PV"
-   Aadd( _aButtons , {"", _bAlteraTA          ,"Alterar Tipo Agen"	       , "Alterar Tipo Agen"         , {|| .T.}})// "Alt.Tipo Agen" 
-   Aadd( _aButtons , {"", {|| U_AOMS097J()}   , "Inserir Justificativas"    , "Inserir Justificativas"    , {|| .T.}})// "Ins.Justificat"
-   Aadd( _aButtons , {"", {|| U_AOMS097C()}   , "Relatorio Por E-Mail"	    , "Relatorio Por E-Mail"      , {|| .T.}})// "Rel.Por E-Mail"
-   Aadd( _aButtons , {"", {|| U_AOMS097L()}   , "Manututencao Ped.Vendas"   , "Manutencao Ped.Vendas"     , {|| .T.}})// "Manut.Ped.Vendas"
-   Aadd( _aButtons , {"", _bAlteraMD          , "Marca/Desmarca Todos"      , "Marca/Desmarca Todos"      , {|| .T.}})// "Marca/Desmarca Todos"
-   Aadd( _aButtons , {"", {|| U_AOMS097V("A")}, "Alteração Armazem Item PV" , "Alteração Armazem Item PV" , {|| .T.}})// "Alteração Armazem Item PV"
-   Aadd( _aButtons , {"", {|| U_AOMS97FIL()}  , "Filtra por Legenda"        , "Filtra por Legenda"        , {|| .T.}})// "Filtra por Legenda"
-   Aadd( _aButtons , {"", {|| U_AOMS97Clear()}, "Cancela Filtro por Legenda", "Cancela Filtro por Legenda", {|| .T.}})// "Cancela Filtro Legenda"
-   Aadd( _aButtons , {"", {|| U_A097LEG()}    , "Legenda..."                , "Legenda"                   , {|| .T.}})// "Legenda"
-   Aadd( _aButtons , {"", {|| U_AOM97ZY5()}   , "Manut.Cad.Justificativas"  , "Manut.Cad.Justificativas"   , {|| .T.}})// "Manut.Cad.Justificativa"
-
- 
+   Aadd( _aButtons , {"", {|| U_AOMS097Q()}      , "Pesquisar..."              , "Pesquisar"                 , {|| .T.}})// "Pesquisar" 
+   Aadd( _aButtons , {"", {|| U_AOMS097T("V")}   , "Visualizar..."             , "Visualizar"                , {|| .T.}})// "Visualizar"
+   Aadd( _aButtons , {"", {|| U_AOMS097T("I")}   , "Incluir..."                , "Incluir"                   , {|| .T.}})// "Incluir"
+   Aadd( _aButtons , {"", {|| U_AOMS097T("A")}   , "Alterar..."                , "Alterar"                   , {|| .T.}})// "Alterar"
+   Aadd( _aButtons , {"", {|| U_AOMS097V("V")}   , "Visualiza Pedido Vendas"   , "Visualiza Pedido Vendas"   , {|| .T.}})// "Visualiza Pedio Vendas"
+   Aadd( _aButtons , {"", {|| U_A097PLA()}       , "Notas..."                  , "Notas"                     , {|| .T.}})// "Notas"
+   Aadd( _aButtons , {"", _bAlteraDT             ,"Alterar Dt.Ent.PV..."       , "Alterar Dt.Ent.PV"         , {|| .T.}})// "Alt.Dt.Ent.PV"
+   Aadd( _aButtons , {"", _bAlteraTA             ,"Alterar Tipo Agen"	       , "Alterar Tipo Agen"         , {|| .T.}})// "Alt.Tipo Agen" 
+   Aadd( _aButtons , {"", {|| U_AOMS097J()}      , "Inserir Justificativas"    , "Inserir Justificativas"    , {|| .T.}})// "Ins.Justificat"
+   Aadd( _aButtons , {"", {|| U_AOMS097C()}      , "Relatorio Por E-Mail"	    , "Relatorio Por E-Mail"      , {|| .T.}})// "Rel.Por E-Mail"
+   Aadd( _aButtons , {"", {|| U_AOMS097L()}      , "Manututencao Ped.Vendas"   , "Manutencao Ped.Vendas"     , {|| .T.}})// "Manut.Ped.Vendas"
+   Aadd( _aButtons , {"", _bAlteraMD             , "Marca/Desmarca Todos"      , "Marca/Desmarca Todos"      , {|| .T.}})// "Marca/Desmarca Todos"
+   Aadd( _aButtons , {"", {|| U_AOMS097V("A")}   , "Alteração Armazem Item PV" , "Alteração Armazem Item PV" , {|| .T.}})// "Alteração Armazem Item PV"
+   Aadd( _aButtons , {"", {|| U_AOMS97FIL()}     , "Filtra por Legenda"        , "Filtra por Legenda"        , {|| .T.}})// "Filtra por Legenda"
+   Aadd( _aButtons , {"", {|| U_AOMS97Clear()}   , "Cancela Filtro por Legenda", "Cancela Filtro por Legenda", {|| .T.}})// "Cancela Filtro Legenda"
+   Aadd( _aButtons , {"", {|| U_A097LEG()}       , "Legenda..."                , "Legenda"                   , {|| .T.}})// "Legenda"
+   Aadd( _aButtons , {"", {|| U_AOM97ZY5()}      , "Manut.Cad.Justificativas"  , "Manut.Cad.Justificativas"   , {|| .T.}})// "Manut.Cad.Justificativa"
+   Aadd( _aButtons , {"", {|| AOM97RETPV("MENU")}, "Solicita Retorno PV TMS --> Protheus", "Solic.Retorno PV TMS --> Protheus", {|| .T.}}) // "Solic.Retorno PV TMS->Protheus"
+   Aadd( _aButtons , {"", {|| AOM97ENVPV()}      , "Reenvia PV Protheus --> TMS"         , "Reenvia PV Protheus --> TMS"      , {|| .T.}}) // "Reenvia PV Protheus --> TMS"
 
    //====================================================
    // Cria a tela de parâmetros iniciais caso não exista
@@ -666,7 +666,7 @@ Local _oDlg2 As Object
 Local aArea		:= GetArea() As Array
 Local cGet1		:= STOD("//") As Date
 Local nOpc		:= 0 As Numeric
-Local _lAlterou:= .F. As Logical
+//Local _lAlterou:= .F. As Logical
 Local _nRegAtu := TRBSC5->(Recno()) As Numeric
 Local nLinha   := 10 As Numeric
 Local _nCol1   := 05 As Numeric
@@ -675,6 +675,11 @@ Local _nCol3   := 90 As Numeric
 Local _nCol4   := 150 As Numeric
 Local _nCol5   := _nCol4+55 As Numeric
 Local _nTam    := 285 As Numeric
+Local _aDados    := {}
+Local _aCabec    := {"Filial","Numero PV","Cliente","Loja","Nome","Status"}
+Local _lTemDados := .F.
+Local _cTitulo   := "Resultado da Solicitação de Retorno de Pedidos de Vendas do TMS para o Protheus"
+Local _lRet      := .T.
 
 _cJustDE := Space(3) // _aJustDE[1]
 _cObseDE := SPACE(LEN(ZY3->ZY3_OBSERV))
@@ -729,7 +734,21 @@ Begin Sequence
 	      
 	      If ! Empty(TRBSC5->WK_OK)
              
-			   SC5->(DbGoto(TRBSC5->WK_RECNO))   
+			   SC5->(DbGoto(TRBSC5->WK_RECNO))
+
+            //================================================================================= 
+            // Solicita retorno do Pedido de vendas do TMS antes de alterar a data de entrega.
+            //=================================================================================
+            _lTemDados := .T.
+            If SC5->C5_I_ENVRD == "S"
+               _lRet := AOM97RETPV("MANUTENCAO")
+               If ! _lRet
+                  Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Não foi possível alterar a data de entrega. Não foi possível realizar o retorno do PV para o Protheus."})
+                  TRBSC5->(DbSkip())
+                  Loop
+               EndIf    
+            EndIf 
+            //=================================================================================
 
             _nConta++
             IF VALTYPE(oProc1) = "O"
@@ -789,17 +808,26 @@ Begin Sequence
             
             ENDIF 
 
-		      _lAlterou := .T.
+		      //_lAlterou := .T.
+            Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Alteração da Data de Entrega realizada com Sucesso."})
 	      EndIf
 
 	      TRBSC5->(DbSkip())
       EndDo
-
+      
+      /*
       If _lAlterou 
 	      U_Itmsg("Data de Entrega alterada com sucesso para todos os itens.","Atenção","Pedidos Gravados: "+ALLTRIM(STR(_nConta)),2)
       Else
          U_Itmsg("Não há itens marcados para alteração da data de entrega.","Atenção",,1)
 	   EndIf 
+      */
+      If _lTemDados
+         U_ITListBox( _cTitulo , _aCabec , _aDados  ) 
+      Else 
+         U_ItMsg("Nenhum registro selecionado para alteração da data de entrega do Pedido de Vendas.","Atenção",,1)
+      EndIf 
+
    EndIf
 
 End Sequence
@@ -2010,6 +2038,12 @@ Local _nCol2    := 62 As Numeric
 Local _nCol3    := 90 As Numeric
 Local _nTam     := 285 As Numeric
 
+Local _aDados    := {}
+Local _aCabec    := {"Filial","Numero PV","Cliente","Loja","Nome","Status"}
+Local _lTemDados := .F.
+Local _cTitulo   := "Resultado da Solicitação de Retorno de Pedidos de Vendas do TMS para o Protheus"
+Local _lRet      := .T.
+
 _cJustAG := Space(3) // _aJustAG[1]
 _cObseAG := SPACE(LEN(ZY3->ZY3_OBSERV))
 _cTpAgenda:=_aTpAgenda[1]
@@ -2060,6 +2094,20 @@ Begin Sequence
 	      If ! Empty(TRBSC5->WK_OK)
              
 			   SC5->(DbGoto(TRBSC5->WK_RECNO))   
+
+            //================================================================================= 
+            // Solicita retorno do Pedido de vendas do TMS antes de alterar a data de entrega.
+            //=================================================================================
+            _lTemDados := .T.
+            If SC5->C5_I_ENVRD == "S"
+               _lRet := AOM97RETPV("MANUTENCAO")
+               If ! _lRet
+                  Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Não foi possível alterar a data de entrega. Não foi possível realizar o retorno do PV para o Protheus."})
+                  TRBSC5->(DbSkip())
+                  Loop
+               EndIf    
+            EndIf 
+            //=================================================================================
 
             _nConta++
             IF VALTYPE(oProc2) = "O"
@@ -2151,19 +2199,30 @@ Begin Sequence
                EndIf                                
 
                U_AOMS097Z()             
+                
+               Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Tipo de agendamento alterado com Sucesso."}) 
 
 		         _lAlterou := .T.
+           Else 
+              Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Não houve alterações para este pedido de vendas.."})     
            ENDIF
 	      EndIf
 
 	      TRBSC5->(DbSkip())
        EndDo
-
+       
+       /*
        If _lAlterou 
 	       U_ItMsg("Tipo de agendamento alterado com sucesso.","Atenção","Pedidos Gravados: "+ALLTRIM(STR(_nConta)),2)
        Else
           U_ItMsg("Não há itens marcados para alteração do Tipo de agendamento.","Atenção",,1)
 	    EndIf 
+       */
+       If _lTemDados
+          U_ITListBox( _cTitulo , _aCabec , _aDados  ) 
+       Else 
+          U_ItMsg("Nenhum registro selecionado para alteração da data de entrega do Pedido de Vendas.","Atenção",,1)
+       EndIf 
    Else	
 
 	  //U_ItMsg("Processo Cancelado.","Atenção",,1)
@@ -3385,8 +3444,6 @@ Begin Sequence
 End Sequence
 
 Return _lRet 
-//------------------------------------------------------------------------------------------------------------------------//
-//------------------------------------------------------------------------------------------------------------------------//
 
 /*
 =================================================================================================================================
@@ -3956,3 +4013,155 @@ Begin Sequence
 End Sequence 
 
 Return _lRet 
+
+/*
+===============================================================================================================================
+Programa----------: AOM97RETPV
+Autor-------------: Julio de Paula Paz
+Data da Criacao---: 25/07/2025
+===============================================================================================================================
+Descrição---------: Rotina de integração Webservice de solicitação de pedidos de vendas do sitema TMS para o Protheus.
+===============================================================================================================================
+Parametros--------: _cChamada = "MENU" - Opção de menu para solicitação de retorno de PV.
+                                "MANUTENCAO" - Chamado de Rotinas que alteram o pedido de vendas (Alt.Data Entrega/Alt. Tip Agendamento).
+===============================================================================================================================
+Retorno-----------: _lRet = .T. = Solicitação de retorno do pedido de vendas bem sucedida.
+                            .F. = Não foi possível retornar o padido de vendas.
+===============================================================================================================================
+*/
+Static Function AOM97RETPV(_cChamada)
+Local _lRet   := .F.
+Local _aDados := {}
+Local _aCabec := {"Filial","Numero PV","Cliente","Loja","Nome","Status"}
+Local _lTemDados := .F.
+Local _cTitulo := "Resultado da Solicitação de Retorno de Pedidos de Vendas do TMS para o Protheus"
+
+Begin Sequence 
+   If _cChamada == "MENU"
+      If ! U_Itmsg("Confirma o processamento da rotina de solicitação de retorno dos pedidos de vendas selecionados, do TMS para o Protheus?","Atenção",,3,2,2) 
+         Break 
+	   EndIf
+
+      TRBSC5->(DbGoTop())
+
+      Do While ! TRBSC5->(Eof())
+         If ! Empty(TRBSC5->WK_OK)
+ 
+            _lTemDados := .T.
+
+            SC5->(DbGoto(TRBSC5->WK_RECNO)) 
+         
+		      If SC5->C5_I_ENVRD <> "S"
+			      Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Este pedido não se encontra integrado ao sistema TMS !"})
+            Else
+               If SC5->C5_I_ENVRD == "S"
+                  If ! U_IT_TMS(SC5->C5_I_LOCEM) 
+                     Fwmsgrun(,{|oproc| _lRet := U_AOMS094E(oproc)},'Aguarde processamento...','Integrando dados solicitação de retorno de PV do TMS para o Protheus...')
+                  Else
+                     Fwmsgrun(,{|oproc| _lRet := U_AOMS140E(oproc)},'Aguarde processamento...','Integrando dados solicitação de retorno de PV do TMS para o Protheus...')
+                  EndIf
+              
+                  If _lRet 
+                     Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Solicitação de retorno do PV realizada com Sucesso."})
+		            Else 
+		               Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Não foi possível realizar o retorno do PV para o Protheus."})
+		            EndIf 
+               Else 
+                  Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Este pedido não se encontra integrado ao sistema TMS !"})
+               EndIf 
+            EndIf 
+         EndIf 
+
+	      TRBSC5->(DbSkip())
+      EndDo 
+   
+      If _lTemDados
+         U_ITListBox( _cTitulo , _aCabec , _aDados  ) 
+      Else 
+         U_ItMsg("Nenhum registro selecionado para solicitação de retorno do Pedido de Vendas do TMS para o Protheus.","Atenção",,1)
+      EndIf 
+   
+      TRBSC5->(DbGoTop())
+   Else 
+      If SC5->C5_I_ENVRD <> "S"
+         _lRet := .T.
+      Else
+         If ! U_IT_TMS(SC5->C5_I_LOCEM) 
+            Fwmsgrun(,{|oproc| _lRet := U_AOMS094E(oproc,.F.)},'Aguarde processamento...','Integrando dados solicitação de retorno de PV do TMS para o Protheus...')
+         Else
+            Fwmsgrun(,{|oproc| _lRet := U_AOMS140E(oproc,.F.)},'Aguarde processamento...','Integrando dados solicitação de retorno de PV do TMS para o Protheus...')
+         EndIf
+      EndIf 
+   EndIf 
+
+End Sequence
+
+Return _lRet
+
+/*
+===============================================================================================================================
+Programa----------: AOM97ENVPV
+Autor-------------: Julio de Paula Paz
+Data da Criacao---: 25/07/2025
+===============================================================================================================================
+Descrição---------: Rotina de reenvio de pedidos de vendas do Protheus para o sitema TMS.
+===============================================================================================================================
+Parametros--------: Nenhum
+===============================================================================================================================
+Retorno-----------: Nenhum
+===============================================================================================================================
+*/
+Static Function AOM97ENVPV()
+Local _aDados    := {}
+Local _aCabec    := {"Filial","Numero PV","Cliente","Loja","Nome","Status"}
+Local _lTemDados := .F.
+Local _cTitulo   := "Resultado do Reenvio de Pedidos de Vendas par o TMS"
+
+Begin Sequence 
+
+   If ! U_Itmsg("Confirma o processamento da rotina de reenvio dos pedidos de vendas selecionados para o TMS?","Atenção",,3,2,2) 
+      Break 
+	EndIf
+
+   TRBSC5->(DbGoTop())
+
+   Do While ! TRBSC5->(Eof())
+      If ! Empty(TRBSC5->WK_OK)
+ 
+         _lTemDados := .T.
+
+         SC5->(DbGoto(TRBSC5->WK_RECNO)) 
+
+         If SC5->C5_I_ENVRD = "S"
+            Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Este pedido já está enviado ao sistema TMS !"})
+         Else 
+            //================================================================================
+            // Realiza a devolução do pedido de vendas selecionados e
+            // atualiza tabelas de muro.
+            //================================================================================
+            SC5->(Reclock("SC5",.F.))
+            SC5->C5_I_ENVRD := "N"
+            SC5->C5_I_DTRET := Stod("") // Data de retorno do pedido de vendas do RDC para o Protheus
+            SC5->C5_I_HRRET := ""       // Hora de retorno do pedidod e vendas do RDC para o Protheus
+            SC5->(MsUnlock())
+         
+            fwmsgrun(,{|oproc| U_AOMS084P(,oproc)},'Aguarde processamento...','Gravando dados para Reenvio do Pedidos de Vendas para o TMS...' )
+
+            Aadd(_aDados,{SC5->C5_FILIAL, SC5->C5_NUM, SC5->C5_CLIENTE, SC5->C5_LOJACLI, SC5->C5_I_NOME,"Procedimento para o reenvio do Pedido de Vendas para o sistema TMS realizado com Sucesso."})
+	      EndIf 
+      EndIf
+
+      TRBSC5->(DbSkip())
+   EndDo 
+
+   If _lTemDados
+      U_ITListBox( _cTitulo , _aCabec , _aDados  ) 
+   Else 
+      U_ItMsg("Nenhum registro selecionado para reenvio de Pedido de Vendas para o TMS.","Atenção",,1)
+   EndIf 
+
+   TRBSC5->(DbGoTop())
+
+End Sequence
+
+Return Nil 

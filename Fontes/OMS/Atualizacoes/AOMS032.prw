@@ -13,6 +13,8 @@ Analista    - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteraçã
 Vanderlei   - Alex Wallauer - 21/03/25 - 24/03/25 - 50197   - Novo tratamento para cortes e desmembramentos de pedidos - GRAVAR: M->C5_I_BLSLD
 Vanderlei   - Igor Melgaço  - 06/06/25 - 10/06/25 - 45229   - Ajuste do parâmetro p/determinar se a integração WebS.será TMS Multiembarcador ou RDC
 Andre       - Igor Melgaço  - 11/06/25 - 11/07/25 - 50716   - Ajustes para busca de preço do produto na tabela Z09, para pedidos de transferência entre filiais
+Jerry       - Julio Paz     - 11/07/25 - 11/08/25 - 49830   - Alterar o Armazém de Produtos Contidos no Parâmetro IT_ZWEXC para 36 quando o destino for filial 90.
+Jerry       - Julio Paz     - 05/08/25 - 11/08/25 - 51639   - Realização de ajustes nas regras de liberação de campos para digitação, na tela de transferência de pedidos de vendas.
 ==============================================================================================================================================================
 */   
 //====================================================================================================
@@ -59,20 +61,20 @@ User Function AOMS032(_cTipoTransf)
 	Private _cFilCarreg := Space(2) 
 	//Private _cFilOpera  := U_ITGETMV( "IT_FILOPER","90;93")
 	//Private _cFilLocal  := U_ITGETMV( "IT_FILLOCL","90;93")
-	Private _cFilDifer  := U_ITGETMV( "IT_FILDIFE","90;93")
+	Private _cFilDifer  := U_ITGETMV( "IT_FILDIFE","")    // "90;93"
 	Private _cOperTran  := U_ITGETMV( "IT_OPTRANF","42")
 	Private _oOper25, _oLocal
 
-    Private _cFilOrigI := U_ITGETMV( "IT_FILORGI","90;93")           // Filiais de Origens Iguais     
-    Private _cFilDDesI := U_ITGETMV( "IT_FILDSTI","01;10;23;20;40;") // Filiais de Destino Iguais     
-	Private _cFilOrigD := U_ITGETMV( "IT_FILORGD","90;93")           // Filiais de Origens Diferentes 
-    Private _cFilDDesD := U_ITGETMV( "IT_FILDSTD","90;93")           // Filiais de Destino Diferentes 
-	Private _cFilLogA  := U_ITGETMV( "IT_FILLOGA","90")              // Filial logada A 
-	Private _cFilLogB  := U_ITGETMV( "IT_FILLOGB","93")              // Filial logada B 
-	Private _cOperacA  := U_ITGETMV( "IT_OPRTRNA","01")              // Operação de Transferência A 
-	Private _cOperacB  := U_ITGETMV( "IT_OPRTRNB","26")              // Operação de Transferência B 
-    Private _cFilDeFat := U_ITGETMV( "IT_FILFATU","90")              // Filiais de Furamento        
-	Private _cOperacC  := U_ITGETMV( "IT_OPERTRC","25")              // Operação de Transferência C
+    Private _cFilOrigI := U_ITGETMV( "IT_FILORGI","") // Filiais de Origens Iguais     // "90;93"     
+    Private _cFilDDesI := U_ITGETMV( "IT_FILDSTI","") // Filiais de Destino Iguais     // "01;10;23;20;40;"    
+	Private _cFilOrigD := U_ITGETMV( "IT_FILORGD","") // Filiais de Origens Diferentes // "90;93"
+    Private _cFilDDesD := U_ITGETMV( "IT_FILDSTD","") // Filiais de Destino Diferentes // "90;93"
+	Private _cFilLogA  := U_ITGETMV( "IT_FILLOGA","") // Filial logada A               // "90"
+	Private _cFilLogB  := U_ITGETMV( "IT_FILLOGB","") // Filial logada B               // "93"
+	Private _cOperacA  := U_ITGETMV( "IT_OPRTRNA","") // Operação de Transferência A   // "01"
+	Private _cOperacB  := U_ITGETMV( "IT_OPRTRNB","") // Operação de Transferência B   // "26"
+    Private _cFilDeFat := U_ITGETMV( "IT_FILFATU","") // Filiais de Furamento          // "90"       
+	Private _cOperacC  := U_ITGETMV( "IT_OPERTRC","") // Operação de Transferência C   // "25"
 	Private aCols     := {}
 	Private aHeader   := {}
     Private _oTrocaNf, _oFilFatur
@@ -542,6 +544,12 @@ User Function AOMS032EXE(oproc)
    Local aHeaderBkp := {}
    Local aLinha := {}
    Local aLinhaExc := {}
+   
+   Local _cFilDesIt := SuperGetMv("IT_FILDESIT",.F.,"90")
+   Local _cOperTran := SuperGetMv("IT_OPETRAPV",.F.,"25")
+   Local _cArmDesIt := SuperGetMv("IT_ARMDESIT",.F.,"36")
+   Local _cPrdItape := U_ITGETMV( 'IT_ZWEXC'   , "00010225901;00010145901;")
+   Local _nX 
 
    Private lMsErroAuto	:= .F.
    Private lAutoErrNoFile := .T.
@@ -882,6 +890,18 @@ User Function AOMS032EXE(oproc)
                         	_cCodLocaliz := 	_cLocal	
                         ENDIF
 
+                        //==================================================================================
+                        // Quando a filial de destino for 90 e o tipo de operação for 25 (Itapetiniga)
+						// Se o produto estiver no parâmetro IT_ZWEXC, alterar o armazém deste produto para
+						// o armazém 36. 
+						//==================================================================================
+                        If _cFilTran $ _cFilDesIt .And. _cOper25 $ _cOperTran  
+                           _nX := AScan(aHeaderBkp,{|x| AllTrim(x[2]) == "C6_PRODUTO"}) 
+                           If AllTrim(aColsBkp[i,_nX]) $ _cPrdItape
+                              _cCodLocaliz := _cArmDesIt
+						   EndIf 
+						EndIf 
+
                         aLinha := {}
 
                         AADD(aLinha,{ "C6_FILIAL"  , SubStr(_cFilTran,1,2),Nil})
@@ -1039,13 +1059,24 @@ User Function AOMS032EXE(oproc)
                   			cfilant := SubStr(_cFilTran,1,2)
                   			SM0->( DBSetOrder(1))
                   			SM0->( DBSeek( SubStr( cNumEmp , 1 , 2 ) + cFilAnt ) )
-                                 
+
                   			IF Empty(_cLocal) .Or. (! U_ITKEY(_cFilTran, "C6_FILIAL") $ _cFilDifer .And. ! U_ITKEY(_cOper25, "C5_I_OPER") $ _cOperTran) // Filias destino diferente de 90/93 e Operação diferente de 42-Triangular, no destino buscar o armazém padrão conforme produto na filial (BZ_LOCPAD).
                   				_cCodLocaliz := Posicione("SBZ",1,cfilant+QRYITENS->C6_PRODUTO,"BZ_LOCPAD")  // BZ_FILIAL+BZ_COD // Ordem 01
                   			ELSE
                   				_cCodLocaliz := 	_cLocal	
                   			ENDIF
-                  			
+
+                            //==================================================================================
+                            // Quando a filial de destino for 90 e o tipo de operação for 25 (Itapetiniga)
+						    // Se o produto estiver no parâmetro IT_ZWEXC, alterar o armazém deste produto para
+						    // o armazém 36. 
+						    //==================================================================================
+                            If _cFilTran $ _cFilDesIt .And. _cOper25 $ _cOperTran  
+                               If AllTrim(QRYITENS->C6_PRODUTO) $ _cPrdItape
+                                  _cCodLocaliz := _cArmDesIt
+						       EndIf 
+						    EndIf 
+
                   			_cOperAlt    := _cOper25
 
                   			cfilant := _cfilg
@@ -2312,10 +2343,14 @@ User Function AOMS032VLD( nQtdTit )
 
 	EndIf
 
-	If _lRet
-		fwmsgrun( ,{|oproc| _lRet := AOMS032TES(_cFilTran,oproc,.F.) } , "Aguarde validando TES INTELIGENTE...", "Aguarde validando TES INTELIGENTE..." ) // AOMS032TES(_cFilTran,oproc,.F.) 
+	If _lRet 
+		//fwmsgrun( ,{|oproc| _lRet := AOMS032TES(_cFilTran,oproc,.F.) } , "Aguarde validando TES INTELIGENTE...", "Aguarde validando TES INTELIGENTE..." ) // AOMS032TES(_cFilTran,oproc,.F.) 
+		fwmsgrun( ,{|oproc| _lRet := AOMS032TES(_cFilTran,oproc,.T.) } , "Aguarde validando TES INTELIGENTE...", "Aguarde validando TES INTELIGENTE..." ) // AOMS032TES(_cFilTran,oproc,.F.) 
 
-		fwmsgrun( ,{|oproc| _lRet := AOMS032N(_cFilTran,oproc, .F.) } , "Aguarde validando data de entrega...", "Aguarde validando data de entrega..." )
+		//fwmsgrun( ,{|oproc| _lRet := AOMS032N(_cFilTran,oproc, .F.) } , "Aguarde validando data de entrega...", "Aguarde validando data de entrega..." )
+		If _lRet 
+		   fwmsgrun( ,{|oproc| _lRet := AOMS032N(_cFilTran,oproc, .T.) } , "Aguarde validando data de entrega...", "Aguarde validando data de entrega..." )
+		EndIf 
 	EndIf
 
 //================================================================================
@@ -2885,7 +2920,7 @@ Static Function AOMS032TES( _cFilDest, oproc, _lExibeTela)
 					cFaltaPVincula+=" PV "+aPVinculados[P,1]+" selecionado sem o PV Vinculado "+aPVinculados[P,2]+_ENTER
 					cPVinculados+=aPVinculados[P,2] +", "
 
-               Aadd(_aMsgVld,{.F. ,aPVinculados[P,1], aPVinculados[P,3], " PV "+aPVinculados[P,1]+" selecionado sem o PV Vinculado "+aPVinculados[P,2], " Retire o vinculo em alteração de Pedido ou selecione o PV vinculado "+aPVinculados[P,2] +" faltante para transferir juntamente."})
+               Aadd(_aMsgVld,{.F. ,aPVinculados[P,1], aPVinculados[P,3], " PV "+aPVinculados[P,1]+" selecionado sem o PV Vinculado "+aPVinculados[P,2], " Retire o vinculo em alteração de Pedido ou selecione o PV vinculado "+aPVinculados[P,2] +" faltante para transferir juntamente."}) 
 
 				ENDIF
 			NEXT
@@ -2895,6 +2930,7 @@ Static Function AOMS032TES( _cFilDest, oproc, _lExibeTela)
 
 				If _lExibeTela
 					U_ITMSG(cFaltaPVincula,"Atenção","Retire o vinculo em alteração de Pedido ou selecione os PV vinculados "+cPVinculados+" faltantes para transferir juntamente.",1)
+					_aMsgVld := {} 
 				EndIf
 
 				//                  Pedido , Operação, Erro                                    , Descrição
@@ -3576,7 +3612,7 @@ Begin Sequence
 
 			_cLocal := Space(2)
 		 Else 
-		    If _cChamadaV == "P" // Chamada da função, pedido de vendas posicionado.
+/*		    If _cChamadaV == "P" // Chamada da função, pedido de vendas posicionado.
 		       If SC5->C5_I_TRCNF == "S" // Upper(_cValorDig) == "SIM" .And.
 			      _oTrocaNf:Disable()
                   _oFilFatur:Disable()
@@ -3594,7 +3630,7 @@ Begin Sequence
 			      _oLocal:Disable()
                EndIf 
 			EndIf 
-
+*/
             _cLocal := Space(2)
 
 		 EndIf
@@ -3771,7 +3807,7 @@ Begin Sequence
 
    If _cCampo == "OPERACAO" .OR. _cCampo == "FILIAL_DESTINO"
 
-		U_AOMS058X(_cOper25,_cFilDestino)
+	  U_AOMS058X(_cOper25,_cFilDestino) 
 
    EndIf
 

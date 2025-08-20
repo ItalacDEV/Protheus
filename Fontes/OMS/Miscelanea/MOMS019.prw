@@ -9,6 +9,8 @@ Alexandre Villar  | 22/01/2016 | Chamado 13062. Ajuste nas claúsulas ORDER BY.  
 Alexandre Villar  | 23/03/2016 | Chamado 14774. Ajuste para padronizar a utilização de rotinas de consultas customizadas.      |
 -------------------------------------------------------------------------------------------------------------------------------
 Igor Melgaço      | 12/03/2024 | Chamado 45575. Ajuste para conversão de texto do Assunto do email em padrao UTF8.
+-------------------------------------------------------------------------------------------------------------------------------
+Lucas Borges      | 01/08/2025 | Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ===============================================================================================================================
 */
 
@@ -746,7 +748,7 @@ oMessage:cFrom    := "workflow@italac.com.br"
 oMessage:cTo      := _cDestinat
 oMessage:cCC      := ""
 oMessage:cBCC     := ""
-oMessage:cSubject := U_ITEncode(_cAssunto)
+oMessage:cSubject := FWHttpEncode(_cAssunto)
 oMessage:cBody    := _cCorpo
 
 oMessage:MsgBodyType( "text/html" )

@@ -13,6 +13,7 @@ Analista - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
 Vanderlei- Alex Wallauer - 26/09/24 - 15/10/24 -  47942  - Colocada a gravacao das Previsões de entrega (U_AOMS3DTSF2) da ocorrecia da Parte 2.
 Alex     - Alex Wallauer - 16/01/24 - 20/03/25 -  49966  - CORREÇÃO DE ERROR.LOG: argument #0 error, expected N->U,function dbgoto on U_AOMS072R(AOMS072.PRW) line : 872
 Jerry    - Alex Wallauer - 10/02/25 - 20/03/25 -  49042  - Ajustes para trartar notas ficais de Transferencia de troca nota. 
+Jerry    - Alex Wallauer - 29/07/25 - 01/08/25 -  49733  - Criação e tratamento do novo campo ZF5_CAUCUS para informar o Causador do Custo.
 ==============================================================================================================================================================
 */
 
@@ -1162,13 +1163,34 @@ Retorno   ------: True ou False.
 ===============================================================================================================================
 */
 User Function AOMS072Q() 
-Local _lRet := .T.      
-Local _aOrd := SaveOrd({"ZFC","ZF5"})
-Local _cTipoOcorr, _cTipoCusto, _nI
-Local _nCustoIt, _nCustoCli, _nCustoRepr, _nCustoTransp, _nCustoTerc
-Local _cGerDevol, _cServOcorr, _cNfDev, _cSerDev 
-Local _nTIPOO, _nTIPOC, _nCUSTOI, _nCUSTOC, _nCUSTOR, _nCUSTOT 
-Local _nCUSTER, _nDEVOL, _nSERVIC, _nDOCDEV, _nSERDEV 
+ Local _lRet := .T. As Logical
+ Local _aOrd := SaveOrd({"ZFC","ZF5"}) As Array
+ Local _cTipoOcorr  := 0 As Char
+ Local _cTipoCusto  := 0 As Char
+ Local _nI          := 0 As Numeric
+ Local _nCustoIt    := 0 As Numeric
+ Local _nCustoCli   := 0 As Numeric
+ Local _nCustoRepr  := 0 As Numeric
+ Local _nCustoTransp:= 0 As Numeric
+ Local _nCustoTerc  := 0 As Numeric
+ Local _cGerDevol   := 0 As Numeric
+ Local _cServOcorr  := 0 As Numeric
+ Local _cNfDev      := 0 As Numeric
+ Local  _cSerDev    := 0 As Numeric
+ Local _nTIPOO      := 0 As Numeric
+ Local _nTIPOC      := 0 As Numeric
+ Local _nCUSTOI     := 0 As Numeric
+ Local _nCUSTOC     := 0 As Numeric
+ Local _nCUSTOR     := 0 As Numeric
+ Local _nCUSTOT     := 0 As Numeric
+ Local _nCUSTER     := 0 As Numeric
+ Local _nDEVOL      := 0 As Numeric
+ Local _nSERVIC     := 0 As Numeric
+ Local _nDOCDEV     := 0 As Numeric
+ Local _nSERDEV     := 0 As Numeric
+ Local _nZF5_CAUCUS := 0 As Numeric
+ Local _nZF5_VLRTOT := 0 As Numeric
+ Local _nZF5_VALEMB := 0 As Numeric
 
 Begin Sequence 
    //================================================================================
@@ -1209,6 +1231,12 @@ Begin Sequence
           _nDOCDEV := _nI // Nota Fiscal de devolução           
        ElseIf AllTrim(aHeader[_nI,2]) == "ZF5_STATUS"
           _nCUSSTA := _nI // Status da ocorrência     
+       ElseIf AllTrim(aHeader[_nI,2]) == "ZF5_CAUCUS"
+          _nZF5_CAUCUS := _nI //   Causador do Custo.
+       ElseIf AllTrim(aHeader[_nI,2]) == "ZF5_VLRTOT"
+          _nZF5_VLRTOT := _nI //   Valor total da ocorrência 
+       ElseIf AllTrim(aHeader[_nI,2]) == "ZF5_VALEMB"
+          _nZF5_VALEMB := _nI //Valor Embutido no Frete     
        EndIf    
    Next
 
@@ -1216,6 +1244,7 @@ Begin Sequence
    // Realiza validações no aCols
    //================================================================================                            
    For _nI := 1 To Len(aCols)
+      
        _cTipoOcorr   := aCols[_nI,_nTIPOO]   // Tipo Ocorrência
        _cTipoCusto   := aCols[_nI,_nTIPOC]   // Tipo de custo.
        _nCustoIt     := aCols[_nI,_nCUSTOI]  // Custo Italac
@@ -1227,34 +1256,45 @@ Begin Sequence
        _cServOcorr   := aCols[_nI,_nSERVIC]  // Serviço Ocorrência - 1=Descarga;2=Deslocamento;3=Diaria;4=Reentrega;5=outros
        _cNfDev       := aCols[_nI,_nDOCDEV]  // Nota Fiscal de devolução 
        _cSerDev      := aCols[_nI,_nSERDEV]  // Serie da Nota Fiscal de Devolução
-
-       _nvaltransp := aCols[_nI,_nCUSTOT]
-       _nvaltot   :=  aCols[_nI,_nCUSTO]
-       _nvalita   :=  aCols[_nI,_nCUSTOI]
-       _nvalrep   :=  aCols[_nI,_nCUSTOR]
-       _nvalcli   :=  aCols[_nI,_nCUSTOC]
-       _nvalter   :=  aCols[_nI,_nCUSTER]
-
+       _nvaltransp   := aCols[_nI,_nCUSTOT]
+       _nvaltot      := aCols[_nI,_nCUSTO]
+       _nvalita      := aCols[_nI,_nCUSTOI]
+       _nvalrep      := aCols[_nI,_nCUSTOR]
+       _nvalcli      := aCols[_nI,_nCUSTOC]
+       _nvalter      := aCols[_nI,_nCUSTER]
+       _nValoco      := aCols[_nI,_nZF5_VLRTOT]
+       _nValemb      := aCols[_nI,_nZF5_VALEMB]
+       
        //Validando campos obrigatórios
-       If (empty(aCols[_ni,_nCUSTIP]) .OR. ((empty(aCols[_ni,_nCUSTIC]) .OR. empty(aCols[_ni,_nCUSMOT])) .and. acols[_ni][_nCusto] > 0);
-                   .OR. empty(aCols[_ni,_nCUSSTA]) ) 
-
-         Help( ,, "Atenção",, "Existem campos obrigatórios não preenchidos (Tipo ocorrência, Tipo custo, motivo de custo e/ou Status)",1,0)
-         _lRet := .F.
-         Exit 
+       If (empty(aCols[_ni,_nCUSTIP]) .OR. ((empty(aCols[_ni,_nCUSTIC]) .OR. empty(aCols[_ni,_nCUSMOT])) .and. acols[_ni][_nCusto] > 0) .OR. empty(aCols[_ni,_nCUSSTA]) ) 
+          Help( ,, "Atenção 001",, "Existem campos obrigatórios não preenchidos (Tipo ocorrência, Tipo custo, motivo de custo e/ou Status)",1,0)
+          _lRet := .F.
+          Exit 
 
       Endif   
 
-
        //Validando total de valores de cada linha  		  		
-       If _nvaltot != (_nvaltransp+_nvalita+_nvalrep+_nvalcli+_nvalter)
-                 
-          Help( ,, "Atenção",, "Custo total da ocorrência deve ser igual à somatória dos custos Italac, cliente, representante, transportador e terceiros ",1,0)
+       If _nvaltot <> (_nvaltransp+_nvalita+_nvalrep+_nvalcli+_nvalter+_nValemb)                 
+          Help( ,, "Atenção 002",, "Custo total da ocorrência deve ser igual à somatória dos custos Italac, cliente, representante, transportador e terceiros ",1,0)
          _lRet := .F.
          Exit    
-   
        Endif
-          
+
+       //Validando total de valores de cada linha  		  		
+       If _nvaloco <> (_nvaltransp+_nvalita+_nvalrep+_nvalcli+_nvalter)
+          Help( ,, 'Atenção 003',, 'Ocorrência ' + STRZERO(VAL(_cCodigo),6) + ' - Custo da ocorrência deve ser igual à somatória dos custos Italac, ' + ;
+                   ' cliente, representante, transportador, terceiros ' , 1, 0, .F. )
+           _lRet := .F.
+          Exit
+       EndIf
+
+       //Validando total de valores de cada linha  		  		
+       If _nvaltot > 0 .AND. Empty(aCols[_nI,_nZF5_CAUCUS] )
+          Help( ,, 'Atenção 004',,'Se tem Valor de custo o campo "Causador do Custo" deve ser informado.', 1, 0, .F. )
+          _lRet := .F.
+          Exit
+       EndIf
+
        ZFC->(DbSetOrder(1))
        ZFC->(DbSeek(xFilial("ZFC")+_cTipoOcorr))  
    

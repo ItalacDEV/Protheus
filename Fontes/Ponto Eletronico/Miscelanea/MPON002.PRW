@@ -4,9 +4,9 @@
 ===============================================================================================================================
    Autor      |   Data   |                              Motivo                                                          
 -------------------------------------------------------------------------------------------------------------------------------
-Bruno dos Reis|29/01/2025| Chamado 49600. Ajustes no envio da requisição.
 Lucas Borges  |27/06/2025| Chamado 50617. Revisões diversas visando padronizar os fontes
 Lucas Borges  |23/07/2025| Chamado 51340. Ajustar função para validação de ambiente de teste
+Lucas Borges  |01/08/2025| Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode
 ===============================================================================================================================
 */
 
@@ -702,7 +702,7 @@ ElseIf cOper == "SO" //OrganizationalStructure/SearchOrganizationalStructure
 	cBodyJson += '}'
 EndIf
 
-Return EncodeUtf8(cBodyJson)
+Return FWHttpEncode(cBodyJson)
 
 /*
 ===============================================================================================================================

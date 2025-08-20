@@ -9,6 +9,8 @@ Alex Wallauer | 19/10/2023 | Chamado 45337. Ajuste no calculo da posição atual d
 Igor Melgaço  | 12/03/2024 | Chamado 45575. Ajuste para conversão de texto do Assunto do email em padrao UTF8.
 --------------------------------------------------------------------------------------------------------------------------------------
 Lucas Borges  | 24/09/2024 | Chamado 48465. Removendo warning de compilação, corrigida chamada para schedule e melhorado log
+--------------------------------------------------------------------------------------------------------------------------------------
+Lucas Borges  | 01/08/2025 | Chamado 51453. Substituir função U_ITEncode por FWHttpEncode
 ======================================================================================================================================
 */
 
@@ -634,7 +636,7 @@ DO While !(_cAliasSC1)->(Eof())
 		//===============================
 		// Informamos o assunto do email.  
 		//===============================
-		_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+		_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 		_cMailID	:= _oProcess:fProcessId
 		_cTaskID	:= _oProcess:fTaskID
@@ -899,7 +901,7 @@ _oProcess:cTo := UsrRetMail(cEmail)
 //===============================
 // Informamos o assunto do email.  
 //===============================
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 _cMailID	:= _oProcess:fProcessId
 _cTaskID	:= _oProcess:fTaskID
@@ -1115,7 +1117,7 @@ While !TRBZZ7->(Eof())
 	//===============================
 	// Informamos o assunto do email.  
 	//===============================
-	_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+	_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 	_cMailID	:= _oProcess:fProcessId
 	_cTaskID	:= _oProcess:fTaskID
@@ -1243,7 +1245,7 @@ _oProcess:cTo := _cEmail
 // Informamos o assunto do email.  
 //===============================
 _cAssunto:="7-Retorno WF da Solicitação de Compras Filial " + _cFilName + " / SC Número: " + ALLTRIM(_cNumSC) + " - " + _cAvisoAssu
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 //=======================================================
 // Iniciamos a tarefa e enviamos o email ao destinatário.
@@ -1478,7 +1480,7 @@ _oProcess:cTo := _cEmail
 // Informamos o assunto do email.  
 //===============================
 _cAssunto:="8-QUESTIONAMENTO da Solicitação de Compras Filial " + _cFilName + " / SC Número: " + ALLTRIM(_cNumSC) 
-_oProcess:cSubject	:= U_ITEncode(_cAssunto)
+_oProcess:cSubject	:= FWHttpEncode(_cAssunto)
 
 //=======================================================
 // Iniciamos a tarefa e enviamos o email ao destinatário.

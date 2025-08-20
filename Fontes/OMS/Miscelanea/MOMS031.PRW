@@ -7,13 +7,14 @@
 Alex Wallauer |24/01/2024| Chamado 46063. Jerry. Adicionado 2 novas colunas: "Tipo de entrega" e "Dt NF Emissao".
 Alex Wallauer |08/02/2024| Chamado 44782. Jerry. Ajustes para a nova opcao de tipo de entrega: O = Agendado pelo Op.Log.
 Lucas Borges  |09/10/2024| Chamado 48465. Retirada manipulação do SX1
-===============================================================================================================================
- Analista     - Programador  - Inicio   - Envio    - Chamado - Motivo da Alteração
-===============================================================================================================================
-Jerry         - Julio Paz    - 29/01/25 - 26/02/25 - 48758   - Inclusão de Novas Informações a Serem Exibidas na Rotina de Exportação de Dados de Ocorrências de Frete.
-Jerry         - Igor Melgaço - 03/04/25 - 04/04/25 - 50342   - Ajustes para melhoria de performance.
-Jerry         - Igor Melgaço - 28/05/25 - 30/05/25 - 50817   - Ajustes para ordem de coluna do cabeçalho.
-===============================================================================================================================
+=================================================================================================================================================================================
+ Analista      - Programador   - Inicio   - Envio    - Chamado - Motivo da Alteração
+=================================================================================================================================================================================
+Jerry Santiago - Julio Paz     - 29/01/25 - 26/02/25 - 48758   - Inclusão de Novas Informações a Serem Exibidas na Rotina de Exportação de Dados de Ocorrências de Frete.
+Jerry Santiago - Igor Melgaço  - 03/04/25 - 04/04/25 - 50342   - Ajustes para melhoria de performance.
+Jerry Santiago - Igor Melgaço  - 28/05/25 - 30/05/25 - 50817   - Ajustes para ordem de coluna do cabeçalho.
+Jerry Santiago - Alex Wallauer - 18/07/25 - 01/08/25 - 49733   - Adicionado os campos: ZF5_CAUCUS,F2_I_PENCL,F2_I_PENOL,F2_VALBRUT,F2_VALMERC
+=================================================================================================================================================================================
 */
 
 //====================================================================================================
@@ -98,8 +99,8 @@ Local _cTotal       := "" As Character
 Local _dDtEmisao    := Ctod("") As Date
 Local _dDtCanhot    := Ctod("") As Date
 Local _dDtEmisPV    := Ctod("") As Date
-Local _cCliRem      := Space(6) As Character
-Local _cLojaclRe    := Space(4) As Character
+//Local _cCliRem      := Space(6) As Character
+//Local _cLojaclRe    := Space(4) As Character
 Local _cNomClRem    := Space(40) As Character    
 Local _cNfRem       := Space(9) As Character
 Local _dDtEntCli    := Ctod("") As Date
@@ -112,27 +113,31 @@ Local _cAliasTMP    := "" As Character
 
 Default _lAuto := .F.
 
+If !_lAuto
+  _oSelf:SetRegua1( 3 )
+  _oSelf:IncRegua1( "1-Buscando dados (Executando SELECT), Aguarde...")
+EndIf
+
 _lSai := .T.
 
 cTimeInicial:=TIME()
 _cAliasTMP := GetNextAlias()
 
 If _lAuto
-   MV_PAR07 := u_MOMS031L()
    _oSelf:cCaption := ("Buscando dados (Executando SELECT), Aguarde...")
+   MV_PAR07 := u_MOMS031L()
    ProcessMessages()
 Else
-  _oSelf:SetRegua1( 3 )
-  _oSelf:IncRegua1( "Buscando dados (Executando SELECT), Aguarde...")
+  _oSelf:IncRegua1( "2-Buscando dados (Executando SELECT), Aguarde...")
 EndIf
 
 _cQuery := "SELECT SC5.C5_FILIAL, SC5.C5_I_FLFNC, SC5.C5_I_FILFT, SC5.C5_I_TRCNF,SA1.A1_NOME, SA1.A1_EST, SA1.A1_MUN, ZF5.*,"
 _cQuery += " SC5.C5_I_AGEND, SA3.A3_TIPO, SA3.A3_NOME, SA3.A3_I_SUPE, SA3.A3_GEREN, SA3.A3_SUPER, "
 _cQuery += " SC5.C5_CLIENTE, SC5.C5_LOJACLI, SC5.C5_NUM, SC5.C5_I_OPER, SC5.C5_I_TPVEN, SC5.C5_I_DIASV,SC5.C5_I_DIASO, "
-_cQuery += " SC6.C6_I_QPALT, "
+_cQuery += " SC6.C6_I_QPALT, ZF5.ZF5_CAUCUS,SF2.F2_I_PENCL,SF2.F2_I_PENOL,SF2.F2_VALBRUT,SF2.F2_VALMERC , "//Campos adicionados ZF5_CAUCUS,F2_I_PENCL,F2_I_PENOL,F2_VALBRUT,F2_VALMERC
 _cQuery += " SF2.F2_EMISSAO, SF2.F2_I_DTRC, DAI_I_OPLO, DAI_I_LOPL, DAI_I_TRED, DAI_I_LTRE, "
 _cQuery += " SA2.A2_NOME AS NOMEOPLOG, SA2_2.A2_NOME AS NOMERED, ZFD_DESCRI, "
-_cQuery += " SC5_2.C5_CLIENT AS R_C5_CLIENT, SC5_2.C5_LOJACLI AS R_C5_LOJACLI,SC5_2.C5_NOTA AS R_C5_NOTA, SA1_2.A1_NOME AS R_A1_NOME, "
+_cQuery += " SC5_2.C5_NOTA AS R_C5_NOTA, SA1_2.A1_NOME AS R_A1_NOME, "//SC5_2.C5_CLIENT AS R_C5_CLIENT, SC5_2.C5_LOJACLI AS R_C5_LOJACLI,
 _cQuery += " SF2_2.F2_I_DENCL AS R_F2_I_DENCL, "
 _cQuery += " SC5.C5_VEND4  , SA3_2.A3_NOME AS NOMESUP, "
 _cQuery += " SC5.C5_VEND3  , SA3_3.A3_NOME AS NOMEGER, "
@@ -246,7 +251,7 @@ If _lAuto
    _oSelf:cCaption := ("Contando dados, Aguarde...")
    ProcessMessages()
 Else
-   _oSelf:IncRegua1("Contando dados, Aguarde...")
+   _oSelf:IncRegua1("3-Contando dados, Aguarde...")
 EndIf
 
 DbSelectArea(_cAliasTMP)
@@ -315,8 +320,8 @@ Do While (_cAliasTMP)->(!EOF())
    _dDtEmisao  := stod((_cAliasTMP)->F2_EMISSAO)
    _dDtCanhot  := stod((_cAliasTMP)->F2_I_DTRC)
 
-   _cCliRem   := Space(6)
-   _cLojaclRe := Space(4)
+   //_cCliRem   := Space(6)
+   //_cLojaclRe := Space(4)
    _cNomClRem := Space(40)
    _cNfRem    := Space(9)
    _dDtEntCli := Ctod("") 
@@ -330,8 +335,8 @@ Do While (_cAliasTMP)->(!EOF())
    _cNomOpRed := Space(40)
 
    If !Empty((_cAliasTMP)->C5_I_PVREM)
-      _cCliRem   := (_cAliasTMP)->R_C5_CLIENT
-      _cLojaclRe := (_cAliasTMP)->R_C5_LOJACLI
+      //_cCliRem   := (_cAliasTMP)->R_C5_CLIENT
+      //_cLojaclRe := (_cAliasTMP)->R_C5_LOJACLI
       _cNomClRem := (_cAliasTMP)->R_A1_NOME
       _cNfRem    := (_cAliasTMP)->R_C5_NOTA
       _dDtEntCli := stod((_cAliasTMP)->R_F2_I_DENCL)
@@ -354,6 +359,13 @@ Do While (_cAliasTMP)->(!EOF())
    _nDiasViag  := (_cAliasTMP)->C5_I_DIASV
    _nDiasOper  := (_cAliasTMP)->C5_I_DIASO
    _nLeadTime  := (_cAliasTMP)->C5_I_DIASV + (_cAliasTMP)->C5_I_DIASO
+   
+   IF !EMPTY((_cAliasTMP)->ZF5_CAUCUS)
+      aSX5Z2:=FwGetSX5("Z2",(_cAliasTMP)->ZF5_CAUCUS)//Vetor com os dados do SX5 com: [1] FILIAL [2] TABELA [3] CHAVE [4] DESCRICAO   
+      _cZF5_CAUCUS:=Alltrim(aSX5Z2[1,3])+"-"+Alltrim(aSX5Z2[1,4])
+   Else
+      _cZF5_CAUCUS:= "  "
+   EndIf
 
    aadd(_aDados ,{   (_cAliasTMP)->ZF5_FILIAL ,;                  // 01   
                      (_cAliasTMP)->ZF5_DOCOC ,;                   // 02
@@ -405,8 +417,7 @@ Do While (_cAliasTMP)->(!EOF())
                      (_cAliasTMP)->ZF5_FORTER ,;                  // 48
                      (_cAliasTMP)->ZF5_LOJTER ,;                  // 49
                      (_cAliasTMP)->ZF5_NOMTER ,;                  // 50
-                     (_cAliasTMP)->ZF5_NDEBIT ,;                  // 51
-                     (_cAliasTMP)->ZF5_VALTON ,;                  // 52
+                     (_cAliasTMP)->ZF5_NDEBIT ,;                  // 51                     (_cAliasTMP)->ZF5_VALTON ,;                  // 52
                      (_cAliasTMP)->C5_ASSNOM ,;                   // 53
                      (_cAliasTMP)->C5_I_TRCNF ,;                  // 54
                      (_cAliasTMP)->C5_I_FLFNC ,;                  // 55
@@ -429,88 +440,100 @@ Do While (_cAliasTMP)->(!EOF())
                      _cNomOpRed ,;                                // 72  // "Operador Redespacho"
                      _nDiasViag ,;                                // 73  // "Dias de Viagem"
                      _nDiasOper ,;                                // 74  // "Dias Operacional"
-                     _nLeadTime})                                 // 75  // "Lead Time"
+                     _nLeadTime ,;                                // 75  // "Lead Time"
+                     _cZF5_CAUCUS ,;                              // 76  // Causador (ZF5_CAUCUS)
+                     Dtoc(Stod((_cAliasTMP)->F2_I_PENCL)) ,;      // 77  // Prev. Entrega Cliente (F2_I_PENCL)
+                     Dtoc(Stod((_cAliasTMP)->F2_I_PENOL)) ,;      // 78  // Prev. Entrega Oper. Logístico (F2_I_PENOL)
+                     (_cAliasTMP)->F2_VALBRUT ,;                  // 79  // Valor Bruto da Nota (F2_VALBRUT)
+                     (_cAliasTMP)->F2_VALMERC })                  // 80  // Valor de Mercadoria da Nota (F2_VALMERC)
+
 
    (_cAliasTMP)->(Dbskip())
 EndDo 
 
 If len(_aDados) > 0
-
-   AADD(_aCabecalho,{"Filial", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"NF", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Serie", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Cod Ocor", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Data entrega", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Data Abertura", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Data Encerrado", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Status Ocorrência", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Motivo", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Cliente", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Loja", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome Cliente", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Cidade Clien.", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"UF Clien.", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Pedido", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Colaborador", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Rep", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome Representante", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Supervisor", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome Supervisor", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Coord", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome Coordernador", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Gerente", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome Gerente", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Carga", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Dt Carga", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Serviço", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Descrição Serviço", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Custo", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Custo Ocorrência", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Custo Emb Frete", 1 , 1 , .F.})   
-   AADD(_aCabecalho,{"Custo Cliente" , 1 , 2 , .F.})
-   AADD(_aCabecalho,{"Custo Italac" , 1 , 2 , .F.})
-   AADD(_aCabecalho,{"Custo Repres" , 1 , 2 , .F.})
-   AADD(_aCabecalho,{"Custo Transp" , 1 , 2 , .F.})
-   AADD(_aCabecalho,{"Custo Terceir" , 1 , 2 , .F.})
-   AADD(_aCabecalho,{"CTRC", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Motivo Custo", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Agenda", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Usuario Log", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome Us Log", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Cod Transp", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Transportadora", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Valor/Ton", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Volumes", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Peso Carg" , 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Peso NF" , 1 , 1 , .F.})
-   AADD(_aCabecalho,{"For Terceiro", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Loja F. Terc", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nome For Ter", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Nf Debito", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Total Tonelada", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Assistente Comercial Resp.", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Troca NF", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Fil Carregamento", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Fil Faturamento", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Cod Regional", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Desc Regional", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Tipo de entrega", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Dt NF Emissao", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Pedido Portal", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Tp Operacao", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Emissao do Pedido", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Veiculo Pedido", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Dt.Entrega Canhoto", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Rem/Vda Ped", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Rem/Vda Razo Social", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Rem/Vda Nfe", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Shelf Life do Produto", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Dt entrega Cliente", 1 , 4 , .F.})
-   AADD(_aCabecalho,{"Operador Logistico", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Operador Redespacho", 1 , 1 , .F.})
-   AADD(_aCabecalho,{"Dias de Viagem", 1 , 2 , .F.})
-   AADD(_aCabecalho,{"Dias Operacional", 1 , 2 , .F.})
-   AADD(_aCabecalho,{"Lead Time", 1 , 2 , .F.})
+   // Alinhamento: 1-Left   ,2-Center,3-Right
+   // Formatação.: 1-General,2-Number,3-Monetário,4-DateTime
+   //                Titulo das Colunas ,Alinhamento ,Formatação, Totaliza?
+   AADD(_aCabecalho,{"Filial"                        , 2 , 1 , .F.})// 01
+   AADD(_aCabecalho,{"NF"                            , 2 , 1 , .F.})// 02
+   AADD(_aCabecalho,{"Serie"                         , 2 , 1 , .F.})// 03
+   AADD(_aCabecalho,{"Cod Ocor"                      , 2 , 1 , .F.})// 04
+   AADD(_aCabecalho,{"Data entrega"                  , 2 , 4 , .F.})// 05
+   AADD(_aCabecalho,{"Data Abertura"                 , 2 , 4 , .F.})// 06
+   AADD(_aCabecalho,{"Data Encerrado"                , 2 , 4 , .F.})// 07
+   AADD(_aCabecalho,{"Status Ocorrência"             , 1 , 1 , .F.})// 08
+   AADD(_aCabecalho,{"Motivo"                        , 1 , 1 , .F.})// 09
+   AADD(_aCabecalho,{"Cliente"                       , 2 , 1 , .F.})// 10
+   AADD(_aCabecalho,{"Loja"                          , 2 , 1 , .F.})// 11
+   AADD(_aCabecalho,{"Nome Cliente"                  , 1 , 1 , .F.})// 12
+   AADD(_aCabecalho,{"Cidade Cliente"                , 1 , 1 , .F.})// 13
+   AADD(_aCabecalho,{"UF Cliente"                    , 2 , 1 , .F.})// 14
+   AADD(_aCabecalho,{"Pedido"                        , 1 , 1 , .F.})// 15
+   AADD(_aCabecalho,{"Colaborador"                   , 2 , 1 , .F.})// 16
+   AADD(_aCabecalho,{"Cod. Representante"            , 2 , 1 , .F.})// 17
+   AADD(_aCabecalho,{"Nome Representante"            , 1 , 1 , .F.})// 18
+   AADD(_aCabecalho,{"Cod. Supervisor"               , 2 , 1 , .F.})// 19
+   AADD(_aCabecalho,{"Nome Supervisor"               , 1 , 1 , .F.})// 20
+   AADD(_aCabecalho,{"Cod. Coordernador"             , 2 , 1 , .F.})// 21
+   AADD(_aCabecalho,{"Nome Coordernador"             , 1 , 1 , .F.})// 22
+   AADD(_aCabecalho,{"Cod. Gerente"                  , 2 , 1 , .F.})// 23
+   AADD(_aCabecalho,{"Nome Gerente"                  , 1 , 1 , .F.})// 24
+   AADD(_aCabecalho,{"Carga"                         , 2 , 1 , .F.})// 25
+   AADD(_aCabecalho,{"Dt Carga"                      , 2 , 4 , .F.})// 26
+   AADD(_aCabecalho,{"Cod. Serviço"                  , 2 , 1 , .F.})// 27
+   AADD(_aCabecalho,{"Descrição Serviço"             , 1 , 1 , .F.})// 28
+   AADD(_aCabecalho,{"Custo"                         , 3 , 3 , .F.})// 29
+   AADD(_aCabecalho,{"Custo Ocorrência"              , 3 , 3 , .F.})// 30
+   AADD(_aCabecalho,{"Custo Emb Frete"               , 3 , 3 , .F.})// 31
+   AADD(_aCabecalho,{"Custo Cliente"                 , 3 , 3 , .F.})// 32
+   AADD(_aCabecalho,{"Custo Italac"                  , 3 , 3 , .F.})// 33
+   AADD(_aCabecalho,{"Custo Repres"                  , 3 , 3 , .F.})// 34
+   AADD(_aCabecalho,{"Custo Transp"                  , 3 , 3 , .F.})// 35
+   AADD(_aCabecalho,{"Custo Terceir"                 , 3 , 3 , .F.})// 36
+   AADD(_aCabecalho,{"CTRC"                          , 1 , 1 , .F.})// 37
+   AADD(_aCabecalho,{"Motivo Custo"                  , 1 , 1 , .F.})// 38
+   AADD(_aCabecalho,{"Agenda"                        , 1 , 1 , .F.})// 39
+   AADD(_aCabecalho,{"Cod. Usuario Inicial"          , 2 , 1 , .F.})// 40
+   AADD(_aCabecalho,{"Nome Usuario Inicial"          , 1 , 1 , .F.})// 41
+   AADD(_aCabecalho,{"Cod. Transportadora"           , 2 , 1 , .F.})// 42
+   AADD(_aCabecalho,{"Transportadora"                , 1 , 1 , .F.})// 43
+   AADD(_aCabecalho,{"Valor por Tonelada"            , 3 , 3 , .F.})// 44
+   AADD(_aCabecalho,{"Volumes"                       , 3 , 2 , .F.})// 45
+   AADD(_aCabecalho,{"Peso Carg"                     , 3 , 2 , .F.})// 46
+   AADD(_aCabecalho,{"Peso NF"                       , 3 , 2 , .F.})// 47
+   AADD(_aCabecalho,{"Forn. Terceiro"                , 2 , 1 , .F.})// 48
+   AADD(_aCabecalho,{"Loja Forn. Terceiro"           , 2 , 1 , .F.})// 49
+   AADD(_aCabecalho,{"Nome Forn. Terceiro"           , 1 , 1 , .F.})// 50
+   AADD(_aCabecalho,{"Nf Debito"                     , 2 , 1 , .F.})// 51    AADD(_aCabecalho,{"Total Tonelada"                , 1 , 1 , .F.})// 52
+   AADD(_aCabecalho,{"Assistente Comercial Resp."    , 1 , 1 , .F.})// 53
+   AADD(_aCabecalho,{"Troca NF"                      , 2 , 1 , .F.})// 54
+   AADD(_aCabecalho,{"Fil Carregamento"              , 2 , 1 , .F.})// 55
+   AADD(_aCabecalho,{"Fil Faturamento"               , 2 , 1 , .F.})// 56
+   AADD(_aCabecalho,{"Cod. Regional"                 , 2 , 1 , .F.})// 57
+   AADD(_aCabecalho,{"Desc. Regional"                , 1 , 1 , .F.})// 58
+   AADD(_aCabecalho,{"Tipo de entrega"               , 1 , 1 , .F.})// 59
+   AADD(_aCabecalho,{"Dt NF Emissao"                 , 2 , 4 , .F.})// 60
+   AADD(_aCabecalho,{"Pedido Portal"                 , 2 , 1 , .F.})// 61
+   AADD(_aCabecalho,{"Tipo Operacao"                 , 2 , 1 , .F.})// 62
+   AADD(_aCabecalho,{"Emissao do Pedido"             , 2 , 4 , .F.})// 63
+   AADD(_aCabecalho,{"Veiculo Pedido"                , 1 , 1 , .F.})// 64
+   AADD(_aCabecalho,{"Dt.Entrega Canhoto"            , 2 , 4 , .F.})// 65
+   AADD(_aCabecalho,{"Rem/Vda Ped"                   , 2 , 1 , .F.})// 66
+   AADD(_aCabecalho,{"Rem/Vda Razo Social"           , 1 , 1 , .F.})// 67
+   AADD(_aCabecalho,{"Rem/Vda Nfe"                   , 2 , 1 , .F.})// 68
+   AADD(_aCabecalho,{"Shelf Life do Produto"         , 1 , 1 , .F.})// 69
+   AADD(_aCabecalho,{"Dt entrega Cliente"            , 2 , 4 , .F.})// 70
+   AADD(_aCabecalho,{"Operador Logistico"            , 1 , 1 , .F.})// 71
+   AADD(_aCabecalho,{"Operador Redespacho"           , 1 , 1 , .F.})// 72
+   AADD(_aCabecalho,{"Dias de Viagem"                , 3 , 2 , .F.})// 73
+   AADD(_aCabecalho,{"Dias Operacional"              , 3 , 2 , .F.})// 74
+   AADD(_aCabecalho,{"Lead Time"                     , 3 , 2 , .F.})// 75
+   AADD(_aCabecalho,{"Causador"                      , 1 , 1 , .F.})// 76
+   AADD(_aCabecalho,{"Prev. Entrega Cliente"         , 2 , 4 , .F.})// 77
+   AADD(_aCabecalho,{"Prev. Entrega Oper. Logístico" , 2 , 4 , .F.})// 78
+   AADD(_aCabecalho,{"Valor Bruto da Nota"           , 3 , 3 , .F.})// 79
+   AADD(_aCabecalho,{"Valor de Mercadoria da Nota"   , 3 , 3 , .F.})// 80
 
    _aDados := aSort(_aDados,,,{|x,y| x[22]+x[18]+x[38] < y[22]+y[18]+y[38]})  
    _cArq    := "MOMS031_"+DTOS(DATE())+"_"+StrTran(TIME(),":","_")+".xlsx"

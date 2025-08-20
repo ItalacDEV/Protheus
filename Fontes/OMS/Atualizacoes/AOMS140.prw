@@ -7,6 +7,7 @@
 Igor Melgaço      | 22/01/2024 | Chamado: 46064 - Integração de Notas Canceladas com o TMS
 Igor Melgaço      | 30/07/2024 | Chamado: 47204 - Ajustes para transf. de pedido.
 Julio Paz         | 31/07/2024 | Chamado: 46122 - Alt.Rot.int.Vale Pedagio p/Salvar Val.Vale Pedagio e XML Retorno na Tab.DAK 
+Lucas Borges      | 01/08/2025 | Chamado 51453. Substituir função EncodeUtf8 por FWHttpEncode
 =========================================================================================================================================================================================================================
 Analista         - Programador       - Inicio     - Envio    - Chamado - Motivo da Alteração
 =========================================================================================================================================================================================================================
@@ -1768,11 +1769,11 @@ Begin Sequence
 
          _cXML := '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">'
          _cXML += '<soapenv:Header>'
-         _cXML += '<Token xmlns="Token">'+EncodeUTF8(AllTrim(_cToken))+'</Token>'
+         _cXML += '<Token xmlns="Token">'+FWHttpEncode(AllTrim(_cToken))+'</Token>'
          _cXML += '</soapenv:Header>'
          _cXML += '<soapenv:Body>'
          _cXML += '<tem:InformarCancelamentoNotaFiscal>'
-         _cXML += '<tem:protocoloNFe>'+ EncodeUTF8(AllTrim(_cProtocolo)) +'</tem:protocoloNFe>'
+         _cXML += '<tem:protocoloNFe>'+ FWHttpEncode(AllTrim(_cProtocolo)) +'</tem:protocoloNFe>'
          _cXML += '</tem:InformarCancelamentoNotaFiscal>'
          _cXML += '</soapenv:Body>'
          _cXML += '</soapenv:Envelope>'
@@ -4346,8 +4347,8 @@ Begin Sequence
    Begin Transaction
          
       _cBodyJson := '{'
-      _cBodyJson += '"protocoloCarga": "'+EncodeUTF8(AllTrim(DAK->DAK_I_RECR))+'",'
-      _cBodyJson += '"numeroCarga": "'+EncodeUTF8(AllTrim(DAK->DAK_COD))+'" '
+      _cBodyJson += '"protocoloCarga": "'+FWHttpEncode(AllTrim(DAK->DAK_I_RECR))+'",'
+      _cBodyJson += '"numeroCarga": "'+FWHttpEncode(AllTrim(DAK->DAK_COD))+'" '
       _cBodyJson += '}'
 
       _aHeader :={}

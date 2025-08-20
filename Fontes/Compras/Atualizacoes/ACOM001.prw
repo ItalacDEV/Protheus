@@ -7,6 +7,7 @@
 Julio Paz     |15/02/2019| Chamado 28120. Correções nas leituras e validações dos Aprovadores sobre tabela Solic. Compras(SC1)
 Lucas Borges  |17/10/2019| Chamado 28346. Removidos os Warning na compilação da release 12.1.25
 Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada estática no nome das tabelas do sistema
+ALEX WALLAUER |09/05/2025| TESTE
 ===============================================================================================================================
 */
 

@@ -1,12 +1,12 @@
 /*
 ===============================================================================================================================
-               ULTIMAS ATUALIZA«’ES EFETUADAS - CONSULTAR LOG DO VERSIONADOR PARA HISTORICO COMPLETO
+               ULTIMAS ATUALIZA√á√ïES EFETUADAS - CONSULTAR LOG DO VERSIONADOR PARA HISTORICO COMPLETO
 ===============================================================================================================================
    Autor      |   Data   |                              Motivo                                                          
 -------------------------------------------------------------------------------------------------------------------------------
-Julio Paz     |15/02/2019| Chamado 28120. CorreÁıes nas leituras e validaÁıes dos Aprovadores sobre tabela Solic. Compras(SC1)
-Lucas Borges  |17/10/2019| Chamado 28346. Removidos os Warning na compilaÁ„o da release 12.1.25
-Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada est·tica no nome das tabelas do sistema
+Julio Paz     |15/02/2019| Chamado 28120. Corre√ß√µes nas leituras e valida√ß√µes dos Aprovadores sobre tabela Solic. Compras(SC1)
+Lucas Borges  |17/10/2019| Chamado 28346. Removidos os Warning na compila√ß√£o da release 12.1.25
+Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada est√°tica no nome das tabelas do sistema
 ===============================================================================================================================
 */
 
@@ -19,9 +19,9 @@ Lucas Borges  |09/05/2025| Chamado 50617. Corrigir chamada est·tica no nome das 
 /*
 ===============================================================================================================================
 Programa----------: ACOM001
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Cadastro de Aprovadores e Solicitantes de solicitaÁıes de compras.
+Descri√ß√£o---------: Cadastro de Aprovadores e Solicitantes de solicita√ß√µes de compras.
 Parametros--------: Nenhum
 Retorno-----------: Nenhum
 ===============================================================================================================================
@@ -52,14 +52,14 @@ If ZZL->(dbSeek(xFilial("ZZL") + __cUserId))
 		
 		_oBrowse:Activate()
 	Else
-		U_ITMSG("O usu·rio: " + cUserName + " n„o possui permiss„o para utilizar este cadastro.",;
-		        "Usu·rio Inv·lido",;
-		        "Verificar com a ·rea de TI a possibilidade de habilitar o seu usu·rio.",2) 
+		U_ITMSG("O usu√°rio: " + cUserName + " n√£o possui permiss√£o para utilizar este cadastro.",;
+		        "Usu√°rio Inv√°lido",;
+		        "Verificar com a √°rea de TI a possibilidade de habilitar o seu usu√°rio.",2) 
 	EndIf
 Else
-	U_ITMSG("O usu·rio: " + cUserName + " n„o possui permiss„o para utilizar este cadastro.",;
-            "Usu·rio Inv·lido",;
-            "Verificar com a ·rea de TI a possibilidade de habilitar o seu usu·rio.",2) 
+	U_ITMSG("O usu√°rio: " + cUserName + " n√£o possui permiss√£o para utilizar este cadastro.",;
+            "Usu√°rio Inv√°lido",;
+            "Verificar com a √°rea de TI a possibilidade de habilitar o seu usu√°rio.",2) 
 EndIf
 
 Return()
@@ -67,11 +67,11 @@ Return()
 /*
 ===============================================================================================================================
 Programa----------: MenuDef
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina para criaÁ„o do menu da tela principal
+Descri√ß√£o---------: Rotina para cria√ß√£o do menu da tela principal
 Parametros--------: Nenhum
-Retorno-----------: _aRotina - Array com as opÁıes de menu.
+Retorno-----------: _aRotina - Array com as op√ß√µes de menu.
 ===============================================================================================================================
 */
 Static Function MenuDef()
@@ -89,9 +89,9 @@ Return( _aRotina )
 /*
 ===============================================================================================================================
 Programa----------: ModelDef
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina para montagem do modelo de dados para o processamento
+Descri√ß√£o---------: Rotina para montagem do modelo de dados para o processamento
 Parametros--------: Nenhum
 Retorno-----------: Nenhum
 ===============================================================================================================================
@@ -124,9 +124,9 @@ Return( _oModel )
 /*
 ===============================================================================================================================
 Programa----------: ViewDef
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina para montar a View de Dados para exibiÁ„o.
+Descri√ß√£o---------: Rotina para montar a View de Dados para exibi√ß√£o.
 Parametros--------: Nenhum
 Retorno-----------: Nenhum
 ===============================================================================================================================
@@ -170,27 +170,21 @@ Return( _oView )
 /*
 ===============================================================================================================================
 Programa----------: ACOM001VLD
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina para validaÁ„o dos campos SX3
+Descri√ß√£o---------: Rotina para valida√ß√£o dos campos SX3
 Parametros--------: Nenhum
-Retorno-----------: _lRet -> .T. - Continua processo / .F. - n„o permite continuaÁ„o do processo
+Retorno-----------: _lRet -> .T. - Continua processo / .F. - n√£o permite continua√ß√£o do processo
 ===============================================================================================================================
 
-sdasdasdasd alsdalsdkalkjsd lajsld ajlsdjkasdasd
-asdasdja 
-sdasd
-asdasda
-sd a
-sd
-asdasda jsda
-jsdiajsdpiajsd 
-asda
-sdapsjd asidasd 
 
 
 
 */
+
+
+/*=========================*/
+
 User Function ACOM001VLD()
 Local _aArea		:= GetArea()
 Local _aSave		:= FwSaveRows()
@@ -227,13 +221,13 @@ If 'ZZ7_TIPO' $ _cCampo
 			If (_cAlias)->USADO > 0
 				_aInfHlp := {}
 				//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-				aAdd( _aInfHlp , { "AlteraÁ„o de Tipo n„o permitido Aprov"		, "ador possui SC pendente.               "	} )
+				aAdd( _aInfHlp , { "Altera√ß√£o de Tipo n√£o permitido Aprov"		, "ador possui SC pendente.               "	} )
 				aAdd( _aInfHlp , { "Por favor verificar SC's.            "		, "                                       "	} )
 			
 				U_ITCADHLP( _aInfHlp , "ACOM00107",.F. )
 				
-				U_ITMSG("AlteraÁ„o de Tipo n„o permitido Aprovador possui SC pendente.",;
-		                "AtenÁ„o",;
+				U_ITMSG("Altera√ß√£o de Tipo n√£o permitido Aprovador possui SC pendente.",;
+		                "Aten√ß√£o",;
 		                "Por favor verificar SC's.",3, , , .T.)
 			
 				_lRet := .F.
@@ -256,13 +250,13 @@ ElseIf 'ZZ7_STATUS' $ _cCampo
 	
 		_aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-		aAdd( _aInfHlp , { "Para o tipo Solicitante, somente poder„o"	, " ser selecionado as situaÁıes N ou B."	} )
-		aAdd( _aInfHlp , { "Favor selecionar uma opÁ„o v·lida.  "		, ""										} )
+		aAdd( _aInfHlp , { "Para o tipo Solicitante, somente poder√£o"	, " ser selecionado as situa√ß√µes N ou B."	} )
+		aAdd( _aInfHlp , { "Favor selecionar uma op√ß√£o v√°lida.  "		, ""										} )
 				
 		U_ITCADHLP( _aInfHlp , "ACOM00101",.F. )
 		
-		U_ITMSG("Para o tipo Solicitante, somente poder„o ser selecionado as situaÁıes N ou B.",;
-		        "AtenÁ„o",;
+		U_ITMSG("Para o tipo Solicitante, somente poder√£o ser selecionado as situa√ß√µes N ou B.",;
+		        "Aten√ß√£o",;
 		        "Por favor verificar SC's.",3, , , .T.)
 
 		_lRet := .F.
@@ -286,14 +280,14 @@ ElseIf 'ZZ7_DTSUBI' $ _cCampo
 
 			_aInfHlp := {}
 			//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-			aAdd( _aInfHlp , { "A data inÌcio n„o pode ser maior que a "	, "data final.                          "	} )
-			aAdd( _aInfHlp , { "Favor selecionar uma data v·lida.      "	, ""                                        } )
+			aAdd( _aInfHlp , { "A data in√≠cio n√£o pode ser maior que a "	, "data final.                          "	} )
+			aAdd( _aInfHlp , { "Favor selecionar uma data v√°lida.      "	, ""                                        } )
 				
 			U_ITCADHLP( _aInfHlp , "ACOM00102",.F. )
 			
-			U_ITMSG("A data inÌcio n„o pode ser maior que a data final. ",;
-		            "AtenÁ„o",;
-		            "Favor selecionar uma data v·lida.",3, , , .T.)
+			U_ITMSG("A data in√≠cio n√£o pode ser maior que a data final. ",;
+		            "Aten√ß√£o",;
+		            "Favor selecionar uma data v√°lida.",3, , , .T.)
 
 			_lRet := .F.
 		EndIf
@@ -304,14 +298,14 @@ ElseIf 'ZZ7_DTSUBF' $ _cCampo
 
 			_aInfHlp := {}
 			//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-			aAdd( _aInfHlp , { "A data final n„o pode ser menor que a "	, "data inicio.                          "	} )
-			aAdd( _aInfHlp , { "Favor selecionar uma data v·lida.      "	, ""                                    } )
+			aAdd( _aInfHlp , { "A data final n√£o pode ser menor que a "	, "data inicio.                          "	} )
+			aAdd( _aInfHlp , { "Favor selecionar uma data v√°lida.      "	, ""                                    } )
 				
 			U_ITCADHLP( _aInfHlp , "ACOM00103",.F. )
 			
-			U_ITMSG("A data final n„o pode ser menor que a data inicio. ",;
-		            "AtenÁ„o",;
-		            "Favor selecionar uma data v·lida. ",3, , , .T.)
+			U_ITMSG("A data final n√£o pode ser menor que a data inicio. ",;
+		            "Aten√ß√£o",;
+		            "Favor selecionar uma data v√°lida. ",3, , , .T.)
 			
 
 			_lRet := .F.
@@ -341,13 +335,13 @@ ElseIf 'ZZ8_CC' $ _cCampo
 	Else
 		aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-		aAdd( _aInfHlp , { "O Centro de custo digitado n„o existe."	, "                                      "	} )
+		aAdd( _aInfHlp , { "O Centro de custo digitado n√£o existe."	, "                                      "	} )
 		aAdd( _aInfHlp , { "Favor digitar um CC correto, ou acessar"	, " a consulta via [F3]"                } )
 				
 		U_ITCADHLP( _aInfHlp , "ACOM00110",.F. )
 		
-		U_ITMSG("O Centro de custo digitado n„o existe.",;
-		        "AtenÁ„o",;
+		U_ITMSG("O Centro de custo digitado n√£o existe.",;
+		        "Aten√ß√£o",;
 		        "Favor digitar um CC correto, ou acessar a consulta via [F3]",3, , , .T.)
 
 		_lRet := .F.
@@ -383,13 +377,13 @@ ElseIf 'ZZ8_MSBLQL' $ _cCampo
 				If TRBCAD->( !Eof() )
 					_aInfHlp := {}
 					//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-					aAdd( _aInfHlp , { "Centro de Custo j· informado em outro "		, "cadastro. Aprov: " + TRBCAD->APROV + ".   "		} )
+					aAdd( _aInfHlp , { "Centro de Custo j√° informado em outro "		, "cadastro. Aprov: " + TRBCAD->APROV + ".   "		} )
 					aAdd( _aInfHlp , { "Favor verificar Centro de Custo infor-"		, "mado.                            "				} )
 	
 					U_ITCADHLP( _aInfHlp , "ACOM00108",.F. )
 					
-					U_ITMSG("Centro de Custo j· informado em outro cadastro. Aprov: " + TRBCAD->APROV + ".",;
-		                    "AtenÁ„o",;
+					U_ITMSG("Centro de Custo j√° informado em outro cadastro. Aprov: " + TRBCAD->APROV + ".",;
+		                    "Aten√ß√£o",;
 		                    "Favor verificar Centro de Custo informado.",3, , , .T.)
 	
 					_lRet := .F.
@@ -404,13 +398,13 @@ ElseIf 'ZZ8_MSBLQL' $ _cCampo
 		If M->ZZ7_STATUS == "B"
 			_aInfHlp := {}
 			//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-			aAdd( _aInfHlp , { "Centro de Custo n„o pode ser desbloque"		, "ado, pois Aprovador est· bloqueado.    "	} )
+			aAdd( _aInfHlp , { "Centro de Custo n√£o pode ser desbloque"		, "ado, pois Aprovador est√° bloqueado.    "	} )
 			aAdd( _aInfHlp , { "Favor verificar Centro de Custo infor-"		, "mado.                                  "	} )
 	
 			U_ITCADHLP( _aInfHlp , "ACOM00112",.F. )
 			
-			U_ITMSG("Centro de Custo n„o pode ser desbloqueado, pois Aprovador est· bloqueado. ",;
-		            "AtenÁ„o",;
+			U_ITMSG("Centro de Custo n√£o pode ser desbloqueado, pois Aprovador est√° bloqueado. ",;
+		            "Aten√ß√£o",;
 		            "Favor verificar Centro de Custo informado.  ",3, , , .T.)
 	
 			_lRet := .F.
@@ -427,11 +421,11 @@ Return(_lRet)
 /*
 ===============================================================================================================================
 Programa----------: VALIDCOMIT
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina para validaÁ„o de validaÁ„o TudoOk, valida as informaÁıes da tela antes de salvar o registro.
+Descri√ß√£o---------: Rotina para valida√ß√£o de valida√ß√£o TudoOk, valida as informa√ß√µes da tela antes de salvar o registro.
 Parametros--------: _oModel -> Modelo de Dados
-Retorno-----------: _lRet -> .T. - Continua processo / .F. - n„o permite continuaÁ„o do processo
+Retorno-----------: _lRet -> .T. - Continua processo / .F. - n√£o permite continua√ß√£o do processo
 ===============================================================================================================================
 */
 Static Function VALIDCOMIT(_oModel)
@@ -460,14 +454,14 @@ If _nOper == MODEL_OPERATION_INSERT
 	If dbSeek(xFilial("ZZ7") + _cCodUsr)
 		_aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-		aAdd( _aInfHlp , { "CÛdigo do Aprovador/Solicitante infor"		, "mado j· consta no cadastro.      "		} )
-		aAdd( _aInfHlp , { "Verique o cÛdigo digitado ou acesse o"		, " cadastro via [F3].              "		} )
+		aAdd( _aInfHlp , { "C√≥digo do Aprovador/Solicitante infor"		, "mado j√° consta no cadastro.      "		} )
+		aAdd( _aInfHlp , { "Verique o c√≥digo digitado ou acesse o"		, " cadastro via [F3].              "		} )
 	
 		U_ITCADHLP( _aInfHlp , "ACOM00114",.F. )
 		
-		U_ITMSG("CÛdigo do Aprovador/Solicitante informado j· consta no cadastro. ",;
-		        "AtenÁ„o",;
-		        "Verique o cÛdigo digitado ou acesse o cadastro via [F3].  ",3 , , , .T.)
+		U_ITMSG("C√≥digo do Aprovador/Solicitante informado j√° consta no cadastro. ",;
+		        "Aten√ß√£o",;
+		        "Verique o c√≥digo digitado ou acesse o cadastro via [F3].  ",3 , , , .T.)
 	
 		_lRet := .F.
 	EndIf
@@ -476,14 +470,14 @@ If _nOper == MODEL_OPERATION_INSERT
 	
 		_aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-		aAdd( _aInfHlp , { "CÛdigo do Aprovador/Solicitante infor"		, "mado est· incorreto.             "		} )
-		aAdd( _aInfHlp , { "Verique o cÛdigo digitado ou acesse o"		, " cadastro via [F3].              "		} )
+		aAdd( _aInfHlp , { "C√≥digo do Aprovador/Solicitante infor"		, "mado est√° incorreto.             "		} )
+		aAdd( _aInfHlp , { "Verique o c√≥digo digitado ou acesse o"		, " cadastro via [F3].              "		} )
 	
 		U_ITCADHLP( _aInfHlp , "ACOM00104",.F. )
 		
-		U_ITMSG("CÛdigo do Aprovador/Solicitante informado est· incorreto. ",;
-		        "AtenÁ„o",;
-		        "Verique o cÛdigo digitado ou acesse o cadastro via [F3].",3 , , , .T.)
+		U_ITMSG("C√≥digo do Aprovador/Solicitante informado est√° incorreto. ",;
+		        "Aten√ß√£o",;
+		        "Verique o c√≥digo digitado ou acesse o cadastro via [F3].",3 , , , .T.)
 	
 		_lRet := .F.
 	
@@ -494,13 +488,13 @@ If _nOper == MODEL_OPERATION_INSERT
 		_aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
 		aAdd( _aInfHlp , { "Para Aprovador com status ausente,   "		, "informar substituto.             "		} )
-		aAdd( _aInfHlp , { "Digite todas as informaÁıes do apro- "		, "vador subistituto.               "		} )
+		aAdd( _aInfHlp , { "Digite todas as informa√ß√µes do apro- "		, "vador subistituto.               "		} )
 	
 		U_ITCADHLP( _aInfHlp , "ACOM00105",.F. )
 		
 		U_ITMSG("Para Aprovador com status ausente, informar substituto. ",;
-		        "AtenÁ„o",;
-		        "Digite todas as informaÁıes do aprovador subistituto.",3, , , .T.)
+		        "Aten√ß√£o",;
+		        "Digite todas as informa√ß√µes do aprovador subistituto.",3, , , .T.)
 	
 		_lRet := .F.
 	
@@ -514,14 +508,14 @@ If _nOper == MODEL_OPERATION_INSERT
 				If CTT->CTT_BLOQ <> "2"
 					_aInfHlp := {}
 					//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-					aAdd( _aInfHlp , { "Centro de Custo informado est· bloqueado"	, ". Linha: " + AllTrim(Str(_nI)) + "              "		} )
-					aAdd( _aInfHlp , { "Favor selecione um Centro de Custo   "		, "v·lido.                          "		} )
+					aAdd( _aInfHlp , { "Centro de Custo informado est√° bloqueado"	, ". Linha: " + AllTrim(Str(_nI)) + "              "		} )
+					aAdd( _aInfHlp , { "Favor selecione um Centro de Custo   "		, "v√°lido.                          "		} )
 	
 					U_ITCADHLP( _aInfHlp , "ACOM00106",.F. )
 					
-					U_ITMSG("Centro de Custo informado est· bloqueado. Linha: " + AllTrim(Str(_nI)) + ". ",; 
-		                    "AtenÁ„o",; 
-		                    "Favor selecione um Centro de Custo v·lido. ", 3, , ,.T.) 
+					U_ITMSG("Centro de Custo informado est√° bloqueado. Linha: " + AllTrim(Str(_nI)) + ". ",; 
+		                    "Aten√ß√£o",; 
+		                    "Favor selecione um Centro de Custo v√°lido. ", 3, , ,.T.) 
 	
 					_lRet := .F.
 				EndIf
@@ -541,13 +535,13 @@ If _nOper == MODEL_OPERATION_INSERT
 				
 				_aInfHlp := {}
 				//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-				aAdd( _aInfHlp , { "Centro de Custo j· informado em outro "		, "cadastro.                        "		} )
+				aAdd( _aInfHlp , { "Centro de Custo j√° informado em outro "		, "cadastro.                        "		} )
 				aAdd( _aInfHlp , { "Favor verificar Centro de Custo in-  "		, "formado.                         "		} )
 	
 				U_ITCADHLP( _aInfHlp , "ACOM00108", .F. )
 
-				U_ITMSG("Centro de Custo j· informado em outro cadastro. ",;
-		                "AtenÁ„o",;
+				U_ITMSG("Centro de Custo j√° informado em outro cadastro. ",;
+		                "Aten√ß√£o",;
 		                "Favor verificar Centro de Custo informado. ",3, , , .T.)
 	
 				_lRet := .F.
@@ -563,14 +557,14 @@ ElseIf _nOper == MODEL_OPERATION_UPDATE
 	
 		_aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-		aAdd( _aInfHlp , { "CÛdigo do Aprovador/Solicitante infor"		, "mado est· incorreto.             "		} )
-		aAdd( _aInfHlp , { "Verique o cÛdigo digitado ou acesse o"		, " cadastro via [F3].              "		} )
+		aAdd( _aInfHlp , { "C√≥digo do Aprovador/Solicitante infor"		, "mado est√° incorreto.             "		} )
+		aAdd( _aInfHlp , { "Verique o c√≥digo digitado ou acesse o"		, " cadastro via [F3].              "		} )
 	
 		U_ITCADHLP( _aInfHlp , "ACOM00104", .F. )
 		
-		U_ITMSG("CÛdigo do Aprovador/Solicitante informado est· incorreto. ",;
-		        "AtenÁ„o",;
-		        "Verique o cÛdigo digitado ou acesse o cadastro via [F3]. ",3, , , .T.)
+		U_ITMSG("C√≥digo do Aprovador/Solicitante informado est√° incorreto. ",;
+		        "Aten√ß√£o",;
+		        "Verique o c√≥digo digitado ou acesse o cadastro via [F3]. ",3, , , .T.)
 	
 		_lRet := .F.
 	
@@ -581,13 +575,13 @@ ElseIf _nOper == MODEL_OPERATION_UPDATE
 		_aInfHlp := {}
 		//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
 		aAdd( _aInfHlp , { "Para Aprovador com status ausente,   "		, "informar substituto.             "		} )
-		aAdd( _aInfHlp , { "Digite todas as informaÁıes do apro- "		, "vador subistituto.               "		} )
+		aAdd( _aInfHlp , { "Digite todas as informa√ß√µes do apro- "		, "vador subistituto.               "		} )
 	
 		U_ITCADHLP( _aInfHlp , "ACOM00105", .F. )
 		
 		U_ITMSG("Para Aprovador com status ausente, informar substituto. ",;
-		        "AtenÁ„o",;
-		        "Digite todas as informaÁıes do aprovador subistituto. ",3, , , .T.)
+		        "Aten√ß√£o",;
+		        "Digite todas as informa√ß√µes do aprovador subistituto. ",3, , , .T.)
 	
 		_lRet := .F.
 	
@@ -601,14 +595,14 @@ ElseIf _nOper == MODEL_OPERATION_UPDATE
 				If CTT->CTT_BLOQ <> "2"
 					_aInfHlp := {}
 					//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-					aAdd( _aInfHlp , { "Centro de Custo informado est· bloqueado"	, ". Linha: " + AllTrim(Str(_nI)) + "              "		} )
-					aAdd( _aInfHlp , { "Favor selecione um Centro de Custo   "		, "v·lido.                          "		} )
+					aAdd( _aInfHlp , { "Centro de Custo informado est√° bloqueado"	, ". Linha: " + AllTrim(Str(_nI)) + "              "		} )
+					aAdd( _aInfHlp , { "Favor selecione um Centro de Custo   "		, "v√°lido.                          "		} )
 	
 					U_ITCADHLP( _aInfHlp , "ACOM00106", .F. )
 					
-					U_ITMSG("Centro de Custo informado est· bloqueado. Linha: " + AllTrim(Str(_nI)) + ". ",;
-		                    "AtenÁ„o",;
-		                    "Favor selecione um Centro de Custo v·lido. ",3, , , .T.)
+					U_ITMSG("Centro de Custo informado est√° bloqueado. Linha: " + AllTrim(Str(_nI)) + ". ",;
+		                    "Aten√ß√£o",;
+		                    "Favor selecione um Centro de Custo v√°lido. ",3, , , .T.)
 	
 					_lRet := .F.
 				EndIf
@@ -628,13 +622,13 @@ ElseIf _nOper == MODEL_OPERATION_UPDATE
 				If _cStatus <> "B" .And. _oModelZZ8:GetValue("ZZ8_MSBLQL") <> '1'
 					_aInfHlp := {}
 					//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-					aAdd( _aInfHlp , { "Centro de Custo j· informado em outro "		, "cadastro.                        "		} )
+					aAdd( _aInfHlp , { "Centro de Custo j√° informado em outro "		, "cadastro.                        "		} )
 					aAdd( _aInfHlp , { "Favor verificar Centro de Custo in-  "		, "formado.                         "		} )
 	
 					U_ITCADHLP( _aInfHlp , "ACOM00109", .F. )
 					
-					U_ITMSG("Centro de Custo j· informado em outro cadastro. ",;
-		                    "AtenÁ„o",;
+					U_ITMSG("Centro de Custo j√° informado em outro cadastro. ",;
+		                    "Aten√ß√£o",;
 		                    "Favor verificar Centro de Custo informado. ",3, , , .T.)
 	
 					_lRet := .F.
@@ -654,13 +648,13 @@ ElseIf _nOper == MODEL_OPERATION_UPDATE
 			If !ZZ8->(dbSeek(_oModelZZ8:GetValue("ZZ8_FILIAL") + _oModelZZ8:GetValue("ZZ8_CODUSR") + _oModelZZ8:GetValue("ZZ8_CC"))) .And. !Empty(_oModelZZ8:GetValue("ZZ8_FILIAL")) .And. !Empty(_oModelZZ8:GetValue("ZZ8_CODUSR"))
 				_aInfHlp := {}
 				//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-				aAdd( _aInfHlp , { "AlteraÁ„o n„o permitida. Centro de Cu-"		, "sto " + _oModelZZ8:GetValue("ZZ8_CC") + "                              "	} )
+				aAdd( _aInfHlp , { "Altera√ß√£o n√£o permitida. Centro de Cu-"		, "sto " + _oModelZZ8:GetValue("ZZ8_CC") + "                              "	} )
 				aAdd( _aInfHlp , { "Bloqueie ou delete o registro.       "		, "                                       "	} )
 			
 				U_ITCADHLP( _aInfHlp , "ACOM00111", .F. )
 				
-				U_ITMSG("AlteraÁ„o n„o permitida. Centro de Custo " + _oModelZZ8:GetValue("ZZ8_CC") + ". ",;
-		                "AtenÁ„o",;
+				U_ITMSG("Altera√ß√£o n√£o permitida. Centro de Custo " + _oModelZZ8:GetValue("ZZ8_CC") + ". ",;
+		                "Aten√ß√£o",;
 		                "Bloqueie ou delete o registro.",3, , , .T.)
 			
 				_lRet := .F.
@@ -682,14 +676,14 @@ ElseIf _nOper == MODEL_OPERATION_UPDATE
 				If TRBCC->USADO > 0
 					_aInfHlp := {}
 					//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-					aAdd( _aInfHlp , { "Exclus„o n„o permitida C. Custo j·   "		, "utilizado em solicitaÁ„o.              "	} )
-					aAdd( _aInfHlp , { "Se necess·rio alterar o campo Bloquei-"		, "o para SIM.                      "		} )
+					aAdd( _aInfHlp , { "Exclus√£o n√£o permitida C. Custo j√°   "		, "utilizado em solicita√ß√£o.              "	} )
+					aAdd( _aInfHlp , { "Se necess√°rio alterar o campo Bloquei-"		, "o para SIM.                      "		} )
 				
 					U_ITCADHLP( _aInfHlp , "ACOM00113",.F. )
 					
-					U_ITMSG("Exclus„o n„o permitida C. Custo j· utilizado em solicitaÁ„o. ",;
-		                    "AtenÁ„o",;
-		                    "Se necess·rio alterar o campo Bloqueio para SIM.",3, , , .T.)
+					U_ITMSG("Exclus√£o n√£o permitida C. Custo j√° utilizado em solicita√ß√£o. ",;
+		                    "Aten√ß√£o",;
+		                    "Se necess√°rio alterar o campo Bloqueio para SIM.",3, , , .T.)
 				
 					_lRet := .F.
 				EndIf
@@ -711,14 +705,14 @@ ElseIf _nOper == MODEL_OPERATION_DELETE
 		If (_cAlias)->USADO > 0
 			_aInfHlp := {}
 			//                 |....:....|....:....|....:....|....:....|      |....:....|....:....|....:....|....:....|
-			aAdd( _aInfHlp , { "Exclus„o n„o permitida Aprovador/Soli-"		, "citante j· utilizado em Sol. de Compra."	} )
-			aAdd( _aInfHlp , { "Se necess·rio alterar o campo Bloquei-"		, "o para SIM.                      "		} )
+			aAdd( _aInfHlp , { "Exclus√£o n√£o permitida Aprovador/Soli-"		, "citante j√° utilizado em Sol. de Compra."	} )
+			aAdd( _aInfHlp , { "Se necess√°rio alterar o campo Bloquei-"		, "o para SIM.                      "		} )
 		
 			U_ITCADHLP( _aInfHlp , "ACOM00104", .F. )
 			
-			U_ITMSG("Exclus„o n„o permitida Aprovador/Solicitante j· utilizado em Sol. de Compra.",;
-		            "AtenÁ„o",;
-		            "Se necess·rio alterar o campo Bloqueio para SIM. ",3, , , .T.)
+			U_ITMSG("Exclus√£o n√£o permitida Aprovador/Solicitante j√° utilizado em Sol. de Compra.",;
+		            "Aten√ß√£o",;
+		            "Se necess√°rio alterar o campo Bloqueio para SIM. ",3, , , .T.)
 		
 			_lRet := .F.
 		EndIf
@@ -730,8 +724,8 @@ RestArea(_aArea)
 FwRestRows(_aSave)
 
 //======================================================================
-// Grava log de Inclus„o/AlteraÁ„o/Exclus„o do Cadastro de Aprovadores 
-// e Solicitantes de solicitaÁıes de compras.
+// Grava log de Inclus√£o/Altera√ß√£o/Exclus√£o do Cadastro de Aprovadores 
+// e Solicitantes de solicita√ß√µes de compras.
 //====================================================================== 
 U_ITLOGACS('VALIDCOMIT')
 
@@ -740,9 +734,9 @@ Return(_lRet)
 /*
 ===============================================================================================================================
 Programa----------: ACOM001C
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina escrita para fazer a cÛpia dos diretiros de um registro para o outro.
+Descri√ß√£o---------: Rotina escrita para fazer a c√≥pia dos diretiros de um registro para o outro.
 Parametros--------: Nenhum
 Retorno-----------: Nenhum
 ===============================================================================================================================
@@ -779,7 +773,7 @@ Local _oSButtonOk
 
 Private _oDlg
 
-DEFINE MSDIALOG _oDlg TITLE "CÛpia de direitos" FROM 000, 000  TO 170, 475 COLORS 0, 16777215 PIXEL
+DEFINE MSDIALOG _oDlg TITLE "C√≥pia de direitos" FROM 000, 000  TO 170, 475 COLORS 0, 16777215 PIXEL
 
 	@ 005, 006 SAY _oSayApo	PROMPT "Aprovador Origem:"	SIZE 046, 007 OF _oDlg COLORS 16711680, 16777215	PIXEL
 	@ 017, 006 MSGET _oGetApo VAR _cGetApo SIZE 050, 010 OF _oDlg VALID VldInf(@_cGetApo,@_cGetNao,@_cGetSao,1) COLORS 0, 16777215 F3 "ZZ7APO"	PIXEL
@@ -787,7 +781,7 @@ DEFINE MSDIALOG _oDlg TITLE "CÛpia de direitos" FROM 000, 000  TO 170, 475 COLOR
 	@ 005, 066 SAY _oSayNao	PROMPT "Nome:"				SIZE 025, 007 OF _oDlg COLORS 0, 16777215	PIXEL
 	@ 017, 066 MSGET _oGetNao VAR _cGetNao SIZE 128, 010 OF _oDlg COLORS 0, 16777215 READONLY	PIXEL
 
-	@ 005, 206 SAY _oSaySao	PROMPT "SituaÁ„o:"			SIZE 025, 007 OF _oDlg COLORS 0, 16777215	PIXEL
+	@ 005, 206 SAY _oSaySao	PROMPT "Situa√ß√£o:"			SIZE 025, 007 OF _oDlg COLORS 0, 16777215	PIXEL
 	@ 017, 206 MSGET _oGetSao VAR _cGetSao SIZE 020, 010 OF _oDlg COLORS 0, 16777215 READONLY	PIXEL
 
 	@ 033, 006 SAY _oSayDst	PROMPT "Aprovador Destino:"	SIZE 048, 007 OF _oDlg COLORS 16711680, 16777215	PIXEL
@@ -796,7 +790,7 @@ DEFINE MSDIALOG _oDlg TITLE "CÛpia de direitos" FROM 000, 000  TO 170, 475 COLOR
 	@ 033, 066 SAY _oSayNds	PROMPT "Nome:"				SIZE 025, 007 OF _oDlg COLORS 0, 16777215	PIXEL
 	@ 045, 066 MSGET _oGetNds VAR _cGetNds SIZE 128, 010 OF _oDlg COLORS 0, 16777215 READONLY	PIXEL
 
-	@ 033, 206 SAY _oSaySds	PROMPT "SituaÁ„o:"			SIZE 025, 007 OF _oDlg COLORS 0, 16777215	PIXEL
+	@ 033, 206 SAY _oSaySds	PROMPT "Situa√ß√£o:"			SIZE 025, 007 OF _oDlg COLORS 0, 16777215	PIXEL
 	@ 045, 206 MSGET _oGetSds VAR _cGetSds SIZE 020, 010 OF _oDlg COLORS 0, 16777215 READONLY	PIXEL
 	
 	DEFINE SBUTTON _oSButtonOk FROM 065, 085 TYPE 01 OF _oDlg ENABLE ACTION (_nOpca := 1, _oDlg:End())
@@ -831,7 +825,7 @@ If _nOpca == 1
 			TRBCC->(dbGoTop())
 			
 			If TRBCC->CONTADOR > 0
-				_cMsg += "O Centro de custo " + AllTrim((_cAlias)->ZZ8_CC) + ", j· est· sendo utilizado em outro cadastro."
+				_cMsg += "O Centro de custo " + AllTrim((_cAlias)->ZZ8_CC) + ", j√° est√° sendo utilizado em outro cadastro."
 			Else
 				RecLock("ZZ8", .T.)
 					ZZ8->ZZ8_FILIAL	:= xFilial("ZZ8")
@@ -847,19 +841,19 @@ If _nOpca == 1
 		End
 		If !Empty(_cMsg)
 			U_ITMSG(_cMsg,;
-            "AtenÁ„o", ,3, , , .T.)
+            "Aten√ß√£o", ,3, , , .T.)
 		EndIf
 	EndIf
 
 	(_cAlias)->( dbCloseArea() )
 	
    //===============================================================
-   // Grava log da cÛpia dos diretiros de um registro para o outro.
+   // Grava log da c√≥pia dos diretiros de um registro para o outro.
    //=============================================================== 
    U_ITLOGACS('ACOM001C')
 Else
-   U_ITMSG('OperaÁ„o cancelada pelo usu·rio.',;
-           "AtenÁ„o", ,3, , , .T.)
+   U_ITMSG('Opera√ß√£o cancelada pelo usu√°rio.',;
+           "Aten√ß√£o", ,3, , , .T.)
 EndIf
 
 RestArea(_aArea)
@@ -869,12 +863,12 @@ Return
 /*
 ===============================================================================================================================
 Programa----------: VldInf
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 31/07/2015                                    .
-DescriÁ„o---------: Rotina de validaÁ„o das informaÁıes digitas na tela de cÛpia, e preenchimento dos campos virtuais
-Parametros--------: _cCodUsr = CÛdigo do usu·rio aprovador.
+Descri√ß√£o---------: Rotina de valida√ß√£o das informa√ß√µes digitas na tela de c√≥pia, e preenchimento dos campos virtuais
+Parametros--------: _cCodUsr = C√≥digo do usu√°rio aprovador.
                     _cNomeAp = Nome do aprovador
-                    _cSituac = SituaÁ„o / Status
+                    _cSituac = Situa√ß√£o / Status
                     _nCampo  = 1 = Aprovador de Origem / 2 = Aprovador de destino.
 Retorno-----------: Nenhum
 ===============================================================================================================================
@@ -890,9 +884,9 @@ If !Empty(_cCodUsr)
 	If ZZ7->(dbSeek(xFilial("ZZ7") + _cCodUsr))
 		If _nCampo == 1
 			If !(ZZ7->ZZ7_TIPO == "A" .And. ZZ7->ZZ7_STATUS == "B")
-			   U_ITMSG("O usu·rio informado n„o est· apto a ser copiado.",;
-                       "Aprovador Inv·lido",;
-                       "Verificar no cadastro se o usu·rio informado È Aprovador e se est· como Bloqueado.",2, , , .T.) 
+			   U_ITMSG("O usu√°rio informado n√£o est√° apto a ser copiado.",;
+                       "Aprovador Inv√°lido",;
+                       "Verificar no cadastro se o usu√°rio informado √© Aprovador e se est√° como Bloqueado.",2, , , .T.) 
 				
 				_cCodUsr	:= Space(TamSX3("ZZ7_CODUSR")[1])
 				_lRet		:= .F.
@@ -902,9 +896,9 @@ If !Empty(_cCodUsr)
 			EndIf
 		ElseIf _nCampo == 2
 			If !(ZZ7->ZZ7_TIPO == "A" .And. ZZ7->ZZ7_STATUS <> "B")
-			   U_ITMSG("O usu·rio informado n„o est· apto a ser copiado.",;
-                       "Aprovador Inv·lido",;
-                       "Verificar no cadastro se o usu·rio informado È Aprovador e sua situaÁ„o est· diferente de Bloqueado.",2, , , .T.)
+			   U_ITMSG("O usu√°rio informado n√£o est√° apto a ser copiado.",;
+                       "Aprovador Inv√°lido",;
+                       "Verificar no cadastro se o usu√°rio informado √© Aprovador e sua situa√ß√£o est√° diferente de Bloqueado.",2, , , .T.)
 				
 				_cCodUsr	:= Space(TamSX3("ZZ7_CODUSR")[1])
 				_lRet		:= .F.
@@ -914,9 +908,9 @@ If !Empty(_cCodUsr)
 			EndIf
 		EndIf
 	Else
-	   U_ITMSG("CÛdigo digitado n„o existe no cadastro.",;
-               "Aprovador n„o cadastrado",;
-               "Favor digitar um cÛdigo v·lido ou acionar a consulta via tecla [F3].",2, , , .T.)
+	   U_ITMSG("C√≥digo digitado n√£o existe no cadastro.",;
+               "Aprovador n√£o cadastrado",;
+               "Favor digitar um c√≥digo v√°lido ou acionar a consulta via tecla [F3].",2, , , .T.)
             
 		_lRet := .F.
 	EndIf
@@ -927,9 +921,9 @@ Else
 		_cAprov := "Aprovador Destino"
 	EndIf
 
-	U_ITMSG("CÛdigo do " + _cAprov + " n„o preenchido.",;
-            "Aprovador ObrigatÛrio",;
-            "Favor preencher o cÛdigo do " + _cAprov + ".",2, , , .T.) 
+	U_ITMSG("C√≥digo do " + _cAprov + " n√£o preenchido.",;
+            "Aprovador Obrigat√≥rio",;
+            "Favor preencher o c√≥digo do " + _cAprov + ".",2, , , .T.) 
 	
 	_lRet := .F.
 EndIf
@@ -941,9 +935,9 @@ Return(_lRet)
 /*
 ===============================================================================================================================
 Programa----------: ACOM001T
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 08/09/2015
-DescriÁ„o---------: Rotina escrita para fazer a transferÍncia de aprovadores
+Descri√ß√£o---------: Rotina escrita para fazer a transfer√™ncia de aprovadores
 Parametros--------: Nenhum
 Retorno-----------: Nenhum
 ===============================================================================================================================
@@ -993,23 +987,23 @@ Private oMSNewGD
 Private oDlg
 
 //==================================================================
-// Valida se o usu·rio corrente est· configurado como adm de compras
+// Valida se o usu√°rio corrente est√° configurado como adm de compras
 //==================================================================
 dbSelectArea("ZZL")
 ZZL->(dbSetOrder(3)) //ZZL_FILIAL + ZZL_CODUSU
 If ZZL->(dbSeek(xFilial("ZZL") + __cUserId))
 	If ZZL->ZZL_ADMCAS == "N"
-       U_ITMSG(__cUserId + " - " + AllTrim(UsrFullName(__cUserId)) + " sem permiss„o para utilizar esta funcionalidade.",;
-               "TransferÍncia de Aprovador",;
-               "Favor comunicar a ·rea de Compras, que È respons·vel por solicitar para TI a liberaÁ„o desta funcionalidade.",2, , , .T.)
+       U_ITMSG(__cUserId + " - " + AllTrim(UsrFullName(__cUserId)) + " sem permiss√£o para utilizar esta funcionalidade.",;
+               "Transfer√™ncia de Aprovador",;
+               "Favor comunicar a √°rea de Compras, que √© respons√°vel por solicitar para TI a libera√ß√£o desta funcionalidade.",2, , , .T.)
 		
 		RestArea(aArea)
 		Return()
 	EndIf
 Else
-   U_ITMSG(__cUserId + " - " + AllTrim(UsrFullName(__cUserId)) + " sem permiss„o para utilizar esta funcionalidade.",;
-           "TransferÍncia de Aprovador",;
-           "Favor comunicar a ·rea de Compras, que È respons·vel por solicitar para TI a liberaÁ„o desta funcionalidade.",2, , , .T.)
+   U_ITMSG(__cUserId + " - " + AllTrim(UsrFullName(__cUserId)) + " sem permiss√£o para utilizar esta funcionalidade.",;
+           "Transfer√™ncia de Aprovador",;
+           "Favor comunicar a √°rea de Compras, que √© respons√°vel por solicitar para TI a libera√ß√£o desta funcionalidade.",2, , , .T.)
                
 	RestArea(aArea)
 	Return()
@@ -1024,30 +1018,30 @@ aHeader := {}
 FillGetDados(1,"SC1",1,,,{||.T.},,,,,,.T.)
 nUsado := Len(aHeader)
 
-DEFINE MSDIALOG oDlg TITLE "TransferÍncia Aprovador" FROM 000, 000  TO 600, 1000 COLORS 0, 16777215 PIXEL
+DEFINE MSDIALOG oDlg TITLE "Transfer√™ncia Aprovador" FROM 000, 000  TO 600, 1000 COLORS 0, 16777215 PIXEL
 
 	@ 001, 003 GROUP oGpAprO TO 066, 232 PROMPT "Aprovador Origem" OF oDlg COLOR 0, 16777215 PIXEL
     @ 001, 268 GROUP oGpAprD TO 066, 497 PROMPT "Aprovador Destino" OF oDlg COLOR 0, 16777215 PIXEL
 	//============================
-	//InformaÁıes Aprovador Origem
+	//Informa√ß√µes Aprovador Origem
 	//============================
 	@ 014, 006 SAY oSAprO PROMPT "Aprovador Origem?" SIZE 049, 007 OF oDlg COLORS 16711680, 16777215 PIXEL
 	@ 023, 006 MSGET oGAprO VAR cGAprO SIZE 045, 010 OF oDlg PICTURE "@!" VALID {||AtuDados("O",cGAprO,@cGSitO,@cGNomO), TransfVld(cGAprO, cGAprD)} COLORS 0, 16777215 F3 "ZZ7TRF" PIXEL
-	@ 014, 080 SAY oSSitO PROMPT "SituaÁ„o" SIZE 025, 007 OF oDlg COLORS 0, 16777215 PIXEL
+	@ 014, 080 SAY oSSitO PROMPT "Situa√ß√£o" SIZE 025, 007 OF oDlg COLORS 0, 16777215 PIXEL
 	@ 023, 080 MSGET oGSitO VAR cGSitO SIZE 018, 010 OF oDlg COLORS 0, 16777215 READONLY PIXEL
 	@ 037, 006 SAY oSNomO PROMPT "Nome" SIZE 025, 007 OF oDlg COLORS 0, 16777215 PIXEL
 	@ 045, 006 MSGET oGNomO VAR cGNomO SIZE 180, 010 OF oDlg COLORS 0, 16777215 READONLY PIXEL
 	//=============================
-	//InformaÁıes Aprovador Destino
+	//Informa√ß√µes Aprovador Destino
 	//=============================
 	@ 015, 271 SAY oSAprD PROMPT "Aprovador Destino?" SIZE 049, 007 OF oDlg COLORS 16711680, 16777215 PIXEL
 	@ 025, 271 MSGET oGAprD VAR cGAprD SIZE 045, 010 OF oDlg PICTURE "@!" VALID {||AtuDados("D",cGAprD,@cGSitD,@cGNomD), TransfVld(cGAprO, cGAprD)} COLORS 0, 16777215 F3 "ZZ7TRF" PIXEL
-	@ 015, 352 SAY oSSitD PROMPT "SituaÁ„o" SIZE 025, 007 OF oDlg COLORS 0, 16777215 PIXEL
+	@ 015, 352 SAY oSSitD PROMPT "Situa√ß√£o" SIZE 025, 007 OF oDlg COLORS 0, 16777215 PIXEL
 	@ 025, 352 MSGET oGSitD VAR cGSitD SIZE 018, 010 OF oDlg COLORS 0, 16777215 READONLY PIXEL
 	@ 038, 271 SAY oSNomD PROMPT "Nome" SIZE 025, 007 OF oDlg COLORS 0, 16777215 PIXEL
 	@ 045, 271 MSGET oGNomD VAR cGNomD SIZE 180, 010 OF oDlg COLORS 0, 16777215 READONLY PIXEL
 
-	@ 074, 175 SAY oSay1 PROMPT "SolicitaÁıes de Compras Pendentes para o Aprovador Origem" SIZE 150, 013 OF oDlg COLORS 0, 16777088 PIXEL
+	@ 074, 175 SAY oSay1 PROMPT "Solicita√ß√µes de Compras Pendentes para o Aprovador Origem" SIZE 150, 013 OF oDlg COLORS 0, 16777088 PIXEL
 
 	oMSNewGD := MsNewGetDados():New( 095, 002, 295, 494, 0, "AllwaysTrue", "AllwaysTrue", "",,, 999, "AllwaysTrue", "", "AllwaysTrue", oDlg, aHeader, aCols)
 	
@@ -1079,17 +1073,17 @@ If nOpc == 1
 		EndIf
 	Next
 	
-	U_ITMSG("TransferÍncia concluÌda com sucesso.",;
-            "TransferÍncia de Aprovador", ,2, , , .T.)
+	U_ITMSG("Transfer√™ncia conclu√≠da com sucesso.",;
+            "Transfer√™ncia de Aprovador", ,2, , , .T.)
    
    //===============================================================
-   // Grava log da transferÍncia de aprovadores
+   // Grava log da transfer√™ncia de aprovadores
    //=============================================================== 
    U_ITLOGACS('ACOM001T')        
              
 Else
-   U_ITMSG("TransferÍncia n„o foi concluÌda. Favor refazer o processo.",;
-           "TransferÍncia de Aprovador", ,2, , , .T.)
+   U_ITMSG("Transfer√™ncia n√£o foi conclu√≠da. Favor refazer o processo.",;
+           "Transfer√™ncia de Aprovador", ,2, , , .T.)
 EndIf
 	
 RestArea(aArea)
@@ -1098,14 +1092,14 @@ Return
 /*
 ===============================================================================================================================
 Programa----------: AtuDados
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 08/09/2015                                    .
-DescriÁ„o---------: FunÁ„o escrita para fazer a atualizaÁ„o dos dados dos Aprovadores Origem/Destino
+Descri√ß√£o---------: Fun√ß√£o escrita para fazer a atualiza√ß√£o dos dados dos Aprovadores Origem/Destino
 Parametros--------: cTipo - O = Aprovador Origem / D = Aprovador Destino
-                  : cGApr - CÛdigo do Aprovador
+                  : cGApr - C√≥digo do Aprovador
                   : cGSit - Status do Aprovador
                   : cGNom - Nome do Aprovador
-Retorno-----------: lRet - Retorno sempre .T., pois a funÁ„o faz somente a atualizaÁ„o dos dados na tela
+Retorno-----------: lRet - Retorno sempre .T., pois a fun√ß√£o faz somente a atualiza√ß√£o dos dados na tela
 ===============================================================================================================================
 */
 Static Function AtuDados(cTipo,cGApr,cGSit,cGNom)
@@ -1128,17 +1122,17 @@ If cTipo == "O"
 	If ZZ7->ZZ7_TIPO <> "A"
 	   lRet := .F.
 
-       U_ITMSG("CÛdigo de Origem informado n„o È um aprovador.",;
-               "TransferÍncia de Aprovador",;
-               "Favor verificar o cÛdigo informado.",2, , , .T.)
+       U_ITMSG("C√≥digo de Origem informado n√£o √© um aprovador.",;
+               "Transfer√™ncia de Aprovador",;
+               "Favor verificar o c√≥digo informado.",2, , , .T.)
 	EndIf
 ElseIf cTipo == "D"
 	If ZZ7->ZZ7_TIPO <> "A" .Or. ZZ7->ZZ7_STATUS == "B"
 		lRet := .F.
 		
-		U_ITMSG("CÛdigo de Destino informado n„o È um Aprovador ou esta Bloqueado.",;
-               "TransferÍncia de Aprovador",;
-               "Favor verificar o cÛdigo informado.",2, , , .T.)
+		U_ITMSG("C√≥digo de Destino informado n√£o √© um Aprovador ou esta Bloqueado.",;
+               "Transfer√™ncia de Aprovador",;
+               "Favor verificar o c√≥digo informado.",2, , , .T.)
 	EndIf
 EndIf
 
@@ -1214,7 +1208,7 @@ If cTipo == "O" .And. lRet
 EndIf
 
 //====================================================================
-// Grava log da atualizaÁ„o dos dados dos Aprovadores Origem/Destino
+// Grava log da atualiza√ß√£o dos dados dos Aprovadores Origem/Destino
 //==================================================================== 
 U_ITLOGACS('AtuDados')
 
@@ -1224,12 +1218,12 @@ Return(lRet)
 /*
 ===============================================================================================================================
 Programa----------: TransfVld
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 08/09/2015
-DescriÁ„o---------: FunÁ„o escrita para validar dos cÛdigos de Aprovador Origem e Aprovador Destino, que n„o podem ser iguais
-Parametros--------: cGAprO - CÛdigo do Aprovador Origem
-                  : cGAprD - CÛdigo do Aprovador Destino
-Retorno-----------: lRet - .T. caso os cÛdigos forem diferente, .F. caso contr·rio, e o sistema n„o deixa salvar a solicitaÁ„o
+Descri√ß√£o---------: Fun√ß√£o escrita para validar dos c√≥digos de Aprovador Origem e Aprovador Destino, que n√£o podem ser iguais
+Parametros--------: cGAprO - C√≥digo do Aprovador Origem
+                  : cGAprD - C√≥digo do Aprovador Destino
+Retorno-----------: lRet - .T. caso os c√≥digos forem diferente, .F. caso contr√°rio, e o sistema n√£o deixa salvar a solicita√ß√£o
 ===============================================================================================================================
 */
 Static Function TransfVld(cGAprO, cGAprD)
@@ -1242,9 +1236,9 @@ If !Empty(cGAprO) .And. !Empty(cGAprD)
 	If cGAprO == cGAprD
 		lRet := .F.
 		
-		U_ITMSG("CÛdigo de Origem n„o pode ser o mesmo que o CÛdigo de Destino.",;
-               "TransferÍncia de Aprovador",;
-               "Favor verificar os cÛdigos informados.",2, , , .T.)
+		U_ITMSG("C√≥digo de Origem n√£o pode ser o mesmo que o C√≥digo de Destino.",;
+               "Transfer√™ncia de Aprovador",;
+               "Favor verificar os c√≥digos informados.",2, , , .T.)
 		
 	EndIf
 EndIf
@@ -1255,12 +1249,12 @@ Return(lRet)
 /*
 ===============================================================================================================================
 Programa----------: TransVldT
-Autor-------------: Darcio Ribeiro Spˆrl
+Autor-------------: Darcio Ribeiro Sp√∂rl
 Data da Criacao---: 08/09/2015
-DescriÁ„o---------: FunÁ„o escrita para validar dos cÛdigos de Aprovador Origem e Aprovador Destino
-Parametros--------: cGAprO - CÛdigo do Aprovador Origem
-                  : cGAprD - CÛdigo do Aprovador Destino
-Retorno-----------: lRet - .T. caso os cÛdigos forem diferente, .F. caso contr·rio, e o sistema n„o deixa salvar a solicitaÁ„o
+Descri√ß√£o---------: Fun√ß√£o escrita para validar dos c√≥digos de Aprovador Origem e Aprovador Destino
+Parametros--------: cGAprO - C√≥digo do Aprovador Origem
+                  : cGAprD - C√≥digo do Aprovador Destino
+Retorno-----------: lRet - .T. caso os c√≥digos forem diferente, .F. caso contr√°rio, e o sistema n√£o deixa salvar a solicita√ß√£o
 ===============================================================================================================================
 */
 Static Function TransVldT(cGAprO, cGAprD)
@@ -1272,17 +1266,17 @@ ZZ7->(dbSetOrder(1))
 If !ZZ7->(dbSeek(xFilial("ZZ7") + cGAprO))
 	lRet := .F.
 		
-	U_ITMSG("CÛdigo de Origem informado n„o È valÌdo.",;
-           "TransferÍncia de Aprovador",;
-           "Favor verificar o cÛdigo informado.",2, , , .T.)
+	U_ITMSG("C√≥digo de Origem informado n√£o √© val√≠do.",;
+           "Transfer√™ncia de Aprovador",;
+           "Favor verificar o c√≥digo informado.",2, , , .T.)
 EndIf
 
 If !ZZ7->(dbSeek(xFilial("ZZ7") + cGAprD))
 	lRet := .F.
 
-	U_ITMSG("CÛdigo de Destino informado n„o È v·lido.",;
-           "TransferÍncia de Aprovador",;
-           "Favor verificar o cÛdigo informado.",2, , , .T.)
+	U_ITMSG("C√≥digo de Destino informado n√£o √© v√°lido.",;
+           "Transfer√™ncia de Aprovador",;
+           "Favor verificar o c√≥digo informado.",2, , , .T.)
 EndIf
 
 RestArea(aArea)
@@ -1293,20 +1287,30 @@ Return(lRet)
 Programa----------: ACOM001G
 Autor-------------: Julio de Paula Paz
 Data da Criacao---: 25/07/2017
-DescriÁ„o---------: Retorna o nome do usu·rio Protheus com base no cÛdigo de usu·rio informado.
+Descri√ß√£o---------: Retorna o nome do usu√°rio Protheus com base no c√≥digo de usu√°rio informado.
 Parametros--------: Nenhum
-Retorno-----------: _cRet = Nome do usu·rio Protheus.
+Retorno-----------: _cRet = Nome do usu√°rio Protheus.
 ===============================================================================================================================
 */
+
+
+/*=========================*/
+
+
 User Function ACOM001G()
 Local _cRet   := Space(20)
 Local _aRetUser
 Local _oModel := FWModelActive()
 Local _cCodUsrP
 
+/*=========================*/
+/*=========================*/
+
+/*=========================*/
+
 Begin Sequence
    _cCodUsrP := _oModel:GetValue( 'ZZ7MASTER' , 'ZZ7_CODUSR' )
-   
+   /*=========================*/
    If !Empty(_cCodUsrP)
       PswOrder(1)
       If PswSeek(_cCodUsrP,.T.) 
@@ -1315,6 +1319,13 @@ Begin Sequence
       EndIf
    EndIf
 
-End Sequence
+/*=========================*/
 
+End Sequence
+/*=========================*/
 Return _cRet
+/*=========================*/
+
+/*=========================*/
+
+

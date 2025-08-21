@@ -1226,12 +1226,13 @@ Parametros--------: cGAprO - Código do Aprovador Origem
 Retorno-----------: lRet - .T. caso os códigos forem diferente, .F. caso contrário, e o sistema não deixa salvar a solicitação
 ===============================================================================================================================
 */
+/*=========*/
 Static Function TransfVld(cGAprO, cGAprD)
 Local aArea		:= GetArea()
 Local lRet		:= .T.
 Default cGAprO := ""
 Default cGAprD := ""
-
+/*=========*/
 If !Empty(cGAprO) .And. !Empty(cGAprD)
 	If cGAprO == cGAprD
 		lRet := .F.
@@ -1245,7 +1246,7 @@ EndIf
 
 RestArea(aArea)
 Return(lRet)
-
+/*=========*/
 /*
 ===============================================================================================================================
 Programa----------: TransVldT
@@ -1281,7 +1282,7 @@ EndIf
 
 RestArea(aArea)
 Return(lRet)
-
+/*=========*//*=========*/
 /*
 ===============================================================================================================================
 Programa----------: ACOM001G
